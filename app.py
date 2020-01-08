@@ -44,3 +44,7 @@ def site_map():
             links.append((url, rule.endpoint))
     return json.dumps({"links": links})
 
+
+if __name__ == '__main__':
+    # run our standalone gevent server
+    app.run(port=4200)
