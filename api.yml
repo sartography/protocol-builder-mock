@@ -88,7 +88,6 @@ paths:
                 type: string
                 format: binary
   /protocol/{id}/{requirement_code}/form:
-    description: We are uncertain if we will need this endpoint.
     parameters:
       - name: id
         description: The unique id of the protocol.
@@ -106,7 +105,7 @@ paths:
       tags:
         - CR-Connect
       operationId: app.get_form
-      summary: Returns a Word Document version of a form related to a requirement.
+      summary: Returns a Word Document version of a form related to a requirement. We are uncertain if we will need this endpoint, but it seems likely.
       responses:
         200:
           description: Details about the protocol
@@ -188,32 +187,33 @@ components:
           example: 15370
         irb_review_type:
           type: string
-          enum: [Emergency Use, Humanitarian Device, Non-Human, Non-UVA Agent, Exempt, Non-Engaged, Expedited, Full Board]
-          example: 'Full Board'
+          enum: [emergency_use, humanitarian_device, non_human, non_uva_agent, exempt, non_engaged, expedited, full_board]
+          example: 'full_board'
+          description: >
+           IRB Review Types
+            * `emergency_use` - Emergency Use
+            * `humanitarian_device` - Humanitarian Device
+            * `non_human` - Non-Human
+            * `non_uva_agent` - Non-UVA Agent
+            * `exempt` - Exempt
+            * `non_engaged` - Non-Engaged
+            * `expedited` - Expedited
+            * `full_board` - Full Board
         site_involvement:
           type: string
-          enum: [single-site, multi-site, collaborative-analysis]
+          enum: [single_site, multi_site, collaborative_analysis]
           description: >
             Currently gathered based on questions 12 and 28
-             * `single-site` - Single Site [12 = F AND 28 = F]
-             * `multi-site` - Multi-Site [12 = T AND 28 = F]
-             * `collaborative-analysis` - Collaborative Analysis [12 = T AND 28 = T]
-          example: 'multi-site'
+             * `single_site` - Single Site [12 = F AND 28 = F]
+             * `multi_site` - Multi-Site [12 = T AND 28 = F]
+             * `collaborative_analysis` - Collaborative Analysis [12 = T AND 28 = T]
+          example: 'multi_site'
         multisite_uva_lead:
           type: boolean
           description: >
             Currently we read this from question 14 in the Protocol Builder
             If the study is multi-site, this let's us know if UVA is the lead, or if the lead is at another site.
           example: true
-        site_location:
-          type: string
-          enum: [us, outside-us, global]
-          description:
-           Currently based on Question 99
-            * `us` - US [99 = F]
-            * `outside-us` - Outside US [99 = T]
-            * `global` - Global (US and Outside US) [?]
-          example: outside-us
         age_of_subjects:
           type: string
           enum: [child, adult, both]
@@ -243,33 +243,33 @@ components:
           example: 'dhf8r'
         personnel_type:
           type: string
-          enum: [pi, sub_inv, dept_chair, study_coord, dept_contact, irb_coord]
+          enum: [sub_inv, dept_chair, study_coord, dept_contact, irb_coord]
           description: >
             Personnel Type:
-             * `pi` - Principal Investigator
-             * `sub_inv` - Principal Investigator
+             * `sub_inv` - Sub Investigator
              * `dept_chair` - Department Chair
-             * `study_coord` - Study Coordinator
+             * `primary_study_coord` - Study Coordinator 1
+             * `study_coord` - Study Coordinator 2, 3, ....
              * `dept_contact` - Department Contact
              * `irb_coord` - IRB Coordinator
+             * `sci_contact` - Scientific Contact
           example: 'dept_chair'
 
     Requirement:
       properties:
         code:
           type: string
-          enum: [COI, ESCRO, SBS-FERPA, GMEC, DSP]
+          enum: [coi, escro, sbs_ferpa, gmec, grime, dsp]
           description: >
             This is just a few examples, there would be many more items here.  We just
             need to agree on the requirements codes.
             requirement_codes:
-             * `COI` - COI Management Plan
-             * `ESCRO` - ESCRO Approval
-             * `SBS-FERPA` - SBS/IRB Approval-FERPA
-             * `GMEC` - GMEC Approval
-             * `GRIME` - GRIME Approval
-             * `DSP` - Data Security Plan
-             * `SCI-CONTACT` - Scientific Contact
+             * `coi` - COI Management Plan
+             * `escrp` - ESCRO Approval
+             * `sbs_ferpa` - SBS/IRB Approval-FERPA
+             * `gmec` - GMEC Approval
+             * `grime` - GRIME Approval
+             * `dsp` - Data Security Plan
         name:
           type: string
           example: "Data Security Plan"
