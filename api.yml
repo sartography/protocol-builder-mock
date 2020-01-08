@@ -1,0 +1,281 @@
+openapi: "3.0.2"
+info:
+  description: Provides access to detailed information about a protocol under definition within the IRB's Protocol Builder Application at the University of Virginia.
+  version: 1.0.0
+  title: Protocol Builder API
+  # put the contact info for your development or API team
+  contact:
+    email: dan@sartography.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  # Added by API Auto Mocking Plugin
+servers:
+  - url: http://localhost:5000/pb
+# tags are used for organizing operations
+tags:
+- name: CR-Connect
+  description: Operations that will be available to CR Connect
+paths:
+  /protocol:
+    get:
+      tags:
+      - CR-Connect
+      summary: A list of all protocols related to a given UVA ID
+      operationId: app.get_protocols
+      description: "By passing in a valid UVA Id (ex: dhf8r) it will return a list of all protocols created by that individual.  "
+      parameters:
+      - in: query
+        name: uva_id
+        description: A valid user id for the University of Virginia.
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: after_date
+        description: Restrict the protocols to only those that were modified after the given date. Date format is yyyy-mm-dd (2019-12-25)
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: A list of protocol details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProtocolBrief"
+  /protocol/{id}:
+    parameters:
+    - name: id
+      description: The unique id of the protocol.
+      in: path
+      schema:
+        type: string
+        format: string
+    get:
+      tags:
+      - CR-Connect
+      operationId: app.get_protocol
+      summary: Details about a specific protocol.
+      responses:
+        200:
+          description: Details about the protocol
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Protocol'
+  /protocol/{id}/cover_sheet:
+    parameters:
+    - name: id
+      description: The unique id of the protocol.
+      in: path
+      schema:
+        type: string
+        format: string
+    get:
+      tags:
+      - CR-Connect
+      operationId: app.get_cover_sheet
+      summary: PDF version of the cover sheet.
+      responses:
+        200:
+          description: Details about the protocol
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+  /protocol/{id}/{requirement_code}/form:
+    description: We are uncertain if we will need this endpoint.
+    parameters:
+      - name: id
+        description: The unique id of the protocol.
+        in: path
+        schema:
+          type: string
+          format: string
+      - name: requirement_code
+        description: The code name for a requirement (see Requirement Code in Schemas below)
+        in: path
+        schema:
+          type: string
+          format: string
+    get:
+      tags:
+        - CR-Connect
+      operationId: app.get_form
+      summary: Returns a Word Document version of a form related to a requirement.
+      responses:
+        200:
+          description: Details about the protocol
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        400:
+          description: No form exists for the given requirement.
+components:
+  schemas:
+    ProtocolBrief:
+      type: object
+      properties:
+        id:
+          type: string
+          format: string
+          example: 15378
+          description: Can be any id that will remain unique within Protocol Builder
+        title:
+          type: string
+          example: The impact of fried pickles on beer consumption in bipedal software developers.
+        last_updated:
+          type: string
+          format: date_time
+          example: "2019-12-25T09:12:33.001Z"
+    Protocol:
+      required:
+      - id
+      - title
+      - last_updated
+      - protocol_status
+      - requirements
+      - pi
+      - sponsor
+      properties:
+        id:
+          type: string
+          format: string
+          example: AB1234
+          description: Can be any id that will remain unique within Protocol Builder
+        title:
+          type: string
+          example: The impact of fried pickles on beer consumption in bipedal software developers.
+        last_updated:
+          type: string
+          format: date_time
+          example: "2019-12-25T09:12:33.001Z"
+        protocol_status:
+          type: string
+          enum: [started, done]
+          example: done
+        pi:
+          type: string
+          example: 'dhf8r'
+        administrative_contact:
+          type: string
+          example: 'dhf8r'
+        sponsor:
+          type: string
+          example: 'National Heart, Lung & Blood Institute (NHLBI-NIH)'
+        ind_numbers:
+          type: array
+          items:
+            type: string
+          example: [12, 55, 1243]
+        ide_numbers:
+          type: array
+          items:
+            type: string
+          example: [1234]
+          description: We know this is not an array now, but we would like to future proof against this eventuality.
+        uva_tracking_number:
+          type: string
+          example: 12345
+        hsr_submission_number:
+          type: number
+          example: 15370
+        irb_review_type:
+          type: string
+          enum: [Emergency Use, Humanitarian Device, Non-Human, Non-UVA Agent, Exempt, Non-Engaged, Expedited, Full Board]
+          example: 'Full Board'
+        site_involvement:
+          type: string
+          enum: [single-site, multi-site, collaborative-analysis]
+          description: >
+            Currently gathered based on questions 12 and 28
+             * `single-site` - Single Site [12 = F AND 28 = F]
+             * `multi-site` - Multi-Site [12 = T AND 28 = F]
+             * `collaborative-analysis` - Collaborative Analysis [12 = T AND 28 = T]
+          example: 'multi-site'
+        multisite_uva_lead:
+          type: boolean
+          description: >
+            Currently we read this from question 14 in the Protocol Builder
+            If the study is multi-site, this let's us know if UVA is the lead, or if the lead is at another site.
+          example: true
+        site_location:
+          type: string
+          enum: [us, outside-us, global]
+          description:
+           Currently based on Question 99
+            * `us` - US [99 = F]
+            * `outside-us` - Outside US [99 = T]
+            * `global` - Global (US and Outside US) [?]
+          example: outside-us
+        age_of_subjects:
+          type: string
+          enum: [child, adult, both]
+          description: >
+           Age of Subject (from questions 171, 172)
+            * `child` - Child (Under 18 Years Old) [171 = F AND 172 = T]
+            * `adult` - Adult (18 Years and Older) [171 = T AND 172 = F]
+            * `both` - [171 = T AND 172 = T]
+        uva_subjects:
+          type: boolean
+          description: >
+           Is the study targeting UVA Medical Students, Residents, and/or Fellows?
+             * `yes` - (22 = T OR 23 = T)
+             * `no` - (22 = F AND 23 = F)
+        personnel:
+          type: array
+          items:
+            $ref: "#/components/schemas/Personnel"
+        requirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/Requirement"
+    Personnel:
+      properties:
+        computing_id:
+          type: string
+          example: 'dhf8r'
+        personnel_type:
+          type: string
+          enum: [pi, sub_inv, dept_chair, study_coord, dept_contact, irb_coord]
+          description: >
+            Personnel Type:
+             * `pi` - Principal Investigator
+             * `sub_inv` - Principal Investigator
+             * `dept_chair` - Department Chair
+             * `study_coord` - Study Coordinator
+             * `dept_contact` - Department Contact
+             * `irb_coord` - IRB Coordinator
+          example: 'dept_chair'
+
+    Requirement:
+      properties:
+        code:
+          type: string
+          enum: [COI, ESCRO, SBS-FERPA, GMEC, DSP]
+          description: >
+            This is just a few examples, there would be many more items here.  We just
+            need to agree on the requirements codes.
+            requirement_codes:
+             * `COI` - COI Management Plan
+             * `ESCRO` - ESCRO Approval
+             * `SBS-FERPA` - SBS/IRB Approval-FERPA
+             * `GMEC` - GMEC Approval
+             * `GRIME` - GRIME Approval
+             * `DSP` - Data Security Plan
+             * `SCI-CONTACT` - Scientific Contact
+        name:
+          type: string
+          example: "Data Security Plan"
+          description: "While this can be deduced from the code, it will be useful to have in the event we enounter
+          an unknown requirement."
+        has_form:
+          type: boolean
+          example: True
+          description: "Can Protocol Builder provide a Word Document form for this requirement."
