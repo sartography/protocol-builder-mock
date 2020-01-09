@@ -1,4 +1,18 @@
-Setting up Mock Services:
+
+## Requirements
+* Python 3
+* pip (for python 3)
+* pipenv (just run pip install pipenv)
+
+## Running these examples
+```bash
+pipenv run python run.py
+```
+This will start a webserver on localhost at port 5001.  To see the api, you can visit
+http://localhost:5001/pb/ui
+
+
+## For future reference, these are the steps Sartography is taking to set up Mock Services:
 
 1. mdkir project
 1. cd project
@@ -6,3 +20,4 @@ Setting up Mock Services:
 1. pipenv install flask
 1. pipenv install connexion
 1. place your swagger/openapi file in the root directory
+1. add methods to return example data in the app.py file.
