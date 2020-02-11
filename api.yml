@@ -1,7 +1,7 @@
 openapi: "3.0.2"
 info:
   description: Provides access to detailed information about a protocol under definition within the IRB's Protocol Builder Application at the University of Virginia.
-  version: 1.0.0
+  version: 2.0.0
   title: Protocol Builder API
   # put the contact info for your development or API team
   contact:
@@ -17,13 +17,13 @@ tags:
 - name: CR-Connect
   description: Operations that will be available to CR Connect
 paths:
-  /protocol:
+  /user_studies:
     get:
       tags:
       - CR-Connect
-      summary: A list of all protocols related to a given UVA ID
-      operationId: app.get_protocols
-      description: "By passing in a valid UVA Id (ex: dhf8r) it will return a list of all protocols created by that individual.  "
+      summary: A list of all studies related to a given UVA ID
+      operationId: app.get_user_studies
+      description: "By passing in a valid UVA Id (ex: dhf8r) it will return a list of all studies that exist for that user in Protocol Builder"
       parameters:
       - in: query
         name: uva_id
@@ -33,27 +33,73 @@ paths:
           type: string
       - in: query
         name: after_date
-        description: Restrict the protocols to only those that were modified after the given date. Date format is yyyy-mm-dd (2019-12-25)
+        description: Restrict the studies to only those that were modified after the given date. Date format is yyyy-mm-dd (2019-12-25)
         schema:
           type: string
           format: date
       responses:
         '200':
-          description: A list of protocol details
+          description: A list of study details
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ProtocolBrief"
-  /protocol/{id}:
+                  $ref: "#/components/schemas/Study"
+  /required_docs:
+    get:
+      tags:
+        - CR-Connect
+      summary: Required documents
+      operationId: app.required_docs
+      description: A list of all documents Protocol Builder considers required, given input from the PI
+      parameters:
+      - in: query
+        name: studyid
+        description: A valid studyid, as provided in the call to list all studies.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A list of required documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RequiredDocument"
+  /investigators:
+    get:
+      tags:
+        - CR-Connect
+      summary: Personnel associated with this study.
+      operationId: app.investigators
+      description: A list of everyone that is associated with the study, including the PI, Study Coordinator, etc... This is currently returned on the "study" endpoint with other information.
+      parameters:
+      - in: query
+        name: studyid
+        description: A valid studyid, as provided in the call to list all studies.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A list of personnel
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Investigator"
+  /study:
     parameters:
-    - name: id
-      description: The unique id of the protocol.
-      in: path
-      schema:
-        type: string
-        format: string
+      - in: query
+        name: studyid
+        description: A valid studyid, as provided in the call to list all studies.
+        required: true
+        schema:
+          type: string
     get:
       tags:
       - CR-Connect
@@ -65,217 +111,426 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Protocol'
-  /protocol/{id}/cover_sheet:
-    parameters:
-    - name: id
-      description: The unique id of the protocol.
-      in: path
-      schema:
-        type: string
-        format: string
-    get:
-      tags:
-      - CR-Connect
-      operationId: app.get_cover_sheet
-      summary: PDF version of the cover sheet.
-      responses:
-        200:
-          description: Details about the protocol
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: binary
-  /protocol/{id}/{requirement_code}/form:
-    parameters:
-      - name: id
-        description: The unique id of the protocol.
-        in: path
-        schema:
-          type: string
-          format: string
-      - name: requirement_code
-        description: The code name for a requirement (see Requirement Code in Schemas below)
-        in: path
-        schema:
-          type: string
-          format: string
-    get:
-      tags:
-        - CR-Connect
-      operationId: app.get_form
-      summary: Returns a Word Document version of a form related to a requirement. We are uncertain if we will need this endpoint, but it seems likely.
-      responses:
-        200:
-          description: Details about the protocol
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
-        400:
-          description: No form exists for the given requirement.
+                $ref: "#/components/schemas/StudyDetail"
 components:
   schemas:
-    ProtocolBrief:
+    Study:
       type: object
       properties:
-        id:
-          type: string
-          format: string
-          example: 15378
-          description: Can be any id that will remain unique within Protocol Builder
-        title:
-          type: string
-          example: The impact of fried pickles on beer consumption in bipedal software developers.
-        last_updated:
-          type: string
-          format: date_time
-          example: "2019-12-25T09:12:33.001Z"
-    Protocol:
-      required:
-      - id
-      - title
-      - last_updated
-      - protocol_status
-      - requirements
-      - pi
-      - sponsor
-      properties:
-        id:
-          type: string
-          format: string
-          example: AB1234
-          description: Can be any id that will remain unique within Protocol Builder
-        title:
-          type: string
-          example: The impact of fried pickles on beer consumption in bipedal software developers.
-        last_updated:
-          type: string
-          format: date_time
-          example: "2019-12-25T09:12:33.001Z"
-        protocol_status:
-          type: string
-          enum: [started, done]
-          example: done
-        pi:
-          type: string
-          example: 'dhf8r'
-        administrative_contact:
-          type: string
-          example: 'dhf8r'
-        sponsor:
-          type: string
-          example: 'National Heart, Lung & Blood Institute (NHLBI-NIH)'
-        ind_numbers:
-          type: array
-          items:
-            type: string
-          example: [12, 55, 1243]
-        ide_numbers:
-          type: array
-          items:
-            type: string
-          example: [1234]
-          description: We know this is not an array now, but we would like to future proof against this eventuality.
-        uva_tracking_number:
-          type: string
-          example: 12345
-        hsr_submission_number:
+        STUDYID:
           type: number
-          example: 15370
-        irb_review_type:
+          example: 11770
+          description: The unique id of the study in Protocol Builder.  Sometimes referenced as the "HSR Submission number" if you are looking at Protocol Builder
+        PID:
+          type: number
+          example:
+          description: (Protocol_id) is similar to studyid but its for IRB online
+        HSRNUMBER:
+          type: number
+          example: 15378
+          description: This is the number users use to lookup and reference when talking about non SOM protocols in IRB Online and displayed in more documentation.   Its only used in IRB Online.  Its not an auto increment.
+        TITLE:
           type: string
-          enum: [emergency_use, humanitarian_device, non_human, non_uva_agent, exempt, non_engaged, expedited, full_board]
-          example: 'full_board'
-          description: >
-           IRB Review Types
-            * `emergency_use` - Emergency Use
-            * `humanitarian_device` - Humanitarian Device
-            * `non_human` - Non-Human
-            * `non_uva_agent` - Non-UVA Agent
-            * `exempt` - Exempt
-            * `non_engaged` - Non-Engaged
-            * `expedited` - Expedited
-            * `full_board` - Full Board
-        site_involvement:
+          format: string
+          example: The impact of fried pickles on beer consumption in bipedal software developers.
+          description: The title of the study, as set in the Protocol Builder.
+        NETBADGEID:
           type: string
-          enum: [single_site, multi_site, collaborative_analysis]
-          description: >
-            Currently gathered based on questions 12 and 28
-             * `single_site` - Single Site [12 = F AND 28 = F]
-             * `multi_site` - Multi-Site [12 = T AND 28 = F]
-             * `collaborative_analysis` - Collaborative Analysis [12 = T AND 28 = T]
-          example: 'multi_site'
-        multisite_uva_lead:
-          type: boolean
-          description: >
-            Currently we read this from question 14 in the Protocol Builder
-            If the study is multi-site, this let's us know if UVA is the lead, or if the lead is at another site.
-          example: true
-        age_of_subjects:
+          format: string
+          example: jfg6n
+          description: The UVA Id of of the principle investigator for the study.
+        Q_COMPLETE:
+          type: number
+          enum: [0,1]
+          example: 0
+          description: If 1, then this study is complete in the Protocol Builder, and is ready for processing by CR Connect.
+        DATE_MODIFIED:
           type: string
-          enum: [child, adult, both]
-          description: >
-           Age of Subject (from questions 171, 172)
-            * `child` - Child (Under 18 Years Old) [171 = F AND 172 = T]
-            * `adult` - Adult (18 Years and Older) [171 = T AND 172 = F]
-            * `both` - [171 = T AND 172 = T]
-        uva_subjects:
-          type: boolean
-          description: >
-           Is the study targeting UVA Medical Students, Residents, and/or Fellows?
-             * `yes` - (22 = T OR 23 = T)
-             * `no` - (22 = F AND 23 = F)
-        personnel:
-          type: array
-          items:
-            $ref: "#/components/schemas/Personnel"
-        requirements:
-          type: array
-          items:
-            $ref: "#/components/schemas/Requirement"
-    Personnel:
+          format: date_time
+          example: "2019-12-25T09:12:33.001Z"
+          description: The last time this study was modified or updated.
+    RequiredDocument:
+      type: object
       properties:
-        computing_id:
+        AUXDOCID:
+          type: number
+          example: 32
+          description: The unique and permiment id of the required document.
+        AUXDOC:
           type: string
-          example: 'dhf8r'
-        personnel_type:
+          format: string
+          example: IDS - Investigational Drug Service Approval
+          description: A descriptive name of the required dcoument.
+    Investigator:
+      properties:
+        STUDYID:
+          type: number
+          example: 11770
+          description: The unique id of the study in Protocol Builder.
+        NETBADGEID:
           type: string
-          enum: [sub_inv, dept_chair, study_coord, dept_contact, irb_coord]
+          example: jfg6n
+          description: The UVA NetBadge Id of the user.
+        INVESTIGATORTYPE:
+          type: string
+          example: PI
+          enum: [PI, SI, DC, SC_I, SC_ii, AS_C, DEPT_CH, IRBC, SCI]
           description: >
             Personnel Type:
-             * `sub_inv` - Sub Investigator
-             * `dept_chair` - Department Chair
-             * `primary_study_coord` - Study Coordinator 1
-             * `study_coord` - Study Coordinator 2, 3, ....
-             * `dept_contact` - Department Contact
-             * `irb_coord` - IRB Coordinator
-             * `sci_contact` - Scientific Contact
-          example: 'dept_chair'
-
-    Requirement:
+             * `PI` - Primary Investigator
+             * `SI` - Sub Investigator
+             * `DC` - Department Contact
+             * `SC_I` - Study Coordinator 1
+             * `SC_II` - Study Coordinator 2
+             * `AS_C` - Additional Study Coordinators
+             * `DEPT_CH` - Department Chair
+             * `IRBC` - IRB Coordinator
+             * `SCI` - Scientific Contact  (NOT SURE IF THIS IS CORRECT!)
+        INVESTIGATORTYPEFULL:
+          type: string
+          example: Principal Investigator
+          description: A human readable descriptive string of the INVESTIGATORTYPE.
+    StudyDetail:
+      type: object
       properties:
-        code:
+        STUDYID:
+          type: number
+          example: 11536
+          description: The study id from the Protocol Builder
+        IS_IND:
+          type: number
+          enum: [0,1,null]
+          example: 0
+          description: Does the study involve a new drug?
+        IND_NUMBERS:
+          type: array
+          items:
+            type: number
+          description: Investigational New Drug Number. (To future proof the API to some extend, we'd like to get this as an array if at all possible.)
+        IS_UVA_IND:
+          type: number
+          enum: [0,1,null]
+          example: 1
+          description: Unknown
+        IS_IDE:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Does the study involve a new device?
+        IS_UVA_IDE:
+          type: number
+          enum: [0,1,null]
+          example: 1
+          description: Unknown
+        IDE_NUMBERS:
+          type: array
+          items:
+            type: number
+          description: Investigational Device Number. (To future proof the API to some extend, we'd like to get this as an array if at all possible.)
+        IS_CHART_REVIEW:
+          type: number
+          enum: [0,1,null]
+          example: 1
+          description: Unknown
+        IS_RADIATION:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unknown
+        GCRC_NUMBER:
           type: string
-          enum: [coi, escro, sbs_ferpa, gmec, grime, dsp]
-          description: >
-            This is just a few examples, there would be many more items here.  We just
-            need to agree on the requirements codes.
-            requirement_codes:
-             * `coi` - COI Management Plan
-             * `escrp` - ESCRO Approval
-             * `sbs_ferpa` - SBS/IRB Approval-FERPA
-             * `gmec` - GMEC Approval
-             * `grime` - GRIME Approval
-             * `dsp` - Data Security Plan
-        name:
+          description: Unknown
+        IS_GCRC:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_PRC_DSMP:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_PRC:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        PRC_NUMBER:
           type: string
-          example: "Data Security Plan"
-          description: "While this can be deduced from the code, it will be useful to have in the event we enounter
-          an unknown requirement."
-        has_form:
-          type: boolean
-          example: True
-          description: "Can Protocol Builder provide a Word Document form for this requirement."
+          description: Unkown
+        IS_IBC:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IBC_NUMBER:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_SPONSOR_TRACKING:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        SPONSOR_TRACKING:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        SPONSORS_PROTOCOL_REVISION_DATE:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_SPONSOR_MONITORING:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_DSMB:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_COMPLETE_NON_IRB_REGULATORY:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_AUX:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_SPONSOR:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_GRANT:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_COMMITTEE_CONFLICT:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        DSMB:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        DSMB_FREQUENCY:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_DB:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_UVA_DB:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_CENTRAL_REG_DB:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_CONSENT_WAIVER:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_HGT:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_GENE_TRANSFER:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_TISSUE_BANKING:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_SURROGATE_CONSENT:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_ADULT_PARTICIPANT:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_MINOR_PARTICIPANT:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_MINOR:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_BIOMEDICAL:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_QUALITATIVE:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_PI_SCHOOL:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_PRISONERS_POP:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_PREGNANT_POP:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_FETUS_POP:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_MENTAL_IMPAIRMENT_POP:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_ELDERLY_POP:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_OTHER_VULNERABLE_POP:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        OTHER_VULNERABLE_DESC:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_MULTI_SITE:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_UVA_LOCATION:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        NON_UVA_LOCATION:
+          type: string
+          description: Unkown
+        MULTI_SITE_LOCATIONS:
+          type: string
+          description: Unkown
+        IS_OUTSIDE_CONTRACT:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_UVA_PI_MULTI:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_NOT_PRC_WAIVER:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_INSIDE_CONTRACT:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_CANCER_PATIENT:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        UPLOAD_COMPLETE:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_FUNDING_SOURCE:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_CODED_RESEARCH:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_OUTSIDE_SPONSOR:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_PI_INITIATED:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_ENGAGED_RESEARCH:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_APPROVED_DEVICE:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_FINANCIAL_CONFLICT:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_NOT_CONSENT_WAIVER:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_FOR_CANCER_CENTER:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IS_REVIEW_BY_CENTRAL_IRB:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown
+        IRBREVIEWERADMIN:
+          type: number
+          enum: [0,1,null]
+          example: true
+          description: Unkown

@@ -4,22 +4,26 @@ from flask import url_for, json
 PROTOCOLS = {}
 
 
-def get_protocols(user_id):
+def get_user_studies(user_id):
     return {"protocols": [p for p in PROTOCOLS.values() if p['user_id'] == user_id][:limit]}
 
 
-def get_protocol(id):
+def required_docs(id):
     return {
         id: 21,
         requirements: []
     }
 
 
-def get_cover_sheet(id):
+def investigators(id):
     return
 
-def get_form(id):
+def get_protocol(id):
     return
+
+def get_form(id, requirement_code):
+    return
+
 
 app = connexion.App('Protocol Builder', specification_dir='./')
 app.add_api('api.yml')
