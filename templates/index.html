@@ -1,0 +1,24 @@
+
+<doctype html>
+<head>
+    <title>Protocol Builder Mock</title>
+</head>
+
+<h2>Protocol Builder Mock</h2>
+
+<p><p>
+<a href="{{ url_for('.new_study') }}"> New Study </a>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+{{ table }}
+
+</doctype>

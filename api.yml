@@ -121,10 +121,6 @@ components:
           type: number
           example: 11770
           description: The unique id of the study in Protocol Builder.  Sometimes referenced as the "HSR Submission number" if you are looking at Protocol Builder
-        PID:
-          type: number
-          example:
-          description: (Protocol_id) is similar to studyid but its for IRB online
         HSRNUMBER:
           type: number
           example: 15378
@@ -211,7 +207,7 @@ components:
           type: number
           enum: [0,1,null]
           example: 1
-          description: Unknown
+          description: Was the investigational new drug developed at UVa?
         IS_IDE:
           type: number
           enum: [0,1,null]
@@ -221,7 +217,7 @@ components:
           type: number
           enum: [0,1,null]
           example: 1
-          description: Unknown
+          description: Was the investigational device developed at UVa?
         IDE_NUMBERS:
           type: array
           items:
@@ -231,306 +227,268 @@ components:
           type: number
           enum: [0,1,null]
           example: 1
-          description: Unknown
+          description: Does this include chart reviews which do not requre the consent of the Study group?
         IS_RADIATION:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unknown
+          description: Does the Study include radiation treatment?
         GCRC_NUMBER:
           type: string
-          description: Unknown
+          description: The General Clinical Research Center number, if funded by GCRC
         IS_GCRC:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will any part of this study take place in or be funded by the General Clinical Research Center?
         IS_PRC_DSMP:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Does this protocol involve the testing of a new device or improvement of a method of detection or diagnosis for cancer?
         IS_PRC:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Does the Study require Cancer Center Protocol Review Committee oversight?
         PRC_NUMBER:
           type: string
-          description: Unkown
+          description: Cancer Center Protocol Review Committee number
         IS_IBC:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will this Study need the approval of the Institutional Biosafety Committee?
         IBC_NUMBER:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
-        IS_SPONSOR_TRACKING:
-          type: number
-          enum: [0,1,null]
-          example: true
-          description: Unkown
-        SPONSOR_TRACKING:
-          type: number
-          enum: [0,1,null]
-          example: true
-          description: Unkown
+          description: Site identifier that the location has been approved to handle biological agents by the Institutional Biosafety Committee.
         SPONSORS_PROTOCOL_REVISION_DATE:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the study be part of a UVA faculty member's-sponsored Investigational Device application?
         IS_SPONSOR_MONITORING:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
-        IS_DSMB:
-          type: number
-          enum: [0,1,null]
-          example: true
-          description: Unkown
-        IS_COMPLETE_NON_IRB_REGULATORY:
-          type: number
-          enum: [0,1,null]
-          example: true
-          description: Unkown
+          description: Will the Sponsor monitor the Study?
         IS_AUX:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Is Auxilliary Info needed?
         IS_SPONSOR:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Is there an outside sponsor involved?
         IS_GRANT:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Is grant money funding all or part of the Study?
         IS_COMMITTEE_CONFLICT:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Does someone on the IRB Review Committee have a conflict of interest?
         DSMB:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will this study be monitored by a Data and Safety Monitoring Board?
         DSMB_FREQUENCY:
-          type: number
-          enum: [0,1,null]
-          example: true
-          description: Unkown
+          type: String
+          example: A lot
+          description: UNDOCUMENTED.
         IS_DB:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Is the ONLY intent of this protocol to establish a research database (repository)?
         IS_UVA_DB:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will any of the data be kept at UVA outside of the official medical record or will specimens be kept at UVA outside of clinical labs?
         IS_CENTRAL_REG_DB:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will any data from UVA subjects be sent to a central registry or database outside of UVA?
         IS_CONSENT_WAIVER:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will there be a consent waiver?
         IS_HGT:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Are you storing specimens, sequences analysis of DNA/RNA for an unspecified future use.
         IS_GENE_TRANSFER:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study involve gene transfer?
         IS_TISSUE_BANKING:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study involve tissue banking?
         IS_SURROGATE_CONSENT:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study require the consent of a surrogate?
         IS_ADULT_PARTICIPANT:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study group include adults?
         IS_MINOR_PARTICIPANT:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Are any of the subjects between the ages of 15 and < 18?
         IS_MINOR:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Does the study enroll subjects under the age of 18?
         IS_BIOMEDICAL:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will this study involve biomedical research?
         IS_QUALITATIVE:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will this study involve only qualitative research?
         IS_PI_SCHOOL:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will this study be submitted through the PI's current primary school and department appointment?
         IS_PRISONERS_POP:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study group include prisoners?
         IS_PREGNANT_POP:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study group include pregnant women?
         IS_FETUS_POP:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study be done on fetuses?
         IS_MENTAL_IMPAIRMENT_POP:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study group include anyone who is mentally impaired?
         IS_ELDERLY_POP:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study group include the elderly?
         IS_OTHER_VULNERABLE_POP:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study group include other vulnerable populations?
         OTHER_VULNERABLE_DESC:
-          type: number
-          enum: [0,1,null]
-          example: true
-          description: Unkown
+          type: string
+          example: homeless people
+          description: Other vulnerable population description
         IS_MULTI_SITE:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study be conducted at multiple sites?
         IS_UVA_LOCATION:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study be done at UVa?
         NON_UVA_LOCATION:
           type: string
-          description: Unkown
+          description: Will the Study be done at non-UVa sites?
         MULTI_SITE_LOCATIONS:
           type: string
-          description: Unkown
+          description: List if other sites involved.
         IS_OUTSIDE_CONTRACT:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study be funded by an outside contract?
         IS_UVA_PI_MULTI:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the PI be from UVa for multi-site study?
         IS_NOT_PRC_WAIVER:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
-        IS_INSIDE_CONTRACT:
-          type: number
-          enum: [0,1,null]
-          example: true
-          description: Unkown
+          description: Have you received notification from the Cancer Center Protocol Review Committee (PRC) that this protocol does not need approval from the PRC?
         IS_CANCER_PATIENT:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study involve cancer patients?
         UPLOAD_COMPLETE:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: bit indicating that the study was moved to IRB online
         IS_FUNDING_SOURCE:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
-        IS_CODED_RESEARCH:
-          type: number
-          enum: [0,1,null]
-          example: true
-          description: Unkown
-        IS_OUTSIDE_SPONSOR:
-          type: number
-          enum: [0,1,null]
-          example: true
-          description: Unkown
+          description: Is there an outside supply source other than the sponsor/funding source supporting this study?
         IS_PI_INITIATED:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Was the Study initiated by the Principal Investigator?
         IS_ENGAGED_RESEARCH:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study group be contacted by UVa employees or agents or obtain personnally identifiable information about them?
         IS_APPROVED_DEVICE:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Has the device in the Study been approved by the FDA?
         IS_FINANCIAL_CONFLICT:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Has the Conflict of Interest Committee provided a COI Management Plan?
         IS_NOT_CONSENT_WAIVER:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Do you plan on getting VERBAL CONSENT for ONLY a PART of this study (waiver of documentation of consent) and getting WRITTEN CONSENT for another part of the study?
         IS_FOR_CANCER_CENTER:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study involve the UVa Cancer Center?
         IS_REVIEW_BY_CENTRAL_IRB:
           type: number
           enum: [0,1,null]
           example: true
-          description: Unkown
+          description: Will the Study require review by the Central IRB?
         IRBREVIEWERADMIN:
-          type: number
-          enum: [0,1,null]
-          example: true
-          description: Unkown
+          type: string
+          example: "dhf8r"
+          description: Netbadge id of IRB staff assinged to do the review
