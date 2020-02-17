@@ -11,7 +11,7 @@ class Study(db.Model):
     DATE_MODIFIED = db.Column(db.DateTime(timezone=True), default=func.now())
     requirements = db.relationship("RequiredDocument", backref="study", lazy='dynamic')
     investigators = db.relationship("Investigator", backref="study", lazy='dynamic')
-    study_details = db.relationship("StudyDetails", backref="study", lazy='dynamic')
+    study_details = db.relationship("StudyDetails", uselist=False, backref="study")
 
 class StudySchema(ma.Schema):
     class Meta:
@@ -173,3 +173,5 @@ class StudyDetails(db.Model):
 class StudyDetailsSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = StudyDetails
+        load_instance = True
+        include_relationships = False
