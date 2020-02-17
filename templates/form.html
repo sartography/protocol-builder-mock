@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>New Study 0 Protocol Builder Mock Configuration</title>
+    <title>Protocol Builder Mock Configuration</title>
 </head>
 <style>
-    select {
+    select.multi {
         height: 600px;
     }
     input {
@@ -14,7 +14,7 @@
 </style>
 <body>
 
-<h2>New Study</h2>
+<h2>{{title}}</h2>
 <form action="{{action}}" method="post">
 
     {{ form.csrf_token() }}

@@ -59,8 +59,8 @@ def site_map():
 
 app.config['SECRET_KEY'] = 'a really really really really long secret key'
 
-from forms import  StudyForm, StudySearchForm, StudyTable
-from models import Study, RequiredDocument
+from forms import StudyForm, StudySearchForm, StudyTable, InvestigatorForm
+from models import Study, RequiredDocument, Investigator
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -75,13 +75,14 @@ def index():
 def new_study():
     form = StudyForm(request.form)
     action = "/new_study"
+    title = "New Study"
     if request.method == 'POST':
         study = Study()
         _update_study(study, form)
         flash('Study created successfully!')
         return redirect('/')
 
-    return render_template('study_form.html', form=form)
+    return render_template('form.html', form=form)
 
 @app.route('/study/<study_id>}', methods=['GET', 'POST'])
 def edit_study(study_id):
@@ -89,13 +90,48 @@ def edit_study(study_id):
     form = StudyForm(request.form, obj=study)
     if request.method == 'GET':
         action = "/study/" + study_id
+        title = "Edit Study #" + study_id
         if study.requirements:
             form.requirements.data = list(map(lambda r: r.code, list(study.requirements)))
+        if study.q_complete:
+            form.q_complete.checked = True
     if request.method == 'POST':
         _update_study(study, form)
         flash('Study updated successfully!')
         return redirect('/')
-    return render_template('study_form.html', form=form)
+    return render_template('form.html', form=form)
+
+
+@app.route('/investigator/<study_id>}', methods=['GET', 'POST'])
+def new_investigator(study_id):
+    form = InvestigatorForm(request.form)
+    action = "/investigator/" + study_id
+    title = "Add Investigator to Study " + study_id
+    if request.method == 'POST':
+        investigator = Investigator(study_id=study_id)
+        investigator.netbadge_id = form.netbadge_id.data
+        investigator.type = form.type.data
+        investigator.description = form.type.label.text
+        db.session.add(investigator)
+        db.session.commit()
+        flash('Investigator created successfully!')
+        return redirect('/')
+
+    return render_template('form.html', form=form)
+
+
+@app.route('/del_investigator/<inv_id>}', methods=['GET'])
+def del_investigator(inv_id):
+    db.session.query(Investigator).filter(Investigator.id == inv_id).delete()
+    db.session.commit()
+    return redirect('/')
+
+
+@app.route('/del_study/<study_id>}', methods=['GET'])
+def del_study(study_id):
+    db.session.query(Study).filter(Study.study_id == study_id).delete()
+    db.session.commit()
+    return redirect('/')
 
 
 def _update_study(study, form):
@@ -109,8 +145,10 @@ def _update_study(study, form):
     study.netbadge_id = form.netbadge_id.data
     study.last_updated = datetime.datetime.now()
     study.q_complete = form.q_complete.data
+    study.hsr_number = form.hsr_number.data
     db.session.add(study)
     db.session.commit()
+
 
 
 

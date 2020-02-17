@@ -10,7 +10,7 @@ class Study(db.Model):
     investigators = db.relationship("Investigator", backref="study", lazy='dynamic')
     last_updated = db.Column(db.DateTime(timezone=True), default=func.now())
     hsr_number = db.Column(db.String())
-    q_complete = db.Column(db.Integer, nullable=True)
+    q_complete = db.Column(db.Boolean, nullable=True)
 
 
 class Investigator(db.Model):
@@ -21,7 +21,7 @@ class Investigator(db.Model):
     description = db.Column(db.String(), nullable=False)
 
     @staticmethod
-    def all_types(self):
+    def all_types():
         types = [
             Investigator(type="PI", description="Primary Investigator"),
             Investigator(type="SI", description="Sub Investigator"),
