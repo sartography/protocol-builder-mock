@@ -2,32 +2,40 @@ import datetime
 from datetime import date
 
 import connexion
+import yaml
 from flask import url_for, json, redirect, render_template, request, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 
-from flask_sqlalchemy import SQLAlchemy
+from wtforms.ext.appengine.db import model_form
 
 PROTOCOLS = {}
 
-def get_user_studies(user_id):
-    return {"protocols": [p for p in PROTOCOLS.values() if p['user_id'] == user_id][:limit]}
+
+def get_user_studies(uva_id):
+    studies = db.session.query(Study).filter(Study.NETBADGEID == uva_id).all()
+    return StudySchema(many=True).dump(studies)
 
 
-def required_docs(id):
-    return {
-        'id': 21,
-        'requirements': []
-    }
+def required_docs(studyid):
+    docs = db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == studyid).all()
+    return RequiredDocumentSchema(many=True).dump(docs)
 
 
-def investigators(id):
-    return
+def investigators(studyid):
+    inv = db.session.query(Investigator).filter(Investigator.STUDYID == studyid).all()
+    return InvestigatorSchema(many=True).dump(inv)
 
-def get_protocol(id):
-    return
+
+def get_study_details(studyid):
+    details = db.session.query(StudyDetails).filter(StudyDetails.STUDYID == studyid).first()
+    return StudyDetailsSchema().dump(details)
+
 
 def get_form(id, requirement_code):
     return
+
 
 
 conn = connexion.App('Protocol Builder', specification_dir='./')
@@ -38,12 +46,25 @@ app = conn.app
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+ma = Marshmallow(app)
 
+description_map = {}
+with open(r'api.yml') as file:
+    api_config = yaml.load(file, Loader=yaml.FullLoader)
+    study_detail_properties = api_config['components']['schemas']['StudyDetail']['properties']
+    for schema in api_config['components']['schemas']:
+        for field, values in api_config['components']['schemas'][schema]['properties'].items():
+            description_map[field] = values['description']
+    print(description_map)
+
+
+# **************************
+# API ENDPOINTS
+# **************************
 def has_no_empty_params(rule):
     defaults = rule.defaults if rule.defaults is not None else ()
     arguments = rule.arguments if rule.arguments is not None else ()
     return len(defaults) >= len(arguments)
-
 
 @app.route("/site_map")
 def site_map():
@@ -57,16 +78,24 @@ def site_map():
     return json.dumps({"links": links})
 
 
+
+
+
+# **************************
+# WEB FORMS
+# **************************
+
 app.config['SECRET_KEY'] = 'a really really really really long secret key'
 
-from forms import StudyForm, StudySearchForm, StudyTable, InvestigatorForm
-from models import Study, RequiredDocument, Investigator
+from forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm
+from models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
+    StudyDetails, StudyDetailsSchema
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # display results
-    studies = db.session.query(Study).order_by(Study.last_updated.desc()).all()
+    studies = db.session.query(Study).order_by(Study.DATE_MODIFIED.desc()).all()
     table = StudyTable(studies)
     return render_template('index.html', table=table)
 
@@ -78,28 +107,35 @@ def new_study():
     title = "New Study"
     if request.method == 'POST':
         study = Study()
+        study.study_details = StudyDetails()
         _update_study(study, form)
         flash('Study created successfully!')
         return redirect('/')
 
-    return render_template('form.html', form=form)
+    return render_template('form.html', form=form,
+                           action=action,
+                           title=title,
+                           description_map=description_map)
 
 @app.route('/study/<study_id>}', methods=['GET', 'POST'])
 def edit_study(study_id):
-    study = db.session.query(Study).filter(Study.study_id == study_id).first()
+    study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
     form = StudyForm(request.form, obj=study)
     if request.method == 'GET':
         action = "/study/" + study_id
         title = "Edit Study #" + study_id
         if study.requirements:
-            form.requirements.data = list(map(lambda r: r.code, list(study.requirements)))
-        if study.q_complete:
-            form.q_complete.checked = True
+            form.requirements.data = list(map(lambda r: r.AUXDOCID, list(study.requirements)))
+        if study.Q_COMPLETE:
+            form.Q_COMPLETE.checked = True
     if request.method == 'POST':
         _update_study(study, form)
         flash('Study updated successfully!')
         return redirect('/')
-    return render_template('form.html', form=form)
+    return render_template('form.html', form=form,
+                           action=action,
+                           title=title,
+                           description_map={})
 
 
 @app.route('/investigator/<study_id>}', methods=['GET', 'POST'])
@@ -108,16 +144,18 @@ def new_investigator(study_id):
     action = "/investigator/" + study_id
     title = "Add Investigator to Study " + study_id
     if request.method == 'POST':
-        investigator = Investigator(study_id=study_id)
-        investigator.netbadge_id = form.netbadge_id.data
-        investigator.type = form.type.data
-        investigator.description = form.type.label.text
+        investigator = Investigator(STUDYID=study_id)
+        investigator.NETBADGEID = form.NETBADGEID.data
+        investigator.set_type(form.INVESTIGATORTYPE.data)
         db.session.add(investigator)
         db.session.commit()
         flash('Investigator created successfully!')
         return redirect('/')
 
-    return render_template('form.html', form=form)
+    return render_template('form.html', form=form,
+                           action=action,
+                           title=title,
+                           description_map={})
 
 
 @app.route('/del_investigator/<inv_id>}', methods=['GET'])
@@ -129,27 +167,47 @@ def del_investigator(inv_id):
 
 @app.route('/del_study/<study_id>}', methods=['GET'])
 def del_study(study_id):
-    db.session.query(Study).filter(Study.study_id == study_id).delete()
+    db.session.query(Study).filter(Study.STUDYID == study_id).delete()
     db.session.commit()
     return redirect('/')
 
 
 def _update_study(study, form):
-    if study.study_id:
-        db.session.query(RequiredDocument).filter(RequiredDocument.study_id == study.study_id).delete()
+    if study.STUDYID:
+        db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == study.STUDYID).delete()
     for r in form.requirements:
         if r.checked:
-            requirement = RequiredDocument(code=r.data, name=r.label.text, study=study)
+            requirement = RequiredDocument(AUXDOCID=r.data, AUXDOC=r.label.text, study=study)
             db.session.add(requirement)
-    study.title = form.title.data
-    study.netbadge_id = form.netbadge_id.data
-    study.last_updated = datetime.datetime.now()
-    study.q_complete = form.q_complete.data
-    study.hsr_number = form.hsr_number.data
+    study.TITLE = form.TITLE.data
+    study.NETBADGEID = form.NETBADGEID.data
+    study.DATE_MODIFIED = datetime.datetime.now()
+    study.Q_COMPLETE = form.Q_COMPLETE.data
+    study.HSRNUMBER = form.HSRNUMBER.data
     db.session.add(study)
     db.session.commit()
 
-
+@app.route('/study_details/<study_id>}', methods=['GET', 'POST'])
+def study_details(study_id):
+    study_details = db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).first()
+    if not study_details:
+        study_details = StudyDetails(STUDYID=study_id)
+    form = StudyDetailsForm(request.form, obj=study_details)
+    if request.method == 'GET':
+        action = "/study_details/" + study_id
+        title = "Edit Study Details for Study #" + study_id
+        details = "Numeric fields can be 1 for true, 0 or false, or Null if not applicable."
+    if request.method == 'POST':
+        form.populate_obj(study_details)
+        db.session.add(study_details)
+        db.session.commit()
+        flash('Study updated successfully!')
+        return redirect('/')
+    return render_template('form.html', form=form,
+                           action=action,
+                           title=title,
+                           details=details,
+                           description_map=description_map)
 
 
 if __name__ == '__main__':

@@ -11,17 +11,24 @@
     input {
         width: 500px;
     }
+    span.label {
+        display: inline-block;
+        min-width: 200px;
+        text-align: left;
+    }
 </style>
 <body>
-
 <h2>{{title}}</h2>
+<p>{{details}}</p>
 <form action="{{action}}" method="post">
 
     {{ form.csrf_token() }}
 
     {% for field in form if field.name != "csrf_token" %}
-        <p>{{ field.label() }}</p>
-        <p>{{ field }}
+        <p>
+            <span class="label">{{ field.label() }}:</span>
+          {{ field }}
+            <i>{{ description_map[field.name] }}</i>
             {% for error in field.errors %}
                 {{ error }}
             {% endfor %}

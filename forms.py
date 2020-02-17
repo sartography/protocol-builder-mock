@@ -2,50 +2,51 @@ from flask_table import Table, Col, DateCol, LinkCol, BoolCol, DatetimeCol, Nest
 from flask_wtf import FlaskForm
 from wtforms import SelectMultipleField, SubmitField, StringField, IntegerField, BooleanField, DateField, widgets, \
     SelectField
+from wtforms_alchemy import ModelForm
 
-from models import RequiredDocument, Investigator
-
-
-class StudySearchForm(FlaskForm):
-    search = StringField('')
+from models import RequiredDocument, Investigator, StudyDetails
 
 
 class StudyForm(FlaskForm):
-    title = StringField('Title')
-    netbadge_id = StringField('UVA Id for Primary Investigator')
+    TITLE = StringField('Title')
+    NETBADGEID = StringField('UVA Id for Primary Investigator')
     requirements = SelectMultipleField("Requirements",
                                        render_kw={'class':'multi'},
-                                       choices=[(rd.code, rd.name) for rd in RequiredDocument.all()])
-    hsr_number = StringField('HSR Number')
-    q_complete = BooleanField('Complete in Protocol Builder?', default='checked',
+                                       choices=[(rd.AUXDOCID, rd.AUXDOC) for rd in RequiredDocument.all()])
+    HSRNUMBER = StringField('HSR Number')
+    Q_COMPLETE = BooleanField('Complete in Protocol Builder?', default='checked',
                               false_values=(False, 'false', 0, '0'))
-    # last_updated = DateField('Last Updated')
 
 class InvestigatorForm(FlaskForm):
-    netbadge_id = StringField('UVA Id')
-    type = SelectField("InvestigatorType", choices=[(i.type, i.description) for i in Investigator.all_types()])
+    NETBADGEID = StringField('UVA Id')
+    INVESTIGATORTYPE = SelectField("InvestigatorType", choices=[(i.INVESTIGATORTYPE, i.INVESTIGATORTYPEFULL) for i in Investigator.all_types()])
+
+class StudyDetailsForm(ModelForm, FlaskForm):
+    class Meta:
+        model = StudyDetails
 
 class RequirementsTable(Table):
-    code = Col('Code')
-    name = Col('Name')
+    AUXDOCID = Col('Code')
+    AUXDOC = Col('Name')
 
 class InvestigatorsTable(Table):
-    netbadge_id = Col('UVA Id')
-    type = Col('Type')
+    NETBADGEID = Col('UVA Id')
+    INVESTIGATORTYPE = Col('Type')
     delete = LinkCol('Delete', 'del_investigator', url_kwargs=dict(inv_id='id'))
 
 
 class StudyTable(Table):
     def sort_url(self, col_id, reverse=False):
         pass
-    edit = LinkCol('Edit', 'edit_study', url_kwargs=dict(study_id='study_id'))
-    delete = LinkCol('Delete', 'del_study', url_kwargs=dict(study_id='study_id'))
-    add_inv = LinkCol('Add Person', 'new_investigator', url_kwargs=dict(study_id='study_id'))
-    study_id = Col('Study Id')
-    title = Col('Title')
-    netbadge_id = Col('User')
-    last_updated = DatetimeCol('Last Update', "medium")
-    q_complete = BoolCol('Complete?')
+    edit = LinkCol('Edit', 'edit_study', url_kwargs=dict(study_id='STUDYID'))
+    delete = LinkCol('Delete', 'del_study', url_kwargs=dict(study_id='STUDYID'))
+    details = LinkCol('Details', 'study_details', url_kwargs=dict(study_id='STUDYID'))
+    add_inv = LinkCol('Add Person', 'new_investigator', url_kwargs=dict(study_id='STUDYID'))
+    STUDYID = Col('Study Id')
+    TITLE = Col('Title')
+    NETBADGEID = Col('User')
+    DATE_MODIFIED = DatetimeCol('Last Update', "medium")
+    Q_COMPLETE = BoolCol('Complete?')
     requirements = NestedTableCol('Requirements', RequirementsTable)
     investigators = NestedTableCol('Investigators', InvestigatorsTable)
 

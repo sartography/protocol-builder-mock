@@ -103,7 +103,7 @@ paths:
     get:
       tags:
       - CR-Connect
-      operationId: app.get_protocol
+      operationId: app.get_study_details
       summary: Details about a specific protocol.
       responses:
         200:
@@ -198,11 +198,15 @@ components:
           enum: [0,1,null]
           example: 0
           description: Does the study involve a new drug?
-        IND_NUMBERS:
-          type: array
-          items:
-            type: number
-          description: Investigational New Drug Number. (To future proof the API to some extend, we'd like to get this as an array if at all possible.)
+        IND_1:
+          type: string
+          description: Investigational New Drug Number, may be several
+        IND_2:
+          type: string
+          description: Investigational New Drug Number, may be several
+        IND_3:
+          type: string
+          description: Investigational New Drug Number, may be several
         IS_UVA_IND:
           type: number
           enum: [0,1,null]
@@ -218,11 +222,9 @@ components:
           enum: [0,1,null]
           example: 1
           description: Was the investigational device developed at UVa?
-        IDE_NUMBERS:
-          type: array
-          items:
-            type: number
-          description: Investigational Device Number. (To future proof the API to some extend, we'd like to get this as an array if at all possible.)
+        IDE:
+          type: string
+          description: Investigational Device Number.
         IS_CHART_REVIEW:
           type: number
           enum: [0,1,null]
