@@ -17,6 +17,7 @@ flask-migrate = "*"
 flask-marshmallow = "*"
 ma = "*"
 marshmallow-sqlalchemy = "*"
+wtforms-alchemy = "*"
 
 [requires]
 python_version = "3.7"

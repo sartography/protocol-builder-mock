@@ -21,3 +21,11 @@ http://localhost:5001/pb/ui
 1. pipenv install connexion
 1. place your swagger/openapi file in the root directory
 1. add methods to return example data in the app.py file.
+
+## Deploying to staging
+We don't have a travis / test environment set up for this yet, no tests
+but you can build and publish it with:
+```bash
+docker image build -t sartography/protocol-builder-mock:latest .
+docker push sartography/protocol-builder-mock:latest
+```
