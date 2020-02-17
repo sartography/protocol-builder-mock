@@ -8,11 +8,14 @@
     select {
         height: 600px;
     }
+    input {
+        width: 500px;
+    }
 </style>
 <body>
 
 <h2>New Study</h2>
-<form action="/new_study" method="post">
+<form action="{{action}}" method="post">
 
     {{ form.csrf_token() }}
 

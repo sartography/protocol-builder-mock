@@ -1,10 +1,13 @@
+import datetime
+from datetime import date
+
 import connexion
 from flask import url_for, json, redirect, render_template, request, flash
+from flask_migrate import Migrate
 
 from flask_sqlalchemy import SQLAlchemy
 
 PROTOCOLS = {}
-
 
 def get_user_studies(user_id):
     return {"protocols": [p for p in PROTOCOLS.values() if p['user_id'] == user_id][:limit]}
@@ -12,8 +15,8 @@ def get_user_studies(user_id):
 
 def required_docs(id):
     return {
-        id: 21,
-        requirements: []
+        'id': 21,
+        'requirements': []
     }
 
 
@@ -32,8 +35,9 @@ conn.add_api('api.yml')
 
 app = conn.app
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 def has_no_empty_params(rule):
     defaults = rule.defaults if rule.defaults is not None else ()
@@ -55,51 +59,59 @@ def site_map():
 
 app.config['SECRET_KEY'] = 'a really really really really long secret key'
 
-from forms import Study, StudyForm, StudySearchForm, StudyTable, RequiredDocument
+from forms import  StudyForm, StudySearchForm, StudyTable
+from models import Study, RequiredDocument
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    search = StudySearchForm(request.form)
-    if request.method == 'POST':
-        return search_results(search)
-    return render_template('index.html', form=search)
-
-
-@app.route('/results')
-def search_results(search):
-    results = []
-    search_string = search.data['search']
-    if search.data['search'] == '':
-        qry = db.session.query(Study)
-        results = qry.all()
-    if not results:
-        flash('No results found!')
-        return redirect('/')
-    else:
-        # display results
-        studies = db.session.query("Study").all()
-        table = StudyTable(studies)
-        return render_template('results.html', table=table)
+    # display results
+    studies = db.session.query(Study).order_by(Study.last_updated.desc()).all()
+    table = StudyTable(studies)
+    return render_template('index.html', table=table)
 
 
 @app.route('/new_study', methods=['GET', 'POST'])
 def new_study():
     form = StudyForm(request.form)
+    action = "/new_study"
     if request.method == 'POST':
-        # save the study
         study = Study()
-        study.id = form.id
-        study.title = form.title
-#        for r in form.requirements:
-#            requirement = RequiredDocument(id = r.id,
-#        study.requirements = form.requirements
-        db.session.add(study)
-        db.session.commit()
-        flash('Album created successfully!')
+        _update_study(study, form)
+        flash('Study created successfully!')
         return redirect('/')
 
-    form = StudyForm(request.form)
     return render_template('study_form.html', form=form)
+
+@app.route('/study/<study_id>}', methods=['GET', 'POST'])
+def edit_study(study_id):
+    study = db.session.query(Study).filter(Study.study_id == study_id).first()
+    form = StudyForm(request.form, obj=study)
+    if request.method == 'GET':
+        action = "/study/" + study_id
+        if study.requirements:
+            form.requirements.data = list(map(lambda r: r.code, list(study.requirements)))
+    if request.method == 'POST':
+        _update_study(study, form)
+        flash('Study updated successfully!')
+        return redirect('/')
+    return render_template('study_form.html', form=form)
+
+
+def _update_study(study, form):
+    if study.study_id:
+        db.session.query(RequiredDocument).filter(RequiredDocument.study_id == study.study_id).delete()
+    for r in form.requirements:
+        if r.checked:
+            requirement = RequiredDocument(code=r.data, name=r.label.text, study=study)
+            db.session.add(requirement)
+    study.title = form.title.data
+    study.netbadge_id = form.netbadge_id.data
+    study.last_updated = datetime.datetime.now()
+    study.q_complete = form.q_complete.data
+    db.session.add(study)
+    db.session.commit()
+
 
 
 if __name__ == '__main__':
