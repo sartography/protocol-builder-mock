@@ -48,6 +48,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
 
+# Loads all the descriptions from the API so we can display them in the editor.
 description_map = {}
 with open(r'api.yml') as file:
     api_config = yaml.load(file, Loader=yaml.FullLoader)
@@ -55,7 +56,6 @@ with open(r'api.yml') as file:
     for schema in api_config['components']['schemas']:
         for field, values in api_config['components']['schemas'][schema]['properties'].items():
             description_map[field] = values['description']
-    print(description_map)
 
 
 # **************************
@@ -117,7 +117,7 @@ def new_study():
                            title=title,
                            description_map=description_map)
 
-@app.route('/study/<study_id>}', methods=['GET', 'POST'])
+@app.route('/study/<study_id>', methods=['GET', 'POST'])
 def edit_study(study_id):
     study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
     form = StudyForm(request.form, obj=study)
@@ -138,7 +138,7 @@ def edit_study(study_id):
                            description_map={})
 
 
-@app.route('/investigator/<study_id>}', methods=['GET', 'POST'])
+@app.route('/investigator/<study_id>', methods=['GET', 'POST'])
 def new_investigator(study_id):
     form = InvestigatorForm(request.form)
     action = "/investigator/" + study_id
@@ -158,16 +158,17 @@ def new_investigator(study_id):
                            description_map={})
 
 
-@app.route('/del_investigator/<inv_id>}', methods=['GET'])
+@app.route('/del_investigator/<inv_id>', methods=['GET'])
 def del_investigator(inv_id):
     db.session.query(Investigator).filter(Investigator.id == inv_id).delete()
     db.session.commit()
     return redirect('/')
 
 
-@app.route('/del_study/<study_id>}', methods=['GET'])
+@app.route('/del_study/<study_id>', methods=['GET'])
 def del_study(study_id):
     db.session.query(Study).filter(Study.STUDYID == study_id).delete()
+    db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).delete()
     db.session.commit()
     return redirect('/')
 
@@ -187,7 +188,7 @@ def _update_study(study, form):
     db.session.add(study)
     db.session.commit()
 
-@app.route('/study_details/<study_id>}', methods=['GET', 'POST'])
+@app.route('/study_details/<study_id>', methods=['GET', 'POST'])
 def study_details(study_id):
     study_details = db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).first()
     if not study_details:
