@@ -32,16 +32,36 @@ class RequirementsTable(Table):
 class InvestigatorsTable(Table):
     NETBADGEID = Col('UVA Id')
     INVESTIGATORTYPE = Col('Type')
-    delete = LinkCol('Delete', 'del_investigator', url_kwargs=dict(inv_id='id'))
+    delete = LinkCol(
+        'delete', 'del_investigator', url_kwargs=dict(inv_id='id'),
+        anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Investigator'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Investigator'}
+    )
 
 
 class StudyTable(Table):
     def sort_url(self, col_id, reverse=False):
         pass
-    edit = LinkCol('Edit', 'edit_study', url_kwargs=dict(study_id='STUDYID'))
-    delete = LinkCol('Delete', 'del_study', url_kwargs=dict(study_id='STUDYID'))
-    details = LinkCol('Details', 'study_details', url_kwargs=dict(study_id='STUDYID'))
-    add_inv = LinkCol('Add Person', 'new_investigator', url_kwargs=dict(study_id='STUDYID'))
+    edit = LinkCol(
+        'edit', 'edit_study', url_kwargs=dict(study_id='STUDYID'),
+        anchor_attrs={'class': 'btn btn-icon btn-primary', 'title': 'Edit Study'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Edit Study'}
+    )
+    delete = LinkCol(
+        'delete', 'del_study', url_kwargs=dict(study_id='STUDYID'),
+        anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Study'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Study'}
+    )
+    details = LinkCol(
+        'ballot', 'study_details', url_kwargs=dict(study_id='STUDYID'),
+        anchor_attrs={'class': 'btn btn-icon btn-default', 'title': 'Edit Questions'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Edit Questions'}
+    )
+    add_inv = LinkCol(
+        'person_add', 'new_investigator', url_kwargs=dict(study_id='STUDYID'),
+        anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Add Investigator'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Add Investigator'}
+    )
     STUDYID = Col('Study Id')
     TITLE = Col('Title')
     NETBADGEID = Col('User')

@@ -3,38 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Protocol Builder Mock Configuration</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.typekit.net/kwp6dli.css">
+    {% assets 'app_scss' %}
+        <link href="{{ ASSET_URL }}" rel="stylesheet" type="text/css">
+    {% endassets %}
 </head>
-<style>
-    select.multi {
-        height: 600px;
-    }
-    input {
-        width: 500px;
-    }
-    span.label {
-        display: inline-block;
-        min-width: 200px;
-        text-align: left;
-    }
-</style>
 <body>
-<h2>{{title}}</h2>
-<p>{{details}}</p>
-<form action="{{action}}" method="post">
+<h2>{{ title }}</h2>
+<p>{{ details }}</p>
+<form action="{{ action }}" method="post">
 
     {{ form.csrf_token() }}
 
     {% for field in form if field.name != "csrf_token" %}
-        <p>
-            <span class="label">{{ field.label() }}:</span>
-          {{ field }}
-            <i>{{ description_map[field.name] }}</i>
+        <div class="form-field">
+            <div class="form-field-label">{{ field.label() }}:</div>
+            <div class="form-field-input">{{ field }}</div>
+            <div class="form-field-help">{{ description_map[field.name] }}</div>
             {% for error in field.errors %}
-                {{ error }}
+                <div class="form-field-error">{{ error }}</div>
             {% endfor %}
-        </p>
+        </div>
     {% endfor %}
-    <input type="submit" value="Submit">
+    <button class="btn btn-primary" type="submit">Submit</button>
+    <a href="/" class="btn btn-default">Cancel</a>
 </form>
 
 </body>

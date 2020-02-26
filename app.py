@@ -4,6 +4,7 @@ from datetime import date
 import connexion
 import yaml
 from flask import url_for, json, redirect, render_template, request, flash
+from flask_assets import Environment, Bundle
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
@@ -47,6 +48,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
+assets = Environment(app)
+assets.url = app.static_url_path
+scss = Bundle('scss/app.scss', filters='pyscss', output='app.css')
+assets.register('app_scss', scss)
 
 # Loads all the descriptions from the API so we can display them in the editor.
 description_map = {}

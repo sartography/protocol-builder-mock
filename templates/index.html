@@ -1,93 +1,33 @@
-<doctype html>
-  <head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <title>Protocol Builder Mock</title>
-  </head>
-  <style>
-    table {
-      border: 1px solid #1C6EA4;
-      background-color: #EEEEEE;
-      width: 100%;
-      text-align: left;
-      border-collapse: collapse;
-    }
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.typekit.net/kwp6dli.css">
+    {% assets 'app_scss' %}
+        <link href="{{ ASSET_URL }}" rel="stylesheet" type="text/css">
+    {% endassets %}
+</head>
+<body>
+<h2>Protocol Builder Mock</h2>
 
-    table td, table.blueTable th {
-      border: 1px solid #AAAAAA;
-      padding: 3px 2px;
-    }
+<p>
+    <a class="btn btn-primary" href="{{ url_for('.new_study') }}"> New Study </a>
+</p>
 
-    table tbody td {
-      font-size: 13px;
-    }
-
-    table tr:nth-child(even) {
-      background: #D0E4F5;
-    }
-
-    table thead {
-      background: #1C6EA4;
-      background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
-      background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
-      background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
-      border-bottom: 2px solid #444444;
-    }
-
-    table thead th {
-      font-size: 15px;
-      font-weight: bold;
-      color: #FFFFFF;
-      border-left: 2px solid #D0E4F5;
-    }
-
-    table thead th:first-child {
-      border-left: none;
-    }
-
-    table tfoot {
-      font-size: 14px;
-      font-weight: bold;
-      color: #FFFFFF;
-      background: #D0E4F5;
-      background: -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
-      background: -webkit-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
-      background: linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
-      border-top: 2px solid #444444;
-    }
-
-    table tfoot td {
-      font-size: 14px;
-    }
-
-    table tfoot .links {
-      text-align: right;
-    }
-
-    table tfoot .links a {
-      display: inline-block;
-      background: #1C6EA4;
-      color: #FFFFFF;
-      padding: 2px 8px;
-      border-radius: 5px;
-    }
-    </style>
-
-    <h2>Protocol Builder Mock</h2>
-
-    <p>
-    <p>
-        <a href="{{ url_for('.new_study') }}"> New Study </a>
-
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-    <ul class=flashes>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class=flashes>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
     {% endif %}
-    {% endwith %}
+{% endwith %}
 
-    <h3>Current Studies</h3>
-    {{ table }}
+<h3>Current Studies</h3>
+{{ table }}
+</body>
 
-</doctype>
+
+</html>
