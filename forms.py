@@ -1,17 +1,20 @@
+import sys
+
 from flask_table import Table, Col, DateCol, LinkCol, BoolCol, DatetimeCol, NestedTableCol
 from flask_wtf import FlaskForm
 from wtforms import SelectMultipleField, SubmitField, StringField, IntegerField, BooleanField, DateField, widgets, \
-    SelectField
+    SelectField, validators
 from wtforms_alchemy import ModelForm
 
 from models import RequiredDocument, Investigator, StudyDetails
 
 
 class StudyForm(FlaskForm):
-    TITLE = StringField('Title')
-    NETBADGEID = StringField('UVA Id for Primary Investigator')
+    STUDYID = IntegerField('Study ID', [validators.required(), validators.number_range(min=10000, max=2147483647)])
+    TITLE = StringField('Title', [validators.required()])
+    NETBADGEID = StringField('User UVA Computing Id', [validators.required()])
     requirements = SelectMultipleField("Requirements",
-                                       render_kw={'class':'multi'},
+                                       render_kw={'class': 'multi'},
                                        choices=[(rd.AUXDOCID, rd.AUXDOC) for rd in RequiredDocument.all()])
     HSRNUMBER = StringField('HSR Number')
     Q_COMPLETE = BooleanField('Complete in Protocol Builder?', default='checked',

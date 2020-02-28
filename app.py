@@ -181,15 +181,19 @@ def del_study(study_id):
 def _update_study(study, form):
     if study.STUDYID:
         db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == study.STUDYID).delete()
-    for r in form.requirements:
-        if r.checked:
-            requirement = RequiredDocument(AUXDOCID=r.data, AUXDOC=r.label.text, study=study)
-            db.session.add(requirement)
+
+    study.STUDYID = form.STUDYID.data
     study.TITLE = form.TITLE.data
     study.NETBADGEID = form.NETBADGEID.data
     study.DATE_MODIFIED = datetime.datetime.now()
     study.Q_COMPLETE = form.Q_COMPLETE.data
     study.HSRNUMBER = form.HSRNUMBER.data
+
+    for r in form.requirements:
+        if r.checked:
+            requirement = RequiredDocument(AUXDOCID=r.data, AUXDOC=r.label.text, study=study)
+            db.session.add(requirement)
+
     db.session.add(study)
     db.session.commit()
 
