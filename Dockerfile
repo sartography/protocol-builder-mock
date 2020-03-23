@@ -4,6 +4,7 @@ ENV PATH=/root/.local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/loca
 
 # install node and yarn
 RUN apt-get update
+RUN apt-get -y install postgresql-client
 
 # config project dir
 RUN mkdir /protocol-builder-mock

@@ -1,4 +1,5 @@
 import datetime
+import os
 from datetime import date
 
 import connexion
@@ -43,7 +44,17 @@ conn.add_api('api.yml')
 
 app = conn.app
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config.from_object('config.default')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+if "TESTING" in os.environ and os.environ["TESTING"] == "true":
+    app.config.from_object('config.testing')
+    app.config.from_pyfile('../config/testing.py')
+else:
+    app.config.root_path = app.instance_path
+    app.config.from_pyfile('config.py', silent=True)
+
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
@@ -84,9 +95,6 @@ def site_map():
 # **************************
 # WEB FORMS
 # **************************
-
-app.config['SECRET_KEY'] = 'a really really really really long secret key'
-
 from forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm
 from models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
     StudyDetails, StudyDetailsSchema
