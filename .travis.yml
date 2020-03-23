@@ -1,10 +1,15 @@
 language: python
 
 services:
+  - postgresql
   - docker
 
 python:
   - "3.7"
+
+before_install:
+  - cp config/travis-testing.py config/testing.py
+  - psql -c 'create database pb_test;' -U postgres
 
 install:
   - pip install pipenv pytest
