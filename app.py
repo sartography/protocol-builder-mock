@@ -5,6 +5,7 @@ from datetime import date
 import connexion
 import yaml
 from flask import url_for, json, redirect, render_template, request, flash
+from flask_assets import Environment, Bundle
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
@@ -58,6 +59,10 @@ else:
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
+assets = Environment(app)
+assets.url = app.static_url_path
+scss = Bundle('scss/app.scss', filters='pyscss', output='app.css')
+assets.register('app_scss', scss)
 
 # Loads all the descriptions from the API so we can display them in the editor.
 description_map = {}
@@ -184,15 +189,19 @@ def del_study(study_id):
 def _update_study(study, form):
     if study.STUDYID:
         db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == study.STUDYID).delete()
-    for r in form.requirements:
-        if r.checked:
-            requirement = RequiredDocument(AUXDOCID=r.data, AUXDOC=r.label.text, study=study)
-            db.session.add(requirement)
+
+    study.STUDYID = form.STUDYID.data
     study.TITLE = form.TITLE.data
     study.NETBADGEID = form.NETBADGEID.data
     study.DATE_MODIFIED = datetime.datetime.now()
     study.Q_COMPLETE = form.Q_COMPLETE.data
     study.HSRNUMBER = form.HSRNUMBER.data
+
+    for r in form.requirements:
+        if r.checked:
+            requirement = RequiredDocument(AUXDOCID=r.data, AUXDOC=r.label.text, study=study)
+            db.session.add(requirement)
+
     db.session.add(study)
     db.session.commit()
 
