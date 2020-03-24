@@ -10,7 +10,6 @@ from models import RequiredDocument, Investigator, StudyDetails
 
 
 class StudyForm(FlaskForm):
-    STUDYID = IntegerField('Study ID', [validators.required(), validators.number_range(min=10000, max=2147483647)])
     TITLE = StringField('Title', [validators.required()])
     NETBADGEID = StringField('User UVA Computing Id', [validators.required()])
     requirements = SelectMultipleField("Requirements",
