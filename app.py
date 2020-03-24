@@ -180,8 +180,10 @@ def del_investigator(inv_id):
 
 @app.route('/del_study/<study_id>', methods=['GET'])
 def del_study(study_id):
-    db.session.query(Study).filter(Study.STUDYID == study_id).delete()
+    db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == study_id).delete()
+    db.session.query(Investigator).filter(Investigator.STUDYID == study_id).delete()
     db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).delete()
+    db.session.query(Study).filter(Study.STUDYID == study_id).delete()
     db.session.commit()
     return redirect('/')
 
