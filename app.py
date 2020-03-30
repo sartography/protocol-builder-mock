@@ -193,8 +193,10 @@ def _update_study(study, form):
     # quick hack to get auto-increment without creating a bunch of hassle, this is not
     # production code by any stretch of the imagination, but this is a throw away library.
     max_id = db.session.query(func.max(Study.STUDYID)).scalar() or 1
-
-    study.STUDYID = max_id + 1
+    if not form.STUDYID.data:
+        study.STUDYID = max_id + 1
+    else:
+        study.STUDYID = form.STUDYID.data
     study.TITLE = form.TITLE.data
     study.NETBADGEID = form.NETBADGEID.data
     study.DATE_MODIFIED = datetime.datetime.now()
