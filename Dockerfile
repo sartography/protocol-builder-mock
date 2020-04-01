@@ -22,6 +22,7 @@ ENV FLASK_APP=./protocol-builder-mock/__init__.py
 COPY . /protocol-builder-mock/
 
 # run webserver by default
+CMD ["pipenv", "run", "flask", "db", "upgrade"]
 CMD ["pipenv", "run", "python", "/protocol-builder-mock/run.py"]
 
 
