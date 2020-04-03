@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Install AWS CLI
+pip install --user awscli;
+export PATH=$PATH:$HOME/.local/bin;
+
 # Build and push Docker image to Docker Hub
 echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
 docker build --no-cache -t sartography/protocol-builder-mock:latest . || exit 1;
