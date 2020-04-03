@@ -12,7 +12,8 @@ before_install:
   - psql -c 'create database pb_test;' -U postgres
 
 install:
-  - pip install pipenv pytest
+  - pip install pipenv pytest awscli
+  - export PATH=$PATH:$HOME/.local/bin;
   - pipenv install
   - pytest              # <== This runs in Pipenv (a/k/a virtualenv)
 
