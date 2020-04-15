@@ -18,3 +18,8 @@ SQLALCHEMY_DATABASE_URI = environ.get(
     default="postgresql://%s:%s@%s:%s/%s" % (DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
 )
 SECRET_KEY = environ.get('SECRET_KEY', default='a really really really really long secret key')
+
+print('=== USING DEFAULT CONFIG: ===')
+print('DB_HOST = ', DB_HOST)
+print('DEVELOPMENT = ', DEVELOPMENT)
+print('TESTING = ', TESTING)

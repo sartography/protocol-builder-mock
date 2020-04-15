@@ -16,7 +16,6 @@ ADD Pipfile /protocol-builder-mock/
 ADD Pipfile.lock /protocol-builder-mock/
 RUN pipenv install --dev
 
-
 # include rejoiner code (gets overriden by local changes)
 COPY . /protocol-builder-mock/
 
@@ -26,8 +25,7 @@ ENV FLASK_APP=/protocol-builder-mock/app.py
 CMD ["pipenv", "run", "flask", "db", "upgrade"]
 CMD ["pipenv", "run", "python", "/protocol-builder-mock/run.py"]
 
-
 # expose ports
-EXPOSE 6000
+EXPOSE 5001
 
 
