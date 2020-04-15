@@ -5,8 +5,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 NAME = "CR Connect Protocol Builder Mock"
 CORS_ENABLED = False
-DEVELOPMENT = bool(eval(environ.get('DEVELOPMENT', default="True")))
-TESTING = bool(eval(environ.get('TESTING', default="False")))
+DEVELOPMENT = bool(environ.get('DEVELOPMENT', default="True"))
+TESTING = bool(environ.get('TESTING', default="False"))
 
 DB_HOST = environ.get('DB_HOST', default="localhost")
 DB_PORT = environ.get('DB_PORT', default="5432")
