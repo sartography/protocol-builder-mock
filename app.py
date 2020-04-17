@@ -40,7 +40,6 @@ def get_form(id, requirement_code):
     return
 
 
-
 conn = connexion.App('Protocol Builder', specification_dir='./')
 conn.add_api('api.yml')
 
@@ -55,7 +54,6 @@ if "TESTING" in os.environ and os.environ["TESTING"] == "true":
 else:
     app.config.root_path = app.instance_path
     app.config.from_pyfile('config.py', silent=True)
-
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -83,6 +81,7 @@ def has_no_empty_params(rule):
     arguments = rule.arguments if rule.arguments is not None else ()
     return len(defaults) >= len(arguments)
 
+
 @app.route("/site_map")
 def site_map():
     links = []
@@ -93,9 +92,6 @@ def site_map():
             url = url_for(rule.endpoint, **(rule.defaults or {}))
             links.append((url, rule.endpoint))
     return json.dumps({"links": links})
-
-
-
 
 
 # **************************
@@ -130,6 +126,7 @@ def new_study():
                            action=action,
                            title=title,
                            description_map=description_map)
+
 
 @app.route('/study/<study_id>', methods=['GET', 'POST'])
 def edit_study(study_id):
@@ -190,11 +187,15 @@ def del_study(study_id):
 
 
 def _update_study(study, form):
-    # quick hack to get auto-increment without creating a bunch of hassle, this is not
-    # production code by any stretch of the imagination, but this is a throw away library.
-    max_id = db.session.query(func.max(Study.STUDYID)).scalar() or 1
+    if study.STUDYID is None:
+        # quick hack to get auto-increment without creating a bunch of hassle, this is not
+        # production code by any stretch of the imagination, but this is a throw away library.
+        max_id = db.session.query(func.max(Study.STUDYID)).scalar() or 1
 
-    study.STUDYID = max_id + 1
+        study.STUDYID = max_id + 1
+    else:
+        db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == study.STUDYID).delete()
+
     study.TITLE = form.TITLE.data
     study.NETBADGEID = form.NETBADGEID.data
     study.DATE_MODIFIED = datetime.datetime.now()
@@ -208,6 +209,7 @@ def _update_study(study, form):
 
     db.session.add(study)
     db.session.commit()
+
 
 @app.route('/study_details/<study_id>', methods=['GET', 'POST'])
 def study_details(study_id):
