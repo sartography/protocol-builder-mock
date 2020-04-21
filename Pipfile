@@ -20,7 +20,7 @@ ma = "*"
 marshmallow-sqlalchemy = "*"
 wtforms-alchemy = "*"
 psycopg2-binary = "*"
-pyScss = "*"
+pyscss = "*"
 
 [requires]
 python_version = "3.7"
