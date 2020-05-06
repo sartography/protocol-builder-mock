@@ -78,6 +78,7 @@ class RequiredDocument(db.Model):
                 RequiredDocument(AUXDOCID=25, AUXDOC="Scientific Pre-review Documentation"),
                 RequiredDocument(AUXDOCID=26, AUXDOC="IBC Number"),
                 RequiredDocument(AUXDOCID=32, AUXDOC="IDS - Investigational Drug Service Approval"),
+                RequiredDocument(AUXDOCID=33, AUXDOC="Data Security Plan"),
                 RequiredDocument(AUXDOCID=36, AUXDOC="RDRC Approval "),
                 RequiredDocument(AUXDOCID=40, AUXDOC="SBS/IRB Approval-FERPA"),
                 RequiredDocument(AUXDOCID=41, AUXDOC="HIRE Standard Radiation Language"),
