@@ -4,6 +4,7 @@ from os import environ
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 NAME = "CR Connect Protocol Builder Mock"
+FLASK_PORT = environ.get('PORT0') or environ.get('FLASK_PORT', default="5001")
 CORS_ENABLED = False
 DEVELOPMENT = environ.get('DEVELOPMENT', default="true") == "true"
 TESTING = environ.get('TESTING', default="false") == "true"
