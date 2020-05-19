@@ -3,13 +3,14 @@ import sys
 from flask_table import Table, Col, DateCol, LinkCol, BoolCol, DatetimeCol, NestedTableCol
 from flask_wtf import FlaskForm
 from wtforms import SelectMultipleField, SubmitField, StringField, IntegerField, BooleanField, DateField, widgets, \
-    SelectField, validators
+    SelectField, validators, HiddenField
 from wtforms_alchemy import ModelForm
 
 from models import RequiredDocument, Investigator, StudyDetails
 
 
 class StudyForm(FlaskForm):
+    STUDYID = HiddenField()
     TITLE = StringField('Title', [validators.required()])
     NETBADGEID = StringField('User UVA Computing Id', [validators.required()])
     requirements = SelectMultipleField("Requirements",
