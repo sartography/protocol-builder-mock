@@ -107,7 +107,7 @@ def index():
     # display results
     studies = db.session.query(Study).order_by(Study.DATE_MODIFIED.desc()).all()
     table = StudyTable(studies)
-    return render_template('index.html', table=table)
+    return render_template('index.html', table=table, BASE_HREF=app.config['BASE_HREF'])
 
 
 @app.route('/new_study', methods=['GET', 'POST'])
