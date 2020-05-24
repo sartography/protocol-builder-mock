@@ -11,7 +11,7 @@ DEVELOPMENT = environ.get('DEVELOPMENT', default="true") == "true"
 TESTING = environ.get('TESTING', default="false") == "true"
 
 # Add trailing slash to base path
-BASE_HREF = re.sub(r'//', '/', '/%s/' % environ.get('BASE_HREF', default="/").strip('/'))
+APPLICATION_ROOT = re.sub(r'//', '/', '/%s/' % environ.get('APPLICATION_ROOT', default="/").strip('/'))
 
 DB_HOST = environ.get('DB_HOST', default="localhost")
 DB_PORT = environ.get('DB_PORT', default="5432")
@@ -28,4 +28,4 @@ print('=== USING DEFAULT CONFIG: ===')
 print('DB_HOST = ', DB_HOST)
 print('DEVELOPMENT = ', DEVELOPMENT)
 print('TESTING = ', TESTING)
-print('BASE_HREF = ', BASE_HREF)
+print('APPLICATION_ROOT = ', APPLICATION_ROOT)
