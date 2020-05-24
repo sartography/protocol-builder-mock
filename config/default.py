@@ -1,3 +1,4 @@
+import re
 import os
 from os import environ
 
@@ -8,7 +9,9 @@ FLASK_PORT = environ.get('PORT0') or environ.get('FLASK_PORT', default="5001")
 CORS_ENABLED = False
 DEVELOPMENT = environ.get('DEVELOPMENT', default="true") == "true"
 TESTING = environ.get('TESTING', default="false") == "true"
-BASE_HREF = environ.get('BASE_HREF', default="/")
+
+# Add trailing slash to base path
+BASE_HREF = re.sub(r'//', '/', '/%s/' % environ.get('BASE_HREF', default="/").strip('/'))
 
 DB_HOST = environ.get('DB_HOST', default="localhost")
 DB_PORT = environ.get('DB_PORT', default="5432")
@@ -25,3 +28,4 @@ print('=== USING DEFAULT CONFIG: ===')
 print('DB_HOST = ', DB_HOST)
 print('DEVELOPMENT = ', DEVELOPMENT)
 print('TESTING = ', TESTING)
+print('BASE_HREF = ', BASE_HREF)
