@@ -41,7 +41,6 @@ def get_form(id, requirement_code):
 
 
 conn = connexion.App('Protocol Builder', specification_dir='./')
-conn.add_api('api.yml')
 
 app = conn.app
 
@@ -55,6 +54,8 @@ else:
     app.config.root_path = app.instance_path
     app.config.from_pyfile('config.py', silent=True)
 
+BASE_HREF = app.config['BASE_HREF']
+conn.add_api('api.yml', base_path=BASE_HREF + '/pb')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
@@ -82,7 +83,7 @@ def has_no_empty_params(rule):
     return len(defaults) >= len(arguments)
 
 
-@app.route("/site_map")
+@app.route(BASE_HREF + '/site_map')
 def site_map():
     links = []
     for rule in app.url_map.iter_rules():
@@ -102,7 +103,7 @@ from models import Study, RequiredDocument, Investigator, StudySchema, RequiredD
     StudyDetails, StudyDetailsSchema
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route(BASE_HREF + '/', methods=['GET', 'POST'])
 def index():
     # display results
     studies = db.session.query(Study).order_by(Study.DATE_MODIFIED.desc()).all()
@@ -110,7 +111,7 @@ def index():
     return render_template('index.html', table=table, BASE_HREF=app.config['BASE_HREF'])
 
 
-@app.route('/new_study', methods=['GET', 'POST'])
+@app.route(BASE_HREF + '/new_study', methods=['GET', 'POST'])
 def new_study():
     form = StudyForm(request.form)
     action = "/new_study"
@@ -128,7 +129,7 @@ def new_study():
                            description_map=description_map)
 
 
-@app.route('/study/<study_id>', methods=['GET', 'POST'])
+@app.route(BASE_HREF + '/study/<study_id>', methods=['GET', 'POST'])
 def edit_study(study_id):
     study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
     form = StudyForm(request.form, obj=study)
@@ -149,7 +150,7 @@ def edit_study(study_id):
                            description_map={})
 
 
-@app.route('/investigator/<study_id>', methods=['GET', 'POST'])
+@app.route(BASE_HREF + '/investigator/<study_id>', methods=['GET', 'POST'])
 def new_investigator(study_id):
     form = InvestigatorForm(request.form)
     action = "/investigator/" + study_id
@@ -169,14 +170,14 @@ def new_investigator(study_id):
                            description_map={})
 
 
-@app.route('/del_investigator/<inv_id>', methods=['GET'])
+@app.route(BASE_HREF + '/del_investigator/<inv_id>', methods=['GET'])
 def del_investigator(inv_id):
     db.session.query(Investigator).filter(Investigator.id == inv_id).delete()
     db.session.commit()
     return redirect('/')
 
 
-@app.route('/del_study/<study_id>', methods=['GET'])
+@app.route(BASE_HREF + '/del_study/<study_id>', methods=['GET'])
 def del_study(study_id):
     db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == study_id).delete()
     db.session.query(Investigator).filter(Investigator.STUDYID == study_id).delete()
@@ -211,7 +212,7 @@ def _update_study(study, form):
     db.session.commit()
 
 
-@app.route('/study_details/<study_id>', methods=['GET', 'POST'])
+@app.route(BASE_HREF + '/study_details/<study_id>', methods=['GET', 'POST'])
 def study_details(study_id):
     study_details = db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).first()
     if not study_details:
