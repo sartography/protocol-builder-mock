@@ -1,30 +1,48 @@
-FROM python:3.7
+#
+# https://medium.com/@greut/building-a-python-package-a-docker-image-using-pipenv-233d8793b6cc
+# https://github.com/greut/pipenv-to-wheel
+#
+FROM kennethreitz/pipenv as pipenv
 
-ENV PATH=/root/.local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+ADD . /app
+WORKDIR /app
 
-# install node and yarn
-RUN apt-get update
-RUN apt-get -y install postgresql-client libpcre3 libpcre3-dev
+RUN pipenv install --dev \
+ && pipenv lock -r > requirements.txt \
+ && pipenv run python setup.py bdist_wheel
 
-# config project dir
-RUN mkdir /protocol-builder-mock
-WORKDIR /protocol-builder-mock
+# ----------------------------------------------------------------------------
+FROM ubuntu:bionic
 
-# install python requirements
-RUN pip install pipenv
-ADD Pipfile /protocol-builder-mock/
-ADD Pipfile.lock /protocol-builder-mock/
-RUN pipenv install --dev
+ARG DEBIAN_FRONTEND=noninteractive
 
-# include rejoiner code (gets overriden by local changes)
-COPY . /protocol-builder-mock/
+COPY --from=pipenv /app/dist/*.whl .
 
-ENV FLASK_APP=/protocol-builder-mock/app.py
+RUN set -xe \
+ && apt-get update -q \
+ && apt-get install -y -q \
+        python3-minimal \
+        python3-wheel \
+        python3-pip \
+        gunicorn3 \
+        postgresql-client \
+ && python3 -m pip install *.whl \
+ && apt-get remove -y python3-pip python3-wheel \
+ && apt-get autoremove -y \
+ && apt-get clean -y \
+ && rm -f *.whl \
+ && rm -rf /root/.cache \
+ && rm -rf /var/lib/apt/lists/* \
+ && mkdir -p /app \
+ && useradd _gunicorn --no-create-home --user-group
 
-# run webserver by default
-CMD ["pipenv", "run", "python", "/protocol-builder-mock/run.py"]
+USER _gunicorn
 
-# expose ports
-EXPOSE 5001
+COPY ./static /app/static
+COPY ./docker_run.sh /app/
+COPY ./wait-for-it.sh /app/
+WORKDIR /app
 
-
+CMD ["gunicorn3", \
+     "--bind", "0.0.0.0:8000", \
+     "pb:app"]

@@ -11,7 +11,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from sqlalchemy import func
-
 from wtforms.ext.appengine.db import model_form
 
 PROTOCOLS = {}
@@ -40,8 +39,7 @@ def get_study_details(studyid):
 def get_form(id, requirement_code):
     return
 
-
-conn = connexion.App('Protocol Builder', specification_dir='./')
+conn = connexion.App('Protocol Builder', specification_dir='pb')
 
 app = conn.app
 
@@ -66,7 +64,7 @@ assets.register('app_scss', scss)
 
 # Loads all the descriptions from the API so we can display them in the editor.
 description_map = {}
-with open(r'api.yml') as file:
+with open(r'pb/api.yml') as file:
     api_config = yaml.load(file, Loader=yaml.FullLoader)
     study_detail_properties = api_config['components']['schemas']['StudyDetail']['properties']
     for schema in api_config['components']['schemas']:
@@ -98,8 +96,8 @@ def site_map():
 # **************************
 # WEB FORMS
 # **************************
-from forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm
-from models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
+from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm
+from pb.models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
     StudyDetails, StudyDetailsSchema
 
 

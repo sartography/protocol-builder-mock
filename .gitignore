@@ -2,4 +2,4 @@
 __pycache__/
 app.db
 static/.webassets-cache*
-static/*.css
+pb/static/*.css

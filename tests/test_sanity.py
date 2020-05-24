@@ -3,9 +3,9 @@ import os
 os.environ["TESTING"] = "true"
 
 import unittest
-from app import app, db
-from forms import StudyForm
-from models import Study, RequiredDocument
+from pb import app, db
+from pb.forms import StudyForm
+from pb.models import Study, RequiredDocument
 
 
 class Sanity_Check_Test(unittest.TestCase):
