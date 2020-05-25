@@ -22,6 +22,7 @@ marshmallow-sqlalchemy = "*"
 wtforms-alchemy = "*"
 psycopg2-binary = "*"
 pyscss = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"
