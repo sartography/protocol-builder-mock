@@ -24,6 +24,7 @@ psycopg2-binary = "*"
 pyscss = "*"
 gunicorn = "*"
 werkzeug = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,10 +1,11 @@
 import datetime
 import os
 import re
+import yaml
 from datetime import date
 
 import connexion
-import yaml
+from flask_cors import CORS
 from flask import url_for, json, redirect, render_template, request, flash
 from flask_assets import Environment, Bundle
 from flask_sqlalchemy import SQLAlchemy
@@ -39,8 +40,8 @@ def get_study_details(studyid):
 def get_form(id, requirement_code):
     return
 
-conn = connexion.FlaskApp('Protocol Builder', specification_dir='pb')
-app = conn.app
+connexion_app = connexion.FlaskApp('Protocol Builder', specification_dir='pb')
+app = connexion_app.app
 
 app.config.from_object('config.default')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -52,7 +53,12 @@ else:
     app.config.root_path = app.instance_path
     app.config.from_pyfile('config.py', silent=True)
 
-conn.add_api('api.yml', base_path='/v2.0')
+connexion_app.add_api('api.yml', base_path='/v2.0')
+
+# Convert list of allowed origins to list of regexes
+origins_re = [r"^https?:\/\/%s(.*)" % o.replace('.', '\.') for o in app.config['CORS_ALLOW_ORIGINS']]
+cors = CORS(connexion_app.app, origins=origins_re)
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
