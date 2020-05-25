@@ -283,7 +283,7 @@ def study_details(study_id):
 
 
 def redirect_home():
-    return redirect('/' + BASE_HREF)
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
