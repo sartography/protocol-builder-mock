@@ -23,6 +23,7 @@ wtforms-alchemy = "*"
 psycopg2-binary = "*"
 pyscss = "*"
 gunicorn = "*"
+werkzeug = "*"
 
 [requires]
 python_version = "3.7"

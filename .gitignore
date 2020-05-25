@@ -1,5 +1,7 @@
 .idea
 __pycache__/
 app.db
+pb/static/.webassets-cache*
+pb/static/*.css
 static/.webassets-cache*
 static/*.css
