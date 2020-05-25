@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # run migrations
-export FLASK_APP=./app.py
+export FLASK_APP=/app/pb/__init__.py
 
 if [ "$DOWNGRADE_DB" = "true" ]; then
   echo 'Downgrading database...'
