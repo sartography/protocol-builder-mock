@@ -1,16 +1,17 @@
 import datetime
 import os
+import re
+import yaml
 from datetime import date
 
 import connexion
-import yaml
+from flask_cors import CORS
 from flask import url_for, json, redirect, render_template, request, flash
 from flask_assets import Environment, Bundle
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from sqlalchemy import func
-
 from wtforms.ext.appengine.db import model_form
 
 PROTOCOLS = {}
@@ -39,11 +40,8 @@ def get_study_details(studyid):
 def get_form(id, requirement_code):
     return
 
-
-conn = connexion.App('Protocol Builder', specification_dir='./')
-conn.add_api('api.yml')
-
-app = conn.app
+connexion_app = connexion.FlaskApp('Protocol Builder', specification_dir='pb')
+app = connexion_app.app
 
 app.config.from_object('config.default')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -55,17 +53,53 @@ else:
     app.config.root_path = app.instance_path
     app.config.from_pyfile('config.py', silent=True)
 
+connexion_app.add_api('api.yml', base_path='/v2.0')
+
+# Convert list of allowed origins to list of regexes
+origins_re = [r"^https?:\/\/%s(.*)" % o.replace('.', '\.') for o in app.config['CORS_ALLOW_ORIGINS']]
+cors = CORS(connexion_app.app, origins=origins_re)
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
+
+# Set the path of the static directory
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+APP_STATIC = os.path.join(APP_ROOT, 'static')
+BASE_HREF = app.config['APPLICATION_ROOT'].strip('/')
+app.static_folder = APP_STATIC
+app.static_url_path = app.config['APPLICATION_ROOT'] + 'static'
+
+print('app.static_folder', app.static_folder)
+print('app.static_url_path', app.static_url_path)
+
+# remove old static map
+url_map = app.url_map
+try:
+    for rule in url_map.iter_rules('static'):
+        url_map._rules.remove(rule)
+except ValueError:
+    # no static view was created yet
+    pass
+
+# register new; the same view function is used
+app.add_url_rule(
+    app.static_url_path + '/<path:filename>',
+    endpoint='static', view_func=app.send_static_file)
+
 assets = Environment(app)
+assets.init_app(app)
 assets.url = app.static_url_path
-scss = Bundle('scss/app.scss', filters='pyscss', output='app.css')
+scss = Bundle(
+    'scss/app.scss',
+    filters='pyscss',
+    output='app.css'
+)
 assets.register('app_scss', scss)
 
 # Loads all the descriptions from the API so we can display them in the editor.
 description_map = {}
-with open(r'api.yml') as file:
+with open(r'pb/api.yml') as file:
     api_config = yaml.load(file, Loader=yaml.FullLoader)
     study_detail_properties = api_config['components']['schemas']['StudyDetail']['properties']
     for schema in api_config['components']['schemas']:
@@ -82,14 +116,14 @@ def has_no_empty_params(rule):
     return len(defaults) >= len(arguments)
 
 
-@app.route("/site_map")
+@app.route('/site_map')
 def site_map():
     links = []
     for rule in app.url_map.iter_rules():
         # Filter out rules we can't navigate to in a browser
         # and rules that require parameters
         if "GET" in rule.methods and has_no_empty_params(rule):
-            url = url_for(rule.endpoint, **(rule.defaults or {}))
+            url = app.confg['APPLICATION_ROOT'].strip('/') + url_for(rule.endpoint, **(rule.defaults or {}))
             links.append((url, rule.endpoint))
     return json.dumps({"links": links})
 
@@ -97,8 +131,8 @@ def site_map():
 # **************************
 # WEB FORMS
 # **************************
-from forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm
-from models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
+from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm
+from pb.models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
     StudyDetails, StudyDetailsSchema
 
 
@@ -107,25 +141,33 @@ def index():
     # display results
     studies = db.session.query(Study).order_by(Study.DATE_MODIFIED.desc()).all()
     table = StudyTable(studies)
-    return render_template('index.html', table=table, BASE_HREF=app.config['BASE_HREF'])
+    return render_template(
+        'index.html',
+        table=table,
+        base_href=BASE_HREF
+    )
 
 
 @app.route('/new_study', methods=['GET', 'POST'])
 def new_study():
     form = StudyForm(request.form)
-    action = "/new_study"
+    action = BASE_HREF + "/new_study"
     title = "New Study"
     if request.method == 'POST':
         study = Study()
         study.study_details = StudyDetails()
         _update_study(study, form)
         flash('Study created successfully!')
-        return redirect('/')
+        return redirect_home()
 
-    return render_template('form.html', form=form,
-                           action=action,
-                           title=title,
-                           description_map=description_map)
+    return render_template(
+        'form.html',
+        form=form,
+        action=action,
+        title=title,
+        description_map=description_map,
+        base_href=BASE_HREF
+    )
 
 
 @app.route('/study/<study_id>', methods=['GET', 'POST'])
@@ -133,7 +175,7 @@ def edit_study(study_id):
     study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
     form = StudyForm(request.form, obj=study)
     if request.method == 'GET':
-        action = "/study/" + study_id
+        action = BASE_HREF + "/study/" + study_id
         title = "Edit Study #" + study_id
         if study.requirements:
             form.requirements.data = list(map(lambda r: r.AUXDOCID, list(study.requirements)))
@@ -142,17 +184,21 @@ def edit_study(study_id):
     if request.method == 'POST':
         _update_study(study, form)
         flash('Study updated successfully!')
-        return redirect('/')
-    return render_template('form.html', form=form,
-                           action=action,
-                           title=title,
-                           description_map={})
+        return redirect_home()
+    return render_template(
+        'form.html',
+        form=form,
+        action=action,
+        title=title,
+        description_map={},
+        base_href=BASE_HREF
+    )
 
 
 @app.route('/investigator/<study_id>', methods=['GET', 'POST'])
 def new_investigator(study_id):
     form = InvestigatorForm(request.form)
-    action = "/investigator/" + study_id
+    action = BASE_HREF + "/investigator/" + study_id
     title = "Add Investigator to Study " + study_id
     if request.method == 'POST':
         investigator = Investigator(STUDYID=study_id)
@@ -161,19 +207,23 @@ def new_investigator(study_id):
         db.session.add(investigator)
         db.session.commit()
         flash('Investigator created successfully!')
-        return redirect('/')
+        return redirect_home()
 
-    return render_template('form.html', form=form,
-                           action=action,
-                           title=title,
-                           description_map={})
+    return render_template(
+        'form.html',
+        form=form,
+        action=action,
+        title=title,
+        description_map={},
+        base_href=BASE_HREF
+    )
 
 
 @app.route('/del_investigator/<inv_id>', methods=['GET'])
 def del_investigator(inv_id):
     db.session.query(Investigator).filter(Investigator.id == inv_id).delete()
     db.session.commit()
-    return redirect('/')
+    return redirect_home()
 
 
 @app.route('/del_study/<study_id>', methods=['GET'])
@@ -183,7 +233,7 @@ def del_study(study_id):
     db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).delete()
     db.session.query(Study).filter(Study.STUDYID == study_id).delete()
     db.session.commit()
-    return redirect('/')
+    return redirect_home()
 
 
 def _update_study(study, form):
@@ -218,7 +268,7 @@ def study_details(study_id):
         study_details = StudyDetails(STUDYID=study_id)
     form = StudyDetailsForm(request.form, obj=study_details)
     if request.method == 'GET':
-        action = "/study_details/" + study_id
+        action = BASE_HREF + "/study_details/" + study_id
         title = "Edit Study Details for Study #" + study_id
         details = "Numeric fields can be 1 for true, 0 or false, or Null if not applicable."
     if request.method == 'POST':
@@ -226,12 +276,20 @@ def study_details(study_id):
         db.session.add(study_details)
         db.session.commit()
         flash('Study updated successfully!')
-        return redirect('/')
-    return render_template('form.html', form=form,
-                           action=action,
-                           title=title,
-                           details=details,
-                           description_map=description_map)
+        return redirect_home()
+    return render_template(
+        'form.html',
+        form=form,
+        action=action,
+        title=title,
+        details=details,
+        description_map=description_map,
+        base_href=BASE_HREF
+    )
+
+
+def redirect_home():
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':

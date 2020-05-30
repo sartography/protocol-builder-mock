@@ -10,8 +10,6 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   # Added by API Auto Mocking Plugin
-servers:
-  - url: http://localhost:5000/pb
 # tags are used for organizing operations
 tags:
 - name: CR-Connect
@@ -22,7 +20,7 @@ paths:
       tags:
       - CR-Connect
       summary: A list of all studies related to a given UVA ID
-      operationId: app.get_user_studies
+      operationId: pb.get_user_studies
       description: "By passing in a valid UVA Id (ex: dhf8r) it will return a list of all studies that exist for that user in Protocol Builder"
       parameters:
       - in: query
@@ -51,7 +49,7 @@ paths:
       tags:
         - CR-Connect
       summary: Required documents
-      operationId: app.required_docs
+      operationId: pb.required_docs
       description: A list of all documents Protocol Builder considers required, given input from the PI
       parameters:
       - in: query
@@ -74,7 +72,7 @@ paths:
       tags:
         - CR-Connect
       summary: Personnel associated with this study.
-      operationId: app.investigators
+      operationId: pb.investigators
       description: A list of everyone that is associated with the study, including the PI, Study Coordinator, etc... This is currently returned on the "study" endpoint with other information.
       parameters:
       - in: query
@@ -103,7 +101,7 @@ paths:
     get:
       tags:
       - CR-Connect
-      operationId: app.get_study_details
+      operationId: pb.get_study_details
       summary: Details about a specific protocol.
       responses:
         200:

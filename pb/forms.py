@@ -1,12 +1,9 @@
-import sys
-
-from flask_table import Table, Col, DateCol, LinkCol, BoolCol, DatetimeCol, NestedTableCol
+from flask_table import Table, Col, LinkCol, BoolCol, DatetimeCol, NestedTableCol
 from flask_wtf import FlaskForm
-from wtforms import SelectMultipleField, SubmitField, StringField, IntegerField, BooleanField, DateField, widgets, \
-    SelectField, validators, HiddenField
+from wtforms import SelectMultipleField, StringField, BooleanField, SelectField, validators, HiddenField
 from wtforms_alchemy import ModelForm
 
-from models import RequiredDocument, Investigator, StudyDetails
+from pb.models import RequiredDocument, Investigator, StudyDetails
 
 
 class StudyForm(FlaskForm):

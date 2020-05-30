@@ -1,3 +1,4 @@
+import re
 import os
 from os import environ
 
@@ -5,10 +6,12 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 NAME = "CR Connect Protocol Builder Mock"
 FLASK_PORT = environ.get('PORT0') or environ.get('FLASK_PORT', default="5001")
-CORS_ENABLED = False
+CORS_ALLOW_ORIGINS = re.split(r',\s*', environ.get('CORS_ALLOW_ORIGINS', default="localhost:5000"))
 DEVELOPMENT = environ.get('DEVELOPMENT', default="true") == "true"
 TESTING = environ.get('TESTING', default="false") == "true"
-BASE_HREF = environ.get('BASE_HREF', default="/")
+
+# Add trailing slash to base path
+APPLICATION_ROOT = re.sub(r'//', '/', '/%s/' % environ.get('APPLICATION_ROOT', default="/").strip('/'))
 
 DB_HOST = environ.get('DB_HOST', default="localhost")
 DB_PORT = environ.get('DB_PORT', default="5432")
@@ -23,5 +26,7 @@ SECRET_KEY = environ.get('SECRET_KEY', default='a really really really really lo
 
 print('=== USING DEFAULT CONFIG: ===')
 print('DB_HOST = ', DB_HOST)
+print('CORS_ALLOW_ORIGINS = ', CORS_ALLOW_ORIGINS)
 print('DEVELOPMENT = ', DEVELOPMENT)
 print('TESTING = ', TESTING)
+print('APPLICATION_ROOT = ', APPLICATION_ROOT)
