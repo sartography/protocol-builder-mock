@@ -1,30 +1,22 @@
-FROM python:3.7
+FROM python:3.7-slim
 
-ENV PATH=/root/.local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+WORKDIR /app
+COPY Pipfile Pipfile.lock /app/
 
-# install node and yarn
-RUN apt-get update
-RUN apt-get -y install postgresql-client libpcre3 libpcre3-dev
+RUN set -xe \
+  && pip install pipenv \
+  && apt-get update -q \
+  && apt-get install -y -q \
+        gcc python3-dev libssl-dev \
+        curl postgresql-client git-core \
+        gunicorn3 postgresql-client \
+  && pipenv install --dev \
+  && apt-get remove -y gcc python3-dev libssl-dev \
+  && apt-get autoremove -y \
+  && apt-get clean -y \
+  && rm -rf /var/lib/apt/lists/* \
+  && mkdir -p /app \
+  && useradd _gunicorn --no-create-home --user-group
 
-# config project dir
-RUN mkdir /protocol-builder-mock
-WORKDIR /protocol-builder-mock
-
-# install python requirements
-RUN pip install pipenv
-ADD Pipfile /protocol-builder-mock/
-ADD Pipfile.lock /protocol-builder-mock/
-RUN pipenv install --dev
-
-# include rejoiner code (gets overriden by local changes)
-COPY . /protocol-builder-mock/
-
-ENV FLASK_APP=/protocol-builder-mock/app.py
-
-# run webserver by default
-CMD ["pipenv", "run", "python", "/protocol-builder-mock/run.py"]
-
-# expose ports
-EXPOSE 5001
-
-
+COPY . /app/
+WORKDIR /app

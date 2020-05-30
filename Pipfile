@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pbr = "*"
 
 [packages]
 flask = "*"
@@ -21,6 +22,9 @@ marshmallow-sqlalchemy = "*"
 wtforms-alchemy = "*"
 psycopg2-binary = "*"
 pyscss = "*"
+gunicorn = "*"
+werkzeug = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.7"

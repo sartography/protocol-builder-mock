@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from app import db, ma
+from pb import db, ma
 
 
 class Study(db.Model):
