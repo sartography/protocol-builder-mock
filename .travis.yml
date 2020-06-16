@@ -16,14 +16,12 @@ before_install:
   - psql -c 'create database pb_test;' -U postgres
 
 install:
-  - pip install pipenv pytest coverage
-  - export PATH=$PATH:$HOME/.local/bin;
   - pipenv install --dev
 
 env:
   global:
     - TESTING=true
-    - SQLALCHEMY_DATABASE_URI="postgresql://postgres:@localhost:5432/crc_test"
+    - SQLALCHEMY_DATABASE_URI="postgresql://postgres:@localhost:5432/pb_test"
 
 script:
   - pipenv run coverage run -m pytest
