@@ -12,7 +12,7 @@ before_install:
   - psql -c 'create database pb_test;' -U postgres
 
 install:
-  - pip install pipenv pytest awscli
+  - pip install pipenv pytest
   - export PATH=$PATH:$HOME/.local/bin;
   - pipenv install
   - pytest              # <== This runs in Pipenv (a/k/a virtualenv)
@@ -23,7 +23,7 @@ script:
 
 deploy:
   provider: script
-  script: bash deploy.sh
+  script: bash deploy.sh sartography/protocol-builder-mock
   skip_cleanup: true
   on:
     all_branches: true
