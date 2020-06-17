@@ -13,11 +13,6 @@ if [ "$UPGRADE_DB" = "true" ]; then
   pipenv run flask db upgrade
 fi
 
-if [ "$RESET_DB" = "true" ]; then
-  echo 'Resetting database...'
-  pipenv run flask load-example-data
-fi
-
 if [ "$APPLICATION_ROOT" = "/" ]; then
   pipenv run gunicorn --bind 0.0.0.0:$PORT0 wsgi:app
 else
