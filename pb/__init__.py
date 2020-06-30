@@ -12,7 +12,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from sqlalchemy import func
-from wtforms.ext.appengine.db import model_form
 
 PROTOCOLS = {}
 
@@ -131,7 +130,7 @@ def site_map():
 # **************************
 # WEB FORMS
 # **************************
-from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm
+from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, ConfirmDeleteForm
 from pb.models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
     StudyDetails, StudyDetailsSchema
 
@@ -157,7 +156,7 @@ def new_study():
         study = Study()
         study.study_details = StudyDetails()
         _update_study(study, form)
-        flash('Study created successfully!')
+        flash('Study created successfully!', 'success')
         return redirect_home()
 
     return render_template(
@@ -183,7 +182,7 @@ def edit_study(study_id):
             form.Q_COMPLETE.checked = True
     if request.method == 'POST':
         _update_study(study, form)
-        flash('Study updated successfully!')
+        flash('Study updated successfully!', 'success')
         return redirect_home()
     return render_template(
         'form.html',
@@ -206,7 +205,7 @@ def new_investigator(study_id):
         investigator.set_type(form.INVESTIGATORTYPE.data)
         db.session.add(investigator)
         db.session.commit()
-        flash('Investigator created successfully!')
+        flash('Investigator created successfully!', 'success')
         return redirect_home()
 
     return render_template(
@@ -219,21 +218,81 @@ def new_investigator(study_id):
     )
 
 
-@app.route('/del_investigator/<inv_id>', methods=['GET'])
+@app.route('/del_investigator/<inv_id>', methods=['GET', 'POST'])
 def del_investigator(inv_id):
-    db.session.query(Investigator).filter(Investigator.id == inv_id).delete()
-    db.session.commit()
+    inv_id = int(inv_id)
+    inv_model = db.session.query(Investigator).filter(Investigator.id == inv_id).first()
+    if inv_model is None:
+        flash('Investigator not found.', 'warn')
+        return redirect_home()
+
+    uid = inv_model.NETBADGEID
+    study_id = int(inv_model.STUDYID)
+    form = ConfirmDeleteForm(request.form, obj=inv_model)
+
+    if request.method == 'GET':
+        action = BASE_HREF + "/del_investigator/%i" % inv_id
+        title = "Delete Investigator #%i?" % inv_id
+        details = "Are you sure you want to delete Investigator '%s' from Study %i?" % (uid, study_id)
+
+        return render_template(
+            'form.html',
+            form=form,
+            action=action,
+            title=title,
+            details=details,
+            description_map=description_map,
+            base_href=BASE_HREF
+        )
+
+    if request.method == 'POST':
+        if form.confirm and form.confirm.data:
+            db.session.query(Investigator).filter(Investigator.id == inv_id).delete()
+            db.session.commit()
+            flash('Investigator %s deleted from Study %i.' % (uid, study_id), 'success')
+        else:
+            flash('Delete canceled.', 'info')
+
     return redirect_home()
 
 
-@app.route('/del_study/<study_id>', methods=['GET'])
+@app.route('/del_study/<study_id>', methods=['GET', 'POST'])
 def del_study(study_id):
-    db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == study_id).delete()
-    db.session.query(Investigator).filter(Investigator.STUDYID == study_id).delete()
-    db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).delete()
-    db.session.query(Study).filter(Study.STUDYID == study_id).delete()
-    db.session.commit()
-    return redirect_home()
+    study_id = int(study_id)
+    study_model = db.session.query(Study).filter(Study.STUDYID == study_id).first()
+    if study_model is None:
+        flash('Study not found.', 'warn')
+        return redirect_home()
+
+    form = ConfirmDeleteForm(request.form, obj=study_model)
+
+    if request.method == 'GET':
+        action = BASE_HREF + "/del_study/%i" % study_id
+        title = "Delete Study #%i?" % study_id
+        details = "Are you sure you want to delete Study '%s'?" % study_model.TITLE
+
+        return render_template(
+            'form.html',
+            form=form,
+            action=action,
+            title=title,
+            details=details,
+            description_map=description_map,
+            base_href=BASE_HREF
+        )
+
+    if request.method == 'POST':
+        if form.confirm and form.confirm.data:
+            db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == study_id).delete()
+            db.session.query(Investigator).filter(Investigator.STUDYID == study_id).delete()
+            db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).delete()
+            db.session.query(Study).filter(Study.STUDYID == study_id).delete()
+            db.session.commit()
+            flash('Study %i deleted.' % study_id, 'success')
+        else:
+            flash('Delete canceled.', 'info')
+
+        return redirect_home()
 
 
 def _update_study(study, form):
@@ -275,7 +334,7 @@ def study_details(study_id):
         form.populate_obj(study_details)
         db.session.add(study_details)
         db.session.commit()
-        flash('Study updated successfully!')
+        flash('Study updated successfully!', 'success')
         return redirect_home()
     return render_template(
         'form.html',

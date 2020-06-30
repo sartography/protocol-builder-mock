@@ -8,8 +8,8 @@ from pb.models import RequiredDocument, Investigator, StudyDetails
 
 class StudyForm(FlaskForm):
     STUDYID = HiddenField()
-    TITLE = StringField('Title', [validators.required()])
-    NETBADGEID = StringField('User UVA Computing Id', [validators.required()])
+    TITLE = StringField('Title', [validators.DataRequired()])
+    NETBADGEID = StringField('User UVA Computing Id', [validators.DataRequired()])
     requirements = SelectMultipleField("Requirements",
                                        render_kw={'class': 'multi'},
                                        choices=[(rd.AUXDOCID, rd.AUXDOC) for rd in RequiredDocument.all()])
@@ -17,17 +17,25 @@ class StudyForm(FlaskForm):
     Q_COMPLETE = BooleanField('Complete in Protocol Builder?', default='checked',
                               false_values=(False, 'false', 0, '0'))
 
+
 class InvestigatorForm(FlaskForm):
     NETBADGEID = StringField('UVA Id')
     INVESTIGATORTYPE = SelectField("InvestigatorType", choices=[(i.INVESTIGATORTYPE, i.INVESTIGATORTYPEFULL) for i in Investigator.all_types()])
+
 
 class StudyDetailsForm(ModelForm, FlaskForm):
     class Meta:
         model = StudyDetails
 
+
+class ConfirmDeleteForm(FlaskForm):
+    confirm = BooleanField('Yes, really delete', default='checked',
+                              false_values=(False, 'false', 0, '0'))
+
 class RequirementsTable(Table):
     AUXDOCID = Col('Code')
     AUXDOC = Col('Name')
+
 
 class InvestigatorsTable(Table):
     NETBADGEID = Col('UVA Id')
@@ -47,11 +55,6 @@ class StudyTable(Table):
         anchor_attrs={'class': 'btn btn-icon btn-primary', 'title': 'Edit Study'},
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Edit Study'}
     )
-    delete = LinkCol(
-        'delete', 'del_study', url_kwargs=dict(study_id='STUDYID'),
-        anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Study'},
-        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Study'}
-    )
     details = LinkCol(
         'ballot', 'study_details', url_kwargs=dict(study_id='STUDYID'),
         anchor_attrs={'class': 'btn btn-icon btn-default', 'title': 'Edit Questions'},
@@ -69,4 +72,9 @@ class StudyTable(Table):
     Q_COMPLETE = BoolCol('Complete?')
     requirements = NestedTableCol('Requirements', RequirementsTable)
     investigators = NestedTableCol('Investigators', InvestigatorsTable)
+    delete = LinkCol(
+        'delete', 'del_study', url_kwargs=dict(study_id='STUDYID'),
+        anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Study'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Study'}
+    )
 

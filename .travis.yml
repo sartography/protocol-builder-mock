@@ -1,29 +1,38 @@
 language: python
 
+python:
+  - "3.7"
+
 services:
   - postgresql
   - docker
 
-python:
-  - "3.7"
+addons:
+  chrome: stable
+  sonarcloud:
+    organization: "sartography"
 
 before_install:
-  - cp config/travis-testing.py config/testing.py
   - psql -c 'create database pb_test;' -U postgres
 
 install:
-  - pip install pipenv pytest awscli
-  - export PATH=$PATH:$HOME/.local/bin;
-  - pipenv install
-  - pytest              # <== This runs in Pipenv (a/k/a virtualenv)
+  - pipenv install --dev
 
-# command to run tests
+env:
+  global:
+    - TESTING=true
+    - SQLALCHEMY_DATABASE_URI="postgresql://postgres:@localhost:5432/pb_test"
+
 script:
-  - pytest
+  - pipenv run coverage run -m pytest
+  - pipenv run coverage xml -i
+
+after_success:
+  - sonar-scanner
 
 deploy:
   provider: script
-  script: bash deploy.sh
+  script: bash deploy.sh sartography/protocol-builder-mock
   skip_cleanup: true
   on:
     all_branches: true
