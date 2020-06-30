@@ -28,6 +28,10 @@ class StudyDetailsForm(ModelForm, FlaskForm):
         model = StudyDetails
 
 
+class ConfirmDeleteForm(FlaskForm):
+    confirm = BooleanField('Yes, really delete', default='checked',
+                              false_values=(False, 'false', 0, '0'))
+
 class RequirementsTable(Table):
     AUXDOCID = Col('Code')
     AUXDOC = Col('Name')
@@ -51,11 +55,6 @@ class StudyTable(Table):
         anchor_attrs={'class': 'btn btn-icon btn-primary', 'title': 'Edit Study'},
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Edit Study'}
     )
-    delete = LinkCol(
-        'delete', 'del_study', url_kwargs=dict(study_id='STUDYID'),
-        anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Study'},
-        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Study'}
-    )
     details = LinkCol(
         'ballot', 'study_details', url_kwargs=dict(study_id='STUDYID'),
         anchor_attrs={'class': 'btn btn-icon btn-default', 'title': 'Edit Questions'},
@@ -73,4 +72,9 @@ class StudyTable(Table):
     Q_COMPLETE = BoolCol('Complete?')
     requirements = NestedTableCol('Requirements', RequirementsTable)
     investigators = NestedTableCol('Investigators', InvestigatorsTable)
+    delete = LinkCol(
+        'delete', 'del_study', url_kwargs=dict(study_id='STUDYID'),
+        anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Study'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Study'}
+    )
 
