@@ -17,19 +17,31 @@
     <a class="btn btn-primary" href="{{ url_for('.new_study') }}"> New Study </a>
 </p>
 
-{% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
-        <ul class=flashes>
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
+        {% for category, message in messages %}
+            <div class="alert {{ category }}">
+                <span class="btn-close" onclick="hideElement(this.parentElement);">&times;</span>
+                {{ message }}
+            </div>
+        {% endfor %}
     {% endif %}
 {% endwith %}
 
 <h3>Current Studies</h3>
 {{ table }}
+
+
+<script>
+    const hideElement = (el) => {
+        el.classList.add('fade-out');
+        setTimeout(() => el.classList.add('shrink'), 250);
+    };
+
+    const alerts = document.getElementsByClassName('alert');
+    for (const alert of alerts) {
+        setTimeout(() => hideElement(alert), 3000);
+    }
+</script>
 </body>
-
-
 </html>

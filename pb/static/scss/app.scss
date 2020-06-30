@@ -22,6 +22,11 @@ $color-warn: #DF1E43;
 $color-warn-light: scale-color($color-warn, $lightness: +30%);
 $color-warn-dark: scale-color($color-warn, $lightness: -30%);
 
+// success (Green)
+$color-success: #64B343;
+$color-success-light: scale-color($color-success, $lightness: +30%);
+$color-success-dark: scale-color($color-success, $lightness: -30%);
+
 $font-size-default: 16px;
 $font-size-lg: 24px;
 $font-size-md: 16px;
@@ -242,3 +247,42 @@ select.multi {
   }
 }
 
+.alert {
+  padding: 20px;
+  background-color: $color-gray;
+  color: white;
+  margin-bottom: 15px;
+  opacity: 1;
+  border-radius: 5px;
+  transform: scale3d(1, 1, 1);
+  transition: all 0.5s ease-in-out;
+
+  &.warn { background-color: $color-warn; }
+  &.success { background-color: $color-success; }
+  &.info { background-color: $color-gray-light; color: black; }
+
+  .btn-close {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+
+    &:hover {
+      color: black;
+    }
+  }
+
+  &.fade-out {
+    opacity: 0;
+  }
+
+  &.shrink {
+    transform: scale3d(0, 0, 0);
+    padding: 0;
+    margin: 0;
+  }
+}

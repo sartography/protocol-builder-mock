@@ -28,6 +28,10 @@ class StudyDetailsForm(ModelForm, FlaskForm):
         model = StudyDetails
 
 
+class ConfirmDeleteForm(FlaskForm):
+    confirm = BooleanField('Yes, really delete', default='checked',
+                              false_values=(False, 'false', 0, '0'))
+
 class RequirementsTable(Table):
     AUXDOCID = Col('Code')
     AUXDOC = Col('Name')
