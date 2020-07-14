@@ -13,6 +13,7 @@ class Study(db.Model):
     investigators = db.relationship("Investigator", backref="study", lazy='dynamic')
     study_details = db.relationship("StudyDetails", uselist=False, backref="study")
 
+
 class StudySchema(ma.Schema):
     class Meta:
         # Fields to expose
@@ -47,6 +48,7 @@ class Investigator(db.Model):
         for t in self.all_types():
             if t.INVESTIGATORTYPE == type_code:
                 self.INVESTIGATORTYPEFULL = t.INVESTIGATORTYPEFULL
+
 
 class InvestigatorSchema(ma.Schema):
     class Meta:
