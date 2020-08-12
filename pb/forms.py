@@ -23,6 +23,11 @@ class InvestigatorForm(FlaskForm):
     INVESTIGATORTYPE = SelectField("InvestigatorType", choices=[(i.INVESTIGATORTYPE, i.INVESTIGATORTYPEFULL) for i in Investigator.all_types()])
 
 
+class StudySponsorForm(FlaskForm):
+    STUDY_ID = HiddenField()
+    SPONSOR_IDS = SelectMultipleField("Sponsor", coerce=int, validators=[validators.DataRequired()])
+
+
 class StudyDetailsForm(ModelForm, FlaskForm):
     class Meta:
         model = StudyDetails
@@ -46,6 +51,15 @@ class InvestigatorsTable(Table):
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Investigator'}
     )
 
+class SponsorsTable(Table):
+    SPONSOR_ID = Col('Sponsor Id')
+    SP_TYPE = Col('Type')
+    delete = LinkCol(
+        'delete', 'del_sponsor', url_kwargs=dict(inv_id='id'),
+        anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Sponsor'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Sponsor'}
+    )
+
 
 class StudyTable(Table):
     def sort_url(self, col_id, reverse=False):
@@ -65,6 +79,11 @@ class StudyTable(Table):
         anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Add Investigator'},
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Add Investigator'}
     )
+    add_sponsor = LinkCol(
+        'add_business', 'new_study_sponsor', url_kwargs=dict(study_id='STUDYID'),
+        anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Add Sponsor'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Add Sponsor'}
+    )
     STUDYID = Col('Study Id')
     TITLE = Col('Title')
     NETBADGEID = Col('User')
@@ -72,6 +91,7 @@ class StudyTable(Table):
     Q_COMPLETE = BoolCol('Complete?')
     requirements = NestedTableCol('Requirements', RequirementsTable)
     investigators = NestedTableCol('Investigators', InvestigatorsTable)
+    sponsors = NestedTableCol('Sponsors', SponsorsTable)
     delete = LinkCol(
         'delete', 'del_study', url_kwargs=dict(study_id='STUDYID'),
         anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Study'},

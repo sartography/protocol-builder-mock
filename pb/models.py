@@ -1,3 +1,4 @@
+from marshmallow import fields
 from sqlalchemy import func
 from pb import db, ma
 
@@ -11,6 +12,7 @@ class Study(db.Model):
     DATE_MODIFIED = db.Column(db.DateTime(timezone=True), default=func.now())
     requirements = db.relationship("RequiredDocument", backref="study", lazy='dynamic')
     investigators = db.relationship("Investigator", backref="study", lazy='dynamic')
+    sponsors = db.relationship("StudySponsor", backref="study", lazy='dynamic')
     study_details = db.relationship("StudyDetails", uselist=False, backref="study")
 
 
@@ -178,3 +180,61 @@ class StudyDetailsSchema(ma.SQLAlchemyAutoSchema):
         model = StudyDetails
         load_instance = True
         include_relationships = False
+
+
+class Sponsor(db.Model):
+    SPONSOR_ID = db.Column(db.Integer, primary_key=True)
+    SP_NAME = db.Column(db.String, nullable=True)
+    SP_MAILING_ADDRESS = db.Column(db.String, nullable=True)
+    SP_PHONE = db.Column(db.String, nullable=True)
+    SP_FAX = db.Column(db.String, nullable=True)
+    SP_EMAIL = db.Column(db.String, nullable=True)
+    SP_HOMEPAGE = db.Column(db.String, nullable=True)
+    COMMONRULEAGENCY = db.Column(db.Boolean, nullable=True)
+    SP_TYPE = db.Column(db.String, nullable=True)
+    SP_TYPE_GROUP_NAME = db.Column(db.String, nullable=True)
+
+    @staticmethod
+    def all_types():
+        types = [
+            Sponsor(SP_TYPE="Federal", SP_TYPE_GROUP_NAME="Government"),
+            Sponsor(SP_TYPE="Foundation/Not for Profit", SP_TYPE_GROUP_NAME="Other External Funding"),
+            Sponsor(SP_TYPE="Incoming Sub Award", SP_TYPE_GROUP_NAME="Government"),
+            Sponsor(SP_TYPE="Industry", SP_TYPE_GROUP_NAME="Industry"),
+            Sponsor(SP_TYPE="Internal/Departmental/Gift", SP_TYPE_GROUP_NAME="Internal Funding"),
+            Sponsor(SP_TYPE="No Funding", SP_TYPE_GROUP_NAME="Internal Funding"),
+            Sponsor(SP_TYPE="Other Colleges and Universities", SP_TYPE_GROUP_NAME="Other External Funding"),
+            Sponsor(SP_TYPE="State", SP_TYPE_GROUP_NAME="Government"),
+        ]
+        return types
+
+    @staticmethod
+    def get_type_group_name(self, type_code):
+        for t in self.all_types():
+            if t.SP_TYPE == type_code:
+                return t.SP_TYPE_GROUP_NAME
+
+
+class SponsorSchema(ma.Schema):
+    class Meta:
+        fields = ("SPONSOR_ID", "SP_NAME", "SP_MAILING_ADDRESS",
+                  "SP_PHONE", "SP_FAX", "SP_EMAIL", "SP_HOMEPAGE",
+                  "COMMONRULEAGENCY", "SP_TYPE")
+
+
+class StudySponsor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    SS_STUDY = db.Column(db.Integer, db.ForeignKey('study.STUDYID'))
+    SPONSOR_ID = db.Column(db.Integer, db.ForeignKey('sponsor.SPONSOR_ID'))
+    study = db.relationship("Study")
+    sponsor = db.relationship("Sponsor")
+
+
+class StudySponsorSchema(ma.Schema):
+    class Meta:
+        fields = ("SS_STUDY", "SPONSOR_ID", "SP_NAME", "SP_TYPE", "SP_TYPE_GROUP_NAME", "COMMONRULEAGENCY")
+
+    SP_TYPE = fields.Function(lambda obj: obj.sponsor.SP_TYPE)
+    SP_NAME = fields.Function(lambda obj: obj.sponsor.SP_NAME)
+    SP_TYPE_GROUP_NAME = fields.Function(lambda obj: obj.sponsor.SP_TYPE_GROUP_NAME)
+    COMMONRULEAGENCY = fields.Function(lambda obj: obj.sponsor.COMMONRULEAGENCY)
