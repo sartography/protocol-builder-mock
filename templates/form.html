@@ -13,13 +13,13 @@
 </head>
 <body>
 <h2>{{ title }}</h2>
-<p>{{ details }}</p>
+<p>{{ details|safe }}</p>
 <form action="{{ action }}" method="post">
 
     {{ form.csrf_token() }}
 
     {% for field in form if field.name != "csrf_token" %}
-        <div class="form-field">
+        <div class="form-field {{ field.widget.input_type }}">
             <div class="form-field-label">{{ field.label() }}:</div>
             <div class="form-field-input">{{ field }}</div>
             <div class="form-field-help">{{ description_map[field.name] }}</div>
