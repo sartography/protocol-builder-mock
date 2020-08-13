@@ -218,6 +218,10 @@ select.multi {
   margin-bottom: 40px;
   padding: 2em;
 
+  &.hidden {
+    display: none;
+  }
+
   &:nth-child(even) {
     background-color: $color-gray-light-2;
   }
@@ -291,4 +295,9 @@ select.multi {
     padding: 0;
     margin: 0;
   }
+}
+
+.highlight {
+  font-weight: bolder;
+  font-style: italic;
 }
