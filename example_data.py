@@ -12,12 +12,14 @@ class ExampleDataLoader:
         session.commit()
         session.flush()
 
-    def load_all(self):
-        self.load_sponsors()
+    @staticmethod
+    def load_all():
+        ExampleDataLoader().load_sponsors()
         # self.load_studies()
         # self.load_investigators()
 
-    def load_sponsors(self):
+    @staticmethod
+    def load_sponsors():
         # Load sponsors from csv
         with open('./pb/static/csv/sponsors.csv') as csv_file:
             data = csv.reader(csv_file, delimiter=',')
@@ -31,8 +33,7 @@ class ExampleDataLoader:
                     # row[2]: SP_MAILING_ADDRESS
                     # row[3]: SP_TYPE
                     first_line = False
-                elif int(row[0] or -1) is not -1:
-                    print('row', row)
+                elif int(row[0] or -1) != -1:
                     new_sponsor = Sponsor(SPONSOR_ID=int(row[0]), SP_NAME=row[1], SP_MAILING_ADDRESS=row[2], SP_TYPE=row[3])
                     new_sponsor.SP_TYPE_GROUP_NAME = Sponsor.get_type_group_name(new_sponsor.SP_TYPE)
                     sponsors.append(new_sponsor)

@@ -25,7 +25,12 @@ class InvestigatorForm(FlaskForm):
 
 class StudySponsorForm(FlaskForm):
     STUDY_ID = HiddenField()
-    SPONSOR_IDS = SelectMultipleField("Sponsor", coerce=int, validators=[validators.DataRequired()])
+    SPONSOR_IDS = SelectMultipleField(
+        "Sponsor",
+        coerce=int,
+        render_kw={'class': 'multi'},
+        validators=[validators.DataRequired()]
+    )
 
 
 class StudyDetailsForm(ModelForm, FlaskForm):
@@ -36,6 +41,7 @@ class StudyDetailsForm(ModelForm, FlaskForm):
 class ConfirmDeleteForm(FlaskForm):
     confirm = BooleanField('Yes, really delete', default='checked',
                               false_values=(False, 'false', 0, '0'))
+
 
 class RequirementsTable(Table):
     AUXDOCID = Col('Code')
@@ -51,11 +57,16 @@ class InvestigatorsTable(Table):
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Investigator'}
     )
 
+
+class SponsorCol(Col):
+    def td_format(self, content):
+        return f'{content.SP_NAME} ({content.SP_TYPE})'
+
+
 class SponsorsTable(Table):
-    SPONSOR_ID = Col('Sponsor Id')
-    SP_TYPE = Col('Type')
+    sponsor = SponsorCol('Sponsor')
     delete = LinkCol(
-        'delete', 'del_sponsor', url_kwargs=dict(inv_id='id'),
+        'delete', 'del_study_sponsor', url_kwargs=dict(study_sponsor_id='id'),
         anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Sponsor'},
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Sponsor'}
     )
@@ -80,9 +91,9 @@ class StudyTable(Table):
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Add Investigator'}
     )
     add_sponsor = LinkCol(
-        'add_business', 'new_study_sponsor', url_kwargs=dict(study_id='STUDYID'),
-        anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Add Sponsor'},
-        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Add Sponsor'}
+        'account_balance', 'edit_study_sponsor', url_kwargs=dict(study_id='STUDYID'),
+        anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Edit Sponsor(s)'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Edit Sponsor(s)'}
     )
     STUDYID = Col('Study Id')
     TITLE = Col('Title')
