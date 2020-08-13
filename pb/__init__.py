@@ -59,6 +59,11 @@ origins_re = [r"^https?:\/\/%s(.*)" % o.replace('.', '\.') for o in app.config['
 cors = CORS(connexion_app.app, origins=origins_re)
 
 db = SQLAlchemy(app)
+""":type: sqlalchemy.orm.SQLAlchemy"""
+
+session = db.session
+""":type: sqlalchemy.orm.Session"""
+
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
 
@@ -115,6 +120,21 @@ def has_no_empty_params(rule):
     return len(defaults) >= len(arguments)
 
 
+@app.cli.command()
+def load_example_data():
+    """Load example data into the database."""
+    from example_data import ExampleDataLoader
+    ExampleDataLoader().clean_db()
+    ExampleDataLoader().load_all()
+
+
+@app.cli.command()
+def load_example_sponsors():
+    """Load example data into the database."""
+    from example_data import ExampleDataLoader
+    ExampleDataLoader().load_sponsors()
+
+
 @app.route('/site_map')
 def site_map():
     links = []
@@ -130,9 +150,9 @@ def site_map():
 # **************************
 # WEB FORMS
 # **************************
-from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, ConfirmDeleteForm
+from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, ConfirmDeleteForm, StudySponsorForm
 from pb.models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
-    StudyDetails, StudyDetailsSchema
+    StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -256,6 +276,84 @@ def del_investigator(inv_id):
     return redirect_home()
 
 
+@app.route('/study_sponsor/<study_id>', methods=['GET', 'POST'])
+def edit_study_sponsor(study_id):
+    study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
+    form = StudySponsorForm(request.form)
+    action = BASE_HREF + "/study_sponsor/" + study_id
+    title = "Edit sponsors for Study " + study_id
+    form.SPONSOR_IDS.choices = [(s.SPONSOR_ID, f'{s.SP_NAME} ({s.SP_TYPE})') for s in db.session.query(Sponsor).all()]
+
+    if request.method == 'GET':
+        if hasattr(study, 'sponsors'):
+            form.SPONSOR_IDS.data = [s.SPONSOR_ID for s in study.sponsors]
+
+    if request.method == 'POST':
+        # Remove all existing sponsors
+        session.query(StudySponsor).filter(StudySponsor.SS_STUDY == study_id).delete()
+
+        # Add the new ones
+        for sponsor_id in form.SPONSOR_IDS.data:
+            study_sponsor = StudySponsor(SS_STUDY=study_id, SPONSOR_ID=sponsor_id)
+            db.session.add(study_sponsor)
+            db.session.commit()
+
+        sponsor_label = 'sponsor' if len(form.SPONSOR_IDS.data) == 1 else 'sponsors'
+        flash(f'Study {sponsor_label} edited successfully!', 'success')
+        return redirect_home()
+
+    return render_template(
+        'form.html',
+        form=form,
+        action=action,
+        title=title,
+        description_map={},
+        base_href=BASE_HREF
+    )
+
+
+@app.route('/del_study_sponsor/<study_sponsor_id>', methods=['GET', 'POST'])
+def del_study_sponsor(study_sponsor_id):
+    study_sponsor_id = int(study_sponsor_id)
+    study_sponsor_model: StudySponsor = db.session.query(StudySponsor).filter(StudySponsor.id == study_sponsor_id).first()
+
+    if study_sponsor_model is None:
+        flash('StudySponsor not found.', 'warn')
+        return redirect_home()
+
+    sponsor_span = f'<span class="highlight">{study_sponsor_model.sponsor.SP_NAME} ' \
+                   f'({study_sponsor_model.sponsor.SP_TYPE})</span>'
+    study_id = int(study_sponsor_model.SS_STUDY)
+    form = ConfirmDeleteForm(request.form, obj=study_sponsor_model)
+
+    if request.method == 'GET':
+        action = f'{BASE_HREF}/del_study_sponsor/{study_sponsor_id}'
+        title = 'Remove study sponsor?'
+        details = f'Are you sure you want to remove {sponsor_span} ' \
+                  f'as a sponsor of Study {study_id}? ' \
+                  f'This will not remove the sponsor itself from the system.'
+
+        return render_template(
+            'form.html',
+            form=form,
+            action=action,
+            title=title,
+            details=details,
+            description_map=description_map,
+            base_href=BASE_HREF
+        )
+
+    if request.method == 'POST':
+        if form.confirm and form.confirm.data:
+            db.session.query(StudySponsor).filter(StudySponsor.id == study_sponsor_id).delete()
+            db.session.commit()
+            flash(f'Sponsor {sponsor_span} removed from Study {study_id}.', 'success')
+        else:
+            flash('Delete canceled.', 'info')
+
+    return redirect_home()
+
+
 @app.route('/del_study/<study_id>', methods=['GET', 'POST'])
 def del_study(study_id):
     study_id = int(study_id)
@@ -267,9 +365,9 @@ def del_study(study_id):
     form = ConfirmDeleteForm(request.form, obj=study_model)
 
     if request.method == 'GET':
-        action = BASE_HREF + "/del_study/%i" % study_id
-        title = "Delete Study #%i?" % study_id
-        details = "Are you sure you want to delete Study '%s'?" % study_model.TITLE
+        action = f'{BASE_HREF}/del_study/{study_id}'
+        title = f'Delete Study #{study_id}?'
+        details = f'Are you sure you want to delete Study <span class="highlight">{study_model.TITLE}</span>?'
 
         return render_template(
             'form.html',
@@ -286,7 +384,9 @@ def del_study(study_id):
             db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == study_id).delete()
             db.session.query(Investigator).filter(Investigator.STUDYID == study_id).delete()
             db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).delete()
-            db.session.query(Study).filter(Study.STUDYID == study_id).delete()
+            db.session.query(StudySponsor).filter(StudySponsor.SS_STUDY == study_id).delete()
+            study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
+            session.delete(study)
             db.session.commit()
             flash('Study %i deleted.' % study_id, 'success')
         else:

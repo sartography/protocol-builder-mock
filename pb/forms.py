@@ -23,6 +23,16 @@ class InvestigatorForm(FlaskForm):
     INVESTIGATORTYPE = SelectField("InvestigatorType", choices=[(i.INVESTIGATORTYPE, i.INVESTIGATORTYPEFULL) for i in Investigator.all_types()])
 
 
+class StudySponsorForm(FlaskForm):
+    STUDY_ID = HiddenField()
+    SPONSOR_IDS = SelectMultipleField(
+        "Sponsor",
+        coerce=int,
+        render_kw={'class': 'multi'},
+        validators=[validators.DataRequired()]
+    )
+
+
 class StudyDetailsForm(ModelForm, FlaskForm):
     class Meta:
         model = StudyDetails
@@ -31,6 +41,7 @@ class StudyDetailsForm(ModelForm, FlaskForm):
 class ConfirmDeleteForm(FlaskForm):
     confirm = BooleanField('Yes, really delete', default='checked',
                               false_values=(False, 'false', 0, '0'))
+
 
 class RequirementsTable(Table):
     AUXDOCID = Col('Code')
@@ -44,6 +55,20 @@ class InvestigatorsTable(Table):
         'delete', 'del_investigator', url_kwargs=dict(inv_id='id'),
         anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Investigator'},
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Investigator'}
+    )
+
+
+class SponsorCol(Col):
+    def td_format(self, content):
+        return f'{content.SP_NAME} ({content.SP_TYPE})'
+
+
+class SponsorsTable(Table):
+    sponsor = SponsorCol('Sponsor')
+    delete = LinkCol(
+        'delete', 'del_study_sponsor', url_kwargs=dict(study_sponsor_id='id'),
+        anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Sponsor'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Sponsor'}
     )
 
 
@@ -65,6 +90,11 @@ class StudyTable(Table):
         anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Add Investigator'},
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Add Investigator'}
     )
+    add_sponsor = LinkCol(
+        'account_balance', 'edit_study_sponsor', url_kwargs=dict(study_id='STUDYID'),
+        anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Edit Sponsor(s)'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Edit Sponsor(s)'}
+    )
     STUDYID = Col('Study Id')
     TITLE = Col('Title')
     NETBADGEID = Col('User')
@@ -72,6 +102,7 @@ class StudyTable(Table):
     Q_COMPLETE = BoolCol('Complete?')
     requirements = NestedTableCol('Requirements', RequirementsTable)
     investigators = NestedTableCol('Investigators', InvestigatorsTable)
+    sponsors = NestedTableCol('Sponsors', SponsorsTable)
     delete = LinkCol(
         'delete', 'del_study', url_kwargs=dict(study_id='STUDYID'),
         anchor_attrs={'class': 'btn btn-icon btn-warn', 'title': 'Delete Study'},
