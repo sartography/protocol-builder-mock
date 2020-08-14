@@ -85,6 +85,12 @@ class Sanity_Check_Test(unittest.TestCase):
         self.assertEqual(num_docs_before, num_docs_after)
         self.assertEqual(num_studies_before, num_studies_after)
 
+    def test_add_sponsors(self):
+        """Load sponsors twice in a row to make sure duplicates aren't created."""
+        self.load_sponsors()
+        self.load_sponsors()
+
+
     def test_add_and_edit_study_sponsor(self):
         """Add and edit a study sponsor"""
         num_sponsors = 5

@@ -403,6 +403,7 @@ def _update_study(study, form):
 
         study.STUDYID = max_id + 1
     else:
+        # Delete existing required documents for this study.
         db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == study.STUDYID).delete()
 
     study.TITLE = form.TITLE.data
