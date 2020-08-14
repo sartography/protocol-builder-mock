@@ -34,9 +34,14 @@ class ExampleDataLoader:
                     # row[3]: SP_TYPE
                     first_line = False
                 elif int(row[0] or -1) != -1:
-                    new_sponsor = Sponsor(SPONSOR_ID=int(row[0]), SP_NAME=row[1], SP_MAILING_ADDRESS=row[2], SP_TYPE=row[3])
-                    new_sponsor.SP_TYPE_GROUP_NAME = Sponsor.get_type_group_name(new_sponsor.SP_TYPE)
-                    sponsors.append(new_sponsor)
+                    sponsor_id = int(row[0])
+                    is_duplicate = session.query(Sponsor).filter(Sponsor.SPONSOR_ID == sponsor_id).count() > 0
+
+                    # Make sure we're not creating duplicates
+                    if not is_duplicate:
+                        new_sponsor = Sponsor(SPONSOR_ID=sponsor_id, SP_NAME=row[1], SP_MAILING_ADDRESS=row[2], SP_TYPE=row[3])
+                        new_sponsor.SP_TYPE_GROUP_NAME = Sponsor.get_type_group_name(new_sponsor.SP_TYPE)
+                        sponsors.append(new_sponsor)
 
             session.add_all(sponsors)
             session.commit()
