@@ -197,6 +197,16 @@ def edit_study(study_id):
 @app.route('/investigator/<study_id>', methods=['GET', 'POST'])
 def new_investigator(study_id):
     form = InvestigatorForm(request.form)
+
+    # Remove options from form if unique investigator already exist, but AS_C and SI can happen many times.
+    investigators = db.session.query(Investigator).filter(Study.STUDYID == study_id).all()
+    choices = form.INVESTIGATORTYPE.choices
+    existing_types = [i.INVESTIGATORTYPE for i in investigators]
+    existing_types = list(filter(lambda a: a != "AS_C", existing_types))
+    existing_types = list(filter(lambda a: a != "SI", existing_types))
+    new_choices = [choice for choice in choices if choice[0] not in existing_types]
+    form.INVESTIGATORTYPE.choices = new_choices
+
     action = BASE_HREF + "/investigator/" + study_id
     title = "Add Investigator to Study " + study_id
     if request.method == 'POST':
