@@ -199,7 +199,7 @@ def new_investigator(study_id):
     form = InvestigatorForm(request.form)
 
     # Remove options from form if unique investigator already exist, but AS_C and SI can happen many times.
-    investigators = db.session.query(Investigator).filter(Study.STUDYID == study_id).all()
+    investigators = db.session.query(Investigator).filter(Investigator.STUDYID == study_id).all()
     choices = form.INVESTIGATORTYPE.choices
     existing_types = [i.INVESTIGATORTYPE for i in investigators]
     existing_types = list(filter(lambda a: a != "AS_C", existing_types))
