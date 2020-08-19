@@ -22,7 +22,7 @@
         {% for category, message in messages %}
             <div class="alert {{ category }}">
                 <span class="btn-close" onclick="hideElement(this.parentElement);">&times;</span>
-                {{ message }}
+                {{ message|safe }}
             </div>
         {% endfor %}
     {% endif %}

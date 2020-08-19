@@ -214,9 +214,13 @@ select.multi {
 
 .form-field {
   display: flex;
-  width: 100%;
+  max-width: 100vw;
   margin-bottom: 40px;
   padding: 2em;
+
+  &.hidden {
+    display: none;
+  }
 
   &:nth-child(even) {
     background-color: $color-gray-light-2;
@@ -227,15 +231,21 @@ select.multi {
   .form-field-input {
     width: 30%;
     text-align: left;
-    margin-right: 40px;
+    margin-right: 24px;
   }
 
   .form-field-label {
     font-weight: bold;
+    text-align: right;
   }
 
   .form-field-input input {
     width: 100%;
+    text-align: left;
+
+    &[type=checkbox] {
+      width: 24px;
+    }
   }
 
   .form-field-help {
@@ -285,4 +295,9 @@ select.multi {
     padding: 0;
     margin: 0;
   }
+}
+
+.highlight {
+  font-weight: bolder;
+  font-style: italic;
 }
