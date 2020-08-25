@@ -52,6 +52,7 @@ class StudySponsor(db.Model):
 
 
 class StudySponsorSchema(ma.Schema):
+
     class Meta:
         fields = ("SS_STUDY", "SPONSOR_ID", "SP_NAME", "SP_TYPE", "SP_TYPE_GROUP_NAME", "COMMONRULEAGENCY")
 

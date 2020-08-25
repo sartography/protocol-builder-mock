@@ -36,6 +36,11 @@ def get_study_details(studyid):
     return StudyDetailsSchema().dump(details)
 
 
+def sponsors(studyid):
+    sponsors = db.session.query(StudySponsor).filter(StudySponsor.SS_STUDY == studyid).all()
+    return StudySponsorSchema(many=True).dump(sponsors)
+
+
 def get_form(id, requirement_code):
     return
 
@@ -152,7 +157,7 @@ def site_map():
 # **************************
 from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, ConfirmDeleteForm, StudySponsorForm
 from pb.models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
-    StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor
+    StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor, SponsorSchema, StudySponsorSchema
 
 
 @app.route('/', methods=['GET', 'POST'])
