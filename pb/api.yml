@@ -90,6 +90,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Investigator"
+  /sponsors:
+    get:
+      tags:
+        - CR-Connect
+      summary: Sponsors associated with a study.
+      operationId: pb.sponsors
+      description: A list of all the sponsors related to a study
+      parameters:
+        - in: query
+          name: studyid
+          description: A valid studyid, as provided in the call to list all studies.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of sponsors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sponsor"
   /study:
     parameters:
       - in: query
@@ -155,6 +178,32 @@ components:
           format: string
           example: IDS - Investigational Drug Service Approval
           description: A descriptive name of the required dcoument.
+    Sponsor:
+      properties:
+        SP_NAME:
+          type: string
+          example: "AstraZeneca Pharmaceuticals LP (Wilmington, DE)"
+          description: A descriptive name
+        SP_TYPE:
+          type: string
+          example: "Industry"
+          description: the type of sponsor
+        SP_TYPE_GROUP_NAME:
+          type: string
+          example: "Industry"
+          description: The category of the type of sponsor
+        SS_STUDY:
+          type: number
+          example: 15333
+          description: The unqiue id of the associated study
+        COMMONRULEAGENCY:
+          type: boolean
+          example: true
+          description: Is this a common rule agency
+        SPONSOR_ID:
+          type: number
+          example: 1022
+          description: The unique id of the sponsor
     Investigator:
       properties:
         STUDYID:

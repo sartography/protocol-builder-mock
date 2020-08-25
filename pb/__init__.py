@@ -36,6 +36,11 @@ def get_study_details(studyid):
     return StudyDetailsSchema().dump(details)
 
 
+def sponsors(studyid):
+    sponsors = db.session.query(StudySponsor).filter(StudySponsor.SS_STUDY == studyid).all()
+    return StudySponsorSchema(many=True).dump(sponsors)
+
+
 def get_form(id, requirement_code):
     return
 
@@ -152,7 +157,7 @@ def site_map():
 # **************************
 from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, ConfirmDeleteForm, StudySponsorForm
 from pb.models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
-    StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor
+    StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor, SponsorSchema, StudySponsorSchema
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -219,7 +224,7 @@ def new_investigator(study_id):
     form = InvestigatorForm(request.form)
 
     # Remove options from form if unique investigator already exist, but AS_C and SI can happen many times.
-    investigators = db.session.query(Investigator).filter(Study.STUDYID == study_id).all()
+    investigators = db.session.query(Investigator).filter(Investigator.STUDYID == study_id).all()
     choices = form.INVESTIGATORTYPE.choices
     existing_types = [i.INVESTIGATORTYPE for i in investigators]
     existing_types = list(filter(lambda a: a != "AS_C", existing_types))
