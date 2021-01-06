@@ -1,4 +1,5 @@
 import os
+import json
 
 from werkzeug.datastructures import MultiDict
 
@@ -9,6 +10,7 @@ import random
 import string
 from pb import app, db, session
 from pb.forms import StudyForm, StudySponsorForm
+from pb.ldap.ldap_service import LdapService
 from pb.models import Study, RequiredDocument, Sponsor, StudySponsor
 from example_data import ExampleDataLoader
 
@@ -130,3 +132,13 @@ class Sanity_Check_Test(unittest.TestCase):
         self.assertGreater(len(study_sponsors_after), 0)
         self.assertEqual(len(study_sponsors_after), num_sponsors)
 
+    def test_ldap_search(self):
+        needle = 'funk'
+        result = LdapService.users_as_json(needle)
+        users = json.loads(result)
+        print(f'len of users: {len(users)}')
+        # self.assertEqual(2, len(users))
+        uids = []
+        for user in users:
+            uids.append(user['uid'])
+        self.assertIn('dhf8r', uids)
