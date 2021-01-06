@@ -24,6 +24,10 @@ SQLALCHEMY_DATABASE_URI = environ.get(
 )
 SECRET_KEY = environ.get('SECRET_KEY', default='a really really really really long secret key')
 
+LDAP_URL = 'mock'
+# LDAP_URL = 'ldap.virginia.edu'
+LDAP_TIMEOUT_SEC = 10
+
 print('=== USING DEFAULT CONFIG: ===')
 print('DB_HOST = ', DB_HOST)
 print('CORS_ALLOW_ORIGINS = ', CORS_ALLOW_ORIGINS)
