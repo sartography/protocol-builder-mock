@@ -31,6 +31,64 @@
     <button class="btn btn-primary" type="submit">Submit</button>
     <a href="{{ url_for('index') }}" class="btn btn-default">Cancel</a>
 </form>
+<div id="ldap-live-search"></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+    clearLiveSearch();
+    $('#NETBADGEID').keyup(function (event) {
+        let val = $('#NETBADGEID').val();
+        {# limit how often we serach LDAP #}
+        if (val.length == 0) {
+            clearLiveSearch();
+        } else if ((val.length > 2) &&  (val.length % 2 == 1)) {
+            SearchLDAP(event);
+        }
+    });
+    $('#ldap-live-search').on('click', '.ldap-user', function() {
+        UpdateUserField(this);
+    });
 
+    function SearchLDAP(event) {
+
+        let current_val = $('#NETBADGEID').val();
+        let url = "http://localhost:5001/search_ldap/" + current_val;
+
+        $.ajax({
+            url: url,
+            cache: false,
+            dataType: "json",
+            success: function (result) {
+                updateLiveSearch(result);
+            }
+        });
+
+    }
+
+    function updateLiveSearch(result) {
+        $('#ldap-live-search').empty();
+        $('#ldap-live-search').show();
+        $('#NETBADGEID').parent().append($('#ldap-live-search'));
+        for(let row in result) {
+            let uid = result[row]['uid'];
+            let display_name = result[row]['display_name'];
+            let row_div = "<div><span class='ldap-user' id='" + uid + "'>" + display_name + "</span></div>";
+            $('#ldap-live-search').append(row_div);
+        }
+
+    }
+
+    function UpdateUserField(obj) {
+        $('#NETBADGEID').val(obj.id);
+        clearLiveSearch();
+    }
+
+    function clearLiveSearch() {
+        $('#ldap-live-search').empty();
+        $('#ldap-live-search').hide();
+    }
+
+});
+</script>
 </body>
 </html>
