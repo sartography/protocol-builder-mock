@@ -158,6 +158,7 @@ def site_map():
 from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, ConfirmDeleteForm, StudySponsorForm
 from pb.models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
     StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor, SponsorSchema, StudySponsorSchema
+from pb.ldap.ldap_service import LdapService
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -461,6 +462,12 @@ def study_details(study_id):
         description_map=description_map,
         base_href=BASE_HREF
     )
+
+
+# from pb.ldap_service import users_as_json
+@app.route('/search_ldap/<needle>')
+def search_ldap(needle):
+    return LdapService.users_as_json(needle)
 
 
 def redirect_home():
