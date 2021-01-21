@@ -24,8 +24,8 @@ SQLALCHEMY_DATABASE_URI = environ.get(
 )
 SECRET_KEY = environ.get('SECRET_KEY', default='a really really really really long secret key')
 
-LDAP_URL = 'mock'
-# LDAP_URL = 'ldap.virginia.edu'
+LDAP_URL = environ.get('LDAP_URL', default='ldap.virginia.edu')
+# LDAP_URL = "mock"  Do this to use the mock service.
 LDAP_TIMEOUT_SEC = 10
 
 print('=== USING DEFAULT CONFIG: ===')
