@@ -30,14 +30,6 @@ script:
 after_success:
   - sonar-scanner
 
-deploy:
-  provider: script
-  script: bash deploy.sh sartography/protocol-builder-mock
-  skip_cleanup: true
-  on:
-    all_branches: true
-    condition: $TRAVIS_BRANCH =~ ^(dev|testing|demo|training|staging|master|rrt\/.*)$
-
 notifications:
   email:
     on_success: change
