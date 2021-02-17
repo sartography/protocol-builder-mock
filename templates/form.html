@@ -52,7 +52,7 @@ $(document).ready(function () {
     function SearchLDAP(event) {
 
         let current_val = $('#NETBADGEID').val();
-        let url = "http://localhost:5001/search_ldap/" + current_val;
+        let url = "./search_ldap/" + current_val;
 
         $.ajax({
             url: url,
