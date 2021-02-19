@@ -16,6 +16,18 @@
 <p>
     <a class="btn btn-primary" href="{{ url_for('.new_study') }}"> New Study </a>
 </p>
+<p>
+    <label>User Studies</label>
+    <select name="uva_id" id="uva_id" onclick="selectStudies()">
+        <option value="">Select User</option>
+        <option value="all">All Users</option>
+        {%  if users %}
+            {% for user in users %}
+                <option value="{{ user }}">{{ user }}</option>
+            {% endfor %}
+        {% endif %}
+    </select>
+</p>
 
 {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
@@ -41,6 +53,16 @@
     const alerts = document.getElementsByClassName('alert');
     for (const alert of alerts) {
         setTimeout(() => hideElement(alert), 3000);
+    }
+</script>
+<script>
+    function selectStudies() {
+        let uva_id = document.getElementById('uva_id').value;
+        if (uva_id == 'all') {
+            window.location.href = '/'
+        } else {
+            window.location.href = "/user_studies/" + uva_id;
+        }
     }
 </script>
 </body>
