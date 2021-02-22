@@ -44,8 +44,11 @@ class Sanity_Check_Test(unittest.TestCase):
         self.assertEqual(len(sponsors), num_lines - 1)
         return sponsors
 
-    def add_study(self):
-        study_title = "My Test Document" + ''.join(random.choices(string.digits, k=8))
+    def add_study(self, title=None):
+        if title is None:
+            study_title = "My Test Document" + ''.join(random.choices(string.digits, k=8))
+        else:
+            study_title = title
         study = Study(TITLE=study_title, NETBADGEID="dhf8r")
         form = StudyForm(formdata=None, obj=study)
         num_reqs = len(form.requirements.choices)
@@ -142,3 +145,8 @@ class Sanity_Check_Test(unittest.TestCase):
         for user in users:
             uids.append(user['uid'])
         self.assertIn('dhf8r', uids)
+
+    def test_long_study_name(self):
+        title = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla egestas quam id ullamcorper facilisis. Praesent ultricies urna malesuada velit ultricies efficitur. Nam eu eleifend libero. Mauris ac erat augue. Curabitur ac fringilla tellus. Morbi sem quam, consectetur sit amet eros non, semper congue metus. Sed sollicitudin augue eu justo fermentum volutpat at sit amet metus. Vestibulum hendrerit pharetra ante. Sed porttitor diam nibh, quis elementum est placerat sit amet. Phasellus magna libero, porta quis euismod et, commodo eu nisl. Quisque consectetur sagittis interdum. Nullam congue consectetur elementum. In hac habitasse platea dictumst. Duis placerat iaculis odio, ac faucibus felis vehicula nec. Praesent cursus id turpis ac maximus.'
+        study = self.add_study(title=title)
+        self.assertEqual(title, study.TITLE)
