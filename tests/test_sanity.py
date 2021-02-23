@@ -146,7 +146,21 @@ class Sanity_Check_Test(unittest.TestCase):
             uids.append(user['uid'])
         self.assertIn('dhf8r', uids)
 
+
+    def test_user_studies(self):
+        studies1 = self.app.get(f'/user_studies')
+        self.assertEqual('308 PERMANENT REDIRECT', studies1.status)
+        for header in studies1.headers:
+            if header[0] == 'Location':
+                self.assertEqual('http://localhost/user_studies/', header[1])
+        studies2 = self.app.get(f'/user_studies/')
+        self.assertEqual('302 FOUND', studies2.status)
+        for header in studies2.headers:
+            if header[0] == 'Location':
+                self.assertEqual('http://localhost/', header[1])
+
     def test_long_study_name(self):
         title = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla egestas quam id ullamcorper facilisis. Praesent ultricies urna malesuada velit ultricies efficitur. Nam eu eleifend libero. Mauris ac erat augue. Curabitur ac fringilla tellus. Morbi sem quam, consectetur sit amet eros non, semper congue metus. Sed sollicitudin augue eu justo fermentum volutpat at sit amet metus. Vestibulum hendrerit pharetra ante. Sed porttitor diam nibh, quis elementum est placerat sit amet. Phasellus magna libero, porta quis euismod et, commodo eu nisl. Quisque consectetur sagittis interdum. Nullam congue consectetur elementum. In hac habitasse platea dictumst. Duis placerat iaculis odio, ac faucibus felis vehicula nec. Praesent cursus id turpis ac maximus.'
         study = self.add_study(title=title)
         self.assertEqual(title, study.TITLE)
+

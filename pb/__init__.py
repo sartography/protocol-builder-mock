@@ -161,16 +161,32 @@ from pb.models import Study, RequiredDocument, Investigator, StudySchema, Requir
 from pb.ldap.ldap_service import LdapService
 
 
+def render_study_template(studies):
+    table = StudyTable(studies)
+    users = []
+    [users.append(study.NETBADGEID) for study in studies if study.NETBADGEID not in users]
+    return render_template(
+        'index.html',
+        table=table,
+        base_href=BASE_HREF,
+        users=users
+    )
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # display results
     studies = db.session.query(Study).order_by(Study.DATE_MODIFIED.desc()).all()
-    table = StudyTable(studies)
-    return render_template(
-        'index.html',
-        table=table,
-        base_href=BASE_HREF
-    )
+    return render_study_template(studies)
+
+
+@app.route('/user_studies/', defaults={'uva_id': 'all'})
+@app.route('/user_studies/<uva_id>', methods=['GET'])
+def user_studies(uva_id):
+    if uva_id == 'all':
+        return redirect(f"/")
+    studies = db.session.query(Study).filter(Study.NETBADGEID == uva_id).order_by(Study.DATE_MODIFIED.desc()).all()
+    return render_study_template(studies)
 
 
 @app.route('/new_study', methods=['GET', 'POST'])
