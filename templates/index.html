@@ -59,9 +59,9 @@
     function selectStudies() {
         let uva_id = document.getElementById('uva_id').value;
         if (uva_id == 'all') {
-            window.location.href = '/'
+            window.location.href = "{{base_href}}/";
         } else {
-            window.location.href = "/user_studies/" + uva_id;
+            window.location.href = "{{base_href}}/user_studies/" + uva_id;
         }
     }
 </script>
