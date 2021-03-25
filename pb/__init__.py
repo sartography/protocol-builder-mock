@@ -463,7 +463,7 @@ def study_details(study_id):
         action = BASE_HREF + "/study_details/" + study_id
         title = "Edit Study Details for Study #" + study_id
         details = "Numeric fields can be 1 for true, 0 or false, or Null if not applicable."
-    if request.method == 'POST':
+    if request.method == 'POST' and form.validate():
         form.populate_obj(study_details)
         db.session.add(study_details)
         db.session.commit()
