@@ -100,7 +100,6 @@ class Investigator(db.Model):
             Investigator(INVESTIGATORTYPE="AS_C", INVESTIGATORTYPEFULL="Additional Study Coordinators"),
             Investigator(INVESTIGATORTYPE="DEPT_CH", INVESTIGATORTYPEFULL="Department Chair"),
             Investigator(INVESTIGATORTYPE="IRBC", INVESTIGATORTYPEFULL="IRB Coordinator"),
-            Investigator(INVESTIGATORTYPE="SCI", INVESTIGATORTYPEFULL="Scientific Contact"),
         ]
         return types
 
@@ -185,7 +184,7 @@ class StudyDetails(db.Model):
     PRC_NUMBER = db.Column(db.String, nullable=True)
     IS_IBC = db.Column(db.Integer, nullable=True)
     IBC_NUMBER = db.Column(db.String, nullable=True)
-    SPONSORS_PROTOCOL_REVISION_DATE = db.Column(db.Integer, nullable=True)
+    SPONSORS_PROTOCOL_REVISION_DATE = db.Column(db.Date, nullable=True)
     IS_SPONSOR_MONITORING = db.Column(db.Integer, nullable=True)
     IS_AUX  = db.Column(db.Integer, nullable=True)
     IS_SPONSOR = db.Column(db.Integer, nullable=True)
@@ -232,6 +231,15 @@ class StudyDetails(db.Model):
     IS_FOR_CANCER_CENTER = db.Column(db.Integer, nullable=True)
     IS_REVIEW_BY_CENTRAL_IRB = db.Column(db.Integer, nullable=True)
     IRBREVIEWERADMIN = db.Column(db.String, nullable=True)
+    IS_SPONSOR_TRACKING = db.Column(db.Integer, nullable=True)
+    SPONSOR_TRACKING = db.Column(db.Integer, nullable=True)
+    IS_DSMB = db.Column(db.Integer, nullable=True)
+    IS_COMPLETE_NON_IRB_REGULATORY = db.Column(db.Integer, nullable=True)
+    IS_INSIDE_CONTRACT = db.Column(db.Integer, nullable=True)
+    IS_CODED_RESEARCH = db.Column(db.Integer, nullable=True)
+    IS_OUTSIDE_SPONSOR = db.Column(db.Integer, nullable=True)
+    IS_UVA_COLLABANALYSIS = db.Column(db.Integer, nullable=True)
+
 
 
 class StudyDetailsSchema(ma.SQLAlchemyAutoSchema):
