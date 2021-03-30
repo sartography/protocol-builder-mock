@@ -10,7 +10,7 @@ class StudyForm(FlaskForm):
     STUDYID = HiddenField()
     TITLE = StringField('Title', [validators.DataRequired()])
     NETBADGEID = StringField('User UVA Computing Id', [validators.DataRequired()])
-    requirements = SelectMultipleField("Requirements",
+    requirements = SelectMultipleField("Documents",
                                        render_kw={'class': 'multi'},
                                        choices=[(rd.AUXDOCID, rd.AUXDOC) for rd in RequiredDocument.all()])
     HSRNUMBER = StringField('HSR Number')
@@ -55,7 +55,7 @@ class StudyDetailsForm(ModelForm, FlaskForm):
                 'IS_CODED_RESEARCH', 'IS_OUTSIDE_SPONSOR', 'IS_PI_INITIATED',
                 'IS_ENGAGED_RESEARCH', 'IS_APPROVED_DEVICE', 'IS_FINANCIAL_CONFLICT',
                 'IS_NOT_CONSENT_WAIVER', 'IS_FOR_CANCER_CENTER', 'IS_REVIEW_BY_CENTRAL_IRB',
-                'IRBREVIEWERADMIN', 'IS_UVA_COLLABANALYSIS']
+                'IRBREVIEWERADMIN', 'IS_UVA_COLLABANALYSIS', 'REVIEW_TYPE', 'REVIEWTYPENAME']
 
 
 class ConfirmDeleteForm(FlaskForm):
@@ -120,7 +120,7 @@ class StudyTable(Table):
     NETBADGEID = Col('User')
     DATE_MODIFIED = DatetimeCol('Last Update', "medium")
     Q_COMPLETE = BoolCol('Complete?')
-    requirements = NestedTableCol('Requirements', RequirementsTable)
+    requirements = NestedTableCol('Documents', RequirementsTable)
     investigators = NestedTableCol('Investigators', InvestigatorsTable)
     sponsors = NestedTableCol('Sponsors', SponsorsTable)
     delete = LinkCol(

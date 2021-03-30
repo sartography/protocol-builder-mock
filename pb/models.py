@@ -136,11 +136,9 @@ class RequiredDocument(db.Model):
                 RequiredDocument(AUXDOCID=21, AUXDOC="New Medical Device Form"),
                 RequiredDocument(AUXDOCID=22, AUXDOC="SOM CTO Review regarding need for IDE"),
                 RequiredDocument(AUXDOCID=23, AUXDOC="SOM CTO Review regarding need for IND"),
-                RequiredDocument(AUXDOCID=24, AUXDOC="InfoSec Approval"),
                 RequiredDocument(AUXDOCID=25, AUXDOC="Scientific Pre-review Documentation"),
                 RequiredDocument(AUXDOCID=26, AUXDOC="IBC Number"),
                 RequiredDocument(AUXDOCID=32, AUXDOC="IDS - Investigational Drug Service Approval"),
-                RequiredDocument(AUXDOCID=33, AUXDOC="Data Security Plan"),
                 RequiredDocument(AUXDOCID=36, AUXDOC="RDRC Approval "),
                 RequiredDocument(AUXDOCID=40, AUXDOC="SBS/IRB Approval-FERPA"),
                 RequiredDocument(AUXDOCID=41, AUXDOC="HIRE Standard Radiation Language"),
@@ -190,7 +188,7 @@ class StudyDetails(db.Model):
     IS_SPONSOR = db.Column(db.Integer, nullable=True)
     IS_GRANT = db.Column(db.Integer, nullable=True)
     IS_COMMITTEE_CONFLICT = db.Column(db.Integer, nullable=True)
-    DSMB = db.Column(db.Integer, nullable=True)
+    DSMB = db.Column(db.String, nullable=True)
     DSMB_FREQUENCY = db.Column(db.Integer, nullable=True)
     IS_DB = db.Column(db.Integer, nullable=True)
     IS_UVA_DB = db.Column(db.Integer, nullable=True)
@@ -239,6 +237,8 @@ class StudyDetails(db.Model):
     IS_CODED_RESEARCH = db.Column(db.Integer, nullable=True)
     IS_OUTSIDE_SPONSOR = db.Column(db.Integer, nullable=True)
     IS_UVA_COLLABANALYSIS = db.Column(db.Integer, nullable=True)
+    REVIEW_TYPE = db.Column(db.Integer, nullable=True)
+    REVIEWTYPENAME = db.Column(db.String, nullable=True)
 
 
 
