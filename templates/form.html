@@ -14,6 +14,16 @@
 <body>
 <h2>{{ title }}</h2>
 <p>{{ details|safe }}</p>
+
+{% if 'Edit Study Details' in title %}
+    <div>Upload CSV</div>
+    <form action="{{ csv_action }}" method="post" enctype=multipart/form-data>
+        {{ form.csrf_token() }}
+        <input type=file name=file>
+        <input type=submit value=Upload label="Upload CSV">
+    </form>
+{% endif %}
+
 <form action="{{ action }}" method="post">
 
     {{ form.csrf_token() }}
