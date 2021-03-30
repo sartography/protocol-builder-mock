@@ -164,6 +164,14 @@ class Sanity_Check_Test(unittest.TestCase):
         study = self.add_study(title=title)
         self.assertEqual(title, study.TITLE)
 
+    # def test_update_study_from_csv(self):
+    #     study = self.add_study()
+    #     f = open('tests/data/ExampleStudyID15370.csv', 'rb')
+    #     r = self.app.post(f'/study_details/{study.STUDYID}', data={'file': [f]}, follow_redirects=False)
+    #
+    #     print(r)
+    #     print('test_update_study_from_csv')
+
     # def test_study_details_validation(self):
     #
     #     test_study = self.add_study()
