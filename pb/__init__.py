@@ -1,8 +1,8 @@
+import csv
 import datetime
 import os
-import re
 import yaml
-from datetime import date
+from io import TextIOWrapper
 
 import connexion
 from flask_cors import CORS
@@ -453,26 +453,78 @@ def _update_study(study, form):
     db.session.commit()
 
 
+def _allowed_file(filename):
+    allowed_extensions = ['csv', 'xls', 'xlsx']
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+
+def process_csv_study_details(study_id, csv_file):
+    study_details = db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).first()
+    csv_file.seek(0)
+    data = csv.DictReader(TextIOWrapper(csv_file))
+    for row in data:
+        if data.line_num == 2:
+
+            for key in row.keys():
+                if key != 'STUDYID':
+                    if hasattr(study_details, key):
+                        if key in row.keys():
+                            val = row[key]
+                            print(key, val)
+                            if key == 'SPONSORS_PROTOCOL_REVISION_DATE':
+                                print(type(val))
+                            if val == '':
+                                val = None
+                            if val == 'null':
+                                val = None
+                            setattr(study_details, key, val)
+
+    session.add(study_details)
+    session.commit()
+
+
 @app.route('/study_details/<study_id>', methods=['GET', 'POST'])
 def study_details(study_id):
+
     study_details = db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).first()
     if not study_details:
         study_details = StudyDetails(STUDYID=study_id)
     form = StudyDetailsForm(request.form, obj=study_details)
-    if request.method == 'GET':
-        action = BASE_HREF + "/study_details/" + study_id
-        title = "Edit Study Details for Study #" + study_id
-        details = "Numeric fields can be 1 for true, 0 or false, or Null if not applicable."
-    if request.method == 'POST' and form.validate():
-        form.populate_obj(study_details)
-        db.session.add(study_details)
-        db.session.commit()
-        flash('Study updated successfully!', 'success')
-        return redirect_home()
+
+    action = BASE_HREF + "/study_details/" + study_id
+    title = "Edit Study Details for Study #" + study_id
+    details = "Numeric fields can be 1 for true, 0 or false, or Null if not applicable."
+
+    if request.method == 'POST':
+        # update study details with csv file
+        if 'file' in request.files:
+            file = request.files['file']
+            if file.filename == '':
+                flash('No file selected', 'failure')
+                return redirect(action)
+            elif file and _allowed_file(file.filename):
+                process_csv_study_details(study_id, file)
+                flash('CSV file uploaded', 'success')
+                return redirect_home()
+            else:
+                flash('There was a problem processing your file', 'failure')
+                return redirect(action)
+
+        # update study details from the form
+        elif form.validate():
+            form.populate_obj(study_details)
+            db.session.add(study_details)
+            db.session.commit()
+            flash('Study updated successfully!', 'success')
+            return redirect_home()
+
+    # display the study details form
     return render_template(
         'form.html',
         form=form,
         action=action,
+        csv_action=action,
         title=title,
         details=details,
         description_map=description_map,
