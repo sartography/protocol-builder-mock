@@ -133,6 +133,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StudyDetail"
+  /check_study/{studyid}:
+    parameters:
+      - name: studyid
+        in: path
+        required: true
+        description: The id of the study.
+        schema:
+          type: integer
+          format: int32
+    get:
+      tags:
+      - CR-Connect
+      operationId: pb.check_study
+      summary: IRB Status about a particular study.
+      responses:
+        200:
+          description: Details about the protocol
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyDetail"
 components:
   schemas:
     Study:
