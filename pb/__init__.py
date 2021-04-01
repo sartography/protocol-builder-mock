@@ -41,6 +41,11 @@ def sponsors(studyid):
     return StudySponsorSchema(many=True).dump(sponsors)
 
 
+def check_study(studyid):
+    irb_status = db.session.query(IRBStatus).filter(IRBStatus.STUDYID == studyid).first()
+    return IRBStatusSchema().dump(irb_status)
+
+
 def get_form(id, requirement_code):
     return
 
@@ -157,7 +162,7 @@ def site_map():
 # **************************
 from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, ConfirmDeleteForm, StudySponsorForm
 from pb.models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
-    StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor, SponsorSchema, StudySponsorSchema
+    StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor, SponsorSchema, StudySponsorSchema, IRBStatus, IRBStatusSchema
 from pb.ldap.ldap_service import LdapService
 
 
@@ -201,6 +206,8 @@ def new_study():
         flash('Study created successfully!', 'success')
         return redirect_home()
 
+    # set default first time
+    form.Q_COMPLETE.data = "('No Error', 'Passed validation.')"
     return render_template(
         'form.html',
         form=form,
@@ -220,8 +227,10 @@ def edit_study(study_id):
         title = "Edit Study #" + study_id
         if study.requirements:
             form.requirements.data = list(map(lambda r: r.AUXDOCID, list(study.requirements)))
-        if study.Q_COMPLETE:
-            form.Q_COMPLETE.checked = True
+        if study.Q_COMPLETE and study.Q_COMPLETE.first():
+            form.Q_COMPLETE.data = "('" + study.Q_COMPLETE.first().STATUS + "', '" + study.Q_COMPLETE.first().DETAIL + "')"
+        else:
+            form.Q_COMPLETE.data = "('No Error', 'Passed validation.')"
     if request.method == 'POST':
         _update_study(study, form)
         flash('Study updated successfully!', 'success')
@@ -441,13 +450,24 @@ def _update_study(study, form):
     study.TITLE = form.TITLE.data
     study.NETBADGEID = form.NETBADGEID.data
     study.DATE_MODIFIED = datetime.datetime.now()
-    study.Q_COMPLETE = form.Q_COMPLETE.data
     study.HSRNUMBER = form.HSRNUMBER.data
 
     for r in form.requirements:
         if r.checked:
             requirement = RequiredDocument(AUXDOCID=r.data, AUXDOC=r.label.text, study=study)
             db.session.add(requirement)
+
+    q_data = eval(form.Q_COMPLETE.data)
+    if q_data:
+        q_data_status = q_data[0]
+        q_data_detail = q_data[1]
+        q_status = db.session.query(IRBStatus).filter(IRBStatus.STUDYID == study.STUDYID).first()
+        if q_status:
+            q_status.STATUS = q_data_status
+            q_status.DETAIL = q_data_detail
+        else:
+            q_status = IRBStatus(STATUS=q_data_status, DETAIL=q_data_detail, STUDYID=study.STUDYID)
+        db.session.add(q_status)
 
     db.session.add(study)
     db.session.commit()
