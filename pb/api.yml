@@ -153,7 +153,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StudyDetail"
+                $ref: "#/components/schemas/IRBStatus"
 components:
   schemas:
     Study:
@@ -178,10 +178,10 @@ components:
           example: jfg6n
           description: The UVA Id of of the principle investigator for the study.
         Q_COMPLETE:
-          type: number
-          enum: [0,1]
-          example: 0
-          description: If 1, then this study is complete in the Protocol Builder, and is ready for processing by CR Connect.
+          type: select
+          format: string
+          example: No Error
+          description: Study Status
         DATE_MODIFIED:
           type: string
           format: date_time
@@ -254,6 +254,21 @@ components:
           type: string
           example: Principal Investigator
           description: A human readable descriptive string of the INVESTIGATORTYPE.
+    IRBStatus:
+      type: object
+      properties:
+        STUDYID:
+          type: number
+          example: 12345
+          description: The study id from the Protocol Builder
+        STATUS:
+          type: string
+          example: No Error
+          description: The study status
+        DETAIL:
+          type: string
+          example: Passed Validation
+          description: Detail about the study status
     StudyDetail:
       type: object
       properties:
