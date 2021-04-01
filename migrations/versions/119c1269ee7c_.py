@@ -30,5 +30,4 @@ def upgrade():
 
 def downgrade():
     op.drop_table('irb_status')
-    # op.drop_column('study', 'Q_COMPLETE')
     op.add_column('study', sa.Column('Q_COMPLETE', sa.Boolean(), nullable=True))
