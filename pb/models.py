@@ -79,7 +79,7 @@ class StudySchema(ma.Schema):
     class Meta:
         # Fields to expose
         fields = ("STUDYID", "HSRNUMBER", "TITLE", "NETBADGEID",
-                  "Q_COMPLETE", "DATE_MODIFIED")
+                  "DATE_MODIFIED")
 
 
 class Investigator(db.Model):
