@@ -10,7 +10,7 @@ class StudyForm(FlaskForm):
     STUDYID = HiddenField()
     TITLE = StringField('Title', [validators.DataRequired()])
     NETBADGEID = StringField('User UVA Computing Id', [validators.DataRequired()])
-    requirements = SelectMultipleField("Requirements",
+    requirements = SelectMultipleField("Documents",
                                        render_kw={'class': 'multi'},
                                        choices=[(rd.AUXDOCID, rd.AUXDOC) for rd in RequiredDocument.all()])
     HSRNUMBER = StringField('HSR Number')
@@ -36,6 +36,26 @@ class StudySponsorForm(FlaskForm):
 class StudyDetailsForm(ModelForm, FlaskForm):
     class Meta:
         model = StudyDetails
+        only = ['IS_IND', 'IND_1', 'IND_2', 'IND_3', 'IS_UVA_IND', 'IS_IDE', 'IDE',
+                'IS_UVA_IDE', 'IS_CHART_REVIEW', 'IS_RADIATION', 'GCRC_NUMBER', 'IS_GCRC',
+                'IS_PRC_DSMP', 'IS_PRC', 'PRC_NUMBER', 'IS_IBC', 'IBC_NUMBER',
+                'IS_SPONSOR_TRACKING', 'SPONSOR_TRACKING', 'SPONSORS_PROTOCOL_REVISION_DATE',
+                'IS_SPONSOR_MONITORING', 'IS_DSMB', 'IS_COMPLETE_NON_IRB_REGULATORY',
+                'IS_AUX', 'IS_SPONSOR', 'IS_GRANT', 'IS_COMMITTEE_CONFLICT', 'DSMB',
+                'DSMB_FREQUENCY', 'IS_DB', 'IS_UVA_DB', 'IS_CENTRAL_REG_DB',
+                'IS_CONSENT_WAIVER', 'IS_HGT', 'IS_GENE_TRANSFER', 'IS_TISSUE_BANKING',
+                'IS_SURROGATE_CONSENT', 'IS_ADULT_PARTICIPANT', 'IS_MINOR_PARTICIPANT',
+                'IS_MINOR', 'IS_BIOMEDICAL', 'IS_QUALITATIVE', 'IS_PI_SCHOOL',
+                'IS_PRISONERS_POP', 'IS_PREGNANT_POP', 'IS_FETUS_POP',
+                'IS_MENTAL_IMPAIRMENT_POP', 'IS_ELDERLY_POP', 'IS_OTHER_VULNERABLE_POP',
+                'OTHER_VULNERABLE_DESC', 'IS_MULTI_SITE', 'IS_UVA_LOCATION',
+                'NON_UVA_LOCATION', 'MULTI_SITE_LOCATIONS', 'IS_OUTSIDE_CONTRACT',
+                'IS_UVA_PI_MULTI', 'IS_NOT_PRC_WAIVER', 'IS_INSIDE_CONTRACT',
+                'IS_CANCER_PATIENT', 'UPLOAD_COMPLETE', 'IS_FUNDING_SOURCE',
+                'IS_CODED_RESEARCH', 'IS_OUTSIDE_SPONSOR', 'IS_PI_INITIATED',
+                'IS_ENGAGED_RESEARCH', 'IS_APPROVED_DEVICE', 'IS_FINANCIAL_CONFLICT',
+                'IS_NOT_CONSENT_WAIVER', 'IS_FOR_CANCER_CENTER', 'IS_REVIEW_BY_CENTRAL_IRB',
+                'IRBREVIEWERADMIN', 'IS_UVA_COLLABANALYSIS', 'REVIEW_TYPE', 'REVIEWTYPENAME']
 
 
 class ConfirmDeleteForm(FlaskForm):
@@ -100,7 +120,7 @@ class StudyTable(Table):
     NETBADGEID = Col('User')
     DATE_MODIFIED = DatetimeCol('Last Update', "medium")
     Q_COMPLETE = BoolCol('Complete?')
-    requirements = NestedTableCol('Requirements', RequirementsTable)
+    requirements = NestedTableCol('Documents', RequirementsTable)
     investigators = NestedTableCol('Investigators', InvestigatorsTable)
     sponsors = NestedTableCol('Sponsors', SponsorsTable)
     delete = LinkCol(

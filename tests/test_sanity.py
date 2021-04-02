@@ -25,7 +25,7 @@ class Sanity_Check_Test(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        db.drop_all()
 
     def setUp(self):
         ExampleDataLoader().clean_db()
@@ -164,3 +164,27 @@ class Sanity_Check_Test(unittest.TestCase):
         study = self.add_study(title=title)
         self.assertEqual(title, study.TITLE)
 
+    # def test_update_study_from_csv(self):
+    #     study = self.add_study()
+    #     f = open('tests/data/ExampleStudyID15370.csv', 'rb')
+    #     r = self.app.post(f'/study_details/{study.STUDYID}', data={'file': [f]}, follow_redirects=False)
+    #
+    #     print(r)
+    #     print('test_update_study_from_csv')
+
+    # def test_study_details_validation(self):
+    #
+    #     test_study = self.add_study()
+    #     data = {'IS_IND': 1, 'IND_1': 1234}
+    #     r = self.app.post(f'/study_details/{test_study.STUDYID}', data=data, follow_redirects=False)
+    #     self.assertNotIn('Form did not validate!', r.data.decode('utf-8'))
+    #
+    #     print('test_study_details_validation')
+    #
+    # def test_study_details_validation_fail(self):
+    #     test_study = self.add_study()
+    #     data = {'IS_IND': 1, 'IND_1': 1234, 'IS_IDE': 'b'}
+    #     r = self.app.post(f'/study_details/{test_study.STUDYID}', data=data, follow_redirects=False)
+    #     self.assertIn('Form did not validate!', r.data.decode('utf-8'))
+    #
+    #     print('test_study_details_validation_fail')
