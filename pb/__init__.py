@@ -184,7 +184,7 @@ def index():
 @app.route('/user_studies/<uva_id>', methods=['GET'])
 def user_studies(uva_id):
     if uva_id == 'all':
-        return redirect(f"/")
+        return redirect(BASE_HREF + "/")
     studies = db.session.query(Study).filter(Study.NETBADGEID == uva_id).order_by(Study.DATE_MODIFIED.desc()).all()
     return render_study_template(studies)
 

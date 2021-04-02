@@ -349,7 +349,7 @@ components:
           example: true
           description: Will this study be monitored by a Data and Safety Monitoring Board?
         DSMB_FREQUENCY:
-          type: String
+          type: string
           example: A lot
           description: UNDOCUMENTED.
         IS_DB:
