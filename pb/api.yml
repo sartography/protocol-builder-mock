@@ -177,11 +177,6 @@ components:
           format: string
           example: jfg6n
           description: The UVA Id of of the principle investigator for the study.
-        Q_COMPLETE:
-          type: select
-          format: string
-          example: No Error
-          description: Study Status
         DATE_MODIFIED:
           type: string
           format: date_time
@@ -385,7 +380,7 @@ components:
           example: true
           description: Will this study be monitored by a Data and Safety Monitoring Board?
         DSMB_FREQUENCY:
-          type: String
+          type: string
           example: A lot
           description: UNDOCUMENTED.
         IS_DB:
