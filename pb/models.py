@@ -67,8 +67,8 @@ class Study(db.Model):
     HSRNUMBER = db.Column(db.String())
     TITLE = db.Column(db.Text(), nullable=False)
     NETBADGEID = db.Column(db.String(), nullable=False)
-    Q_COMPLETE = db.Column(db.Boolean, nullable=True)
     DATE_MODIFIED = db.Column(db.DateTime(timezone=True), default=func.now())
+    Q_COMPLETE = db.relationship("IRBStatus", backref="study", lazy='dynamic')
     requirements = db.relationship("RequiredDocument", backref="study", lazy='dynamic')
     investigators = db.relationship("Investigator", backref="study", lazy='dynamic')
     study_details = db.relationship("StudyDetails", uselist=False, backref="study")
@@ -79,7 +79,7 @@ class StudySchema(ma.Schema):
     class Meta:
         # Fields to expose
         fields = ("STUDYID", "HSRNUMBER", "TITLE", "NETBADGEID",
-                  "Q_COMPLETE", "DATE_MODIFIED")
+                  "DATE_MODIFIED")
 
 
 class Investigator(db.Model):
@@ -161,6 +161,24 @@ class RequiredDocument(db.Model):
 class RequiredDocumentSchema(ma.Schema):
     class Meta:
         fields = ("AUXDOCID", "AUXDOC")
+
+
+class IRBStatus(db.Model):
+    STUDYID = db.Column(db.Integer, db.ForeignKey('study.STUDYID'), primary_key=True)
+    STATUS = db.Column(db.String(), nullable=False, default="")
+    DETAIL = db.Column(db.String(), nullable=False, default="")
+
+    @staticmethod
+    def all():
+        status = [IRBStatus(STATUS="Error", DETAIL="Study ID does not exist."),
+                  IRBStatus(STATUS="Error", DETAIL="General study errors. UVA Study Tracking Number is missing or not formatted correctly."),
+                  IRBStatus(STATUS="No Error", DETAIL="Passed validation.")]
+        return status
+
+
+class IRBStatusSchema(ma.Schema):
+    class Meta:
+        fields = ("STATUS", "DETAIL")
 
 
 class StudyDetails(db.Model):

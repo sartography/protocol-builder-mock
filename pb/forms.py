@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import SelectMultipleField, StringField, BooleanField, SelectField, validators, HiddenField
 from wtforms_alchemy import ModelForm
 
-from pb.models import RequiredDocument, Investigator, StudyDetails
+from pb.models import RequiredDocument, Investigator, StudyDetails, IRBStatus
 
 
 class StudyForm(FlaskForm):
@@ -14,8 +14,8 @@ class StudyForm(FlaskForm):
                                        render_kw={'class': 'multi'},
                                        choices=[(rd.AUXDOCID, rd.AUXDOC) for rd in RequiredDocument.all()])
     HSRNUMBER = StringField('HSR Number')
-    Q_COMPLETE = BooleanField('Complete in Protocol Builder?', default='checked',
-                              false_values=(False, 'false', 0, '0'))
+    Q_COMPLETE = SelectField("IRBStatus",
+                             choices=[((q.STATUS, q.DETAIL), q.DETAIL) for q in IRBStatus.all()])
 
 
 class InvestigatorForm(FlaskForm):

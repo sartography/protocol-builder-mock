@@ -57,6 +57,8 @@ class Sanity_Check_Test(unittest.TestCase):
         for r in form.requirements:
             form.data['requirements'].append(r.data)
 
+        form.Q_COMPLETE.data = "('No Error', 'Passed validation.')"
+
         r = self.app.post('/new_study', data=form.data, follow_redirects=False)
         assert r.status_code == 302
         added_study = Study.query.filter(Study.TITLE == study_title).first()
@@ -79,6 +81,7 @@ class Sanity_Check_Test(unittest.TestCase):
 
         for r in form_2.requirements:
             form_2.data['requirements'].append(r.data)
+        form_2.Q_COMPLETE.data = "('No Error', 'Passed validation.')"
 
         r_2 = self.app.post('/study/%i' % added_study.STUDYID, data=form_2.data, follow_redirects=False)
         assert r_2.status_code == 302
