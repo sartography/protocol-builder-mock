@@ -1,9 +1,9 @@
 from flask_table import Table, Col, LinkCol, BoolCol, DatetimeCol, NestedTableCol
 from flask_wtf import FlaskForm
-from wtforms import SelectMultipleField, StringField, BooleanField, SelectField, validators, HiddenField
+from wtforms import SelectMultipleField, StringField, BooleanField, SelectField, validators, HiddenField, DateField, IntegerField
 from wtforms_alchemy import ModelForm
 
-from pb.models import RequiredDocument, Investigator, StudyDetails, IRBStatus
+from pb.models import RequiredDocument, Investigator, StudyDetails, IRBStatus, IRBInfo
 
 
 class StudyForm(FlaskForm):
@@ -16,6 +16,12 @@ class StudyForm(FlaskForm):
     HSRNUMBER = StringField('HSR Number')
     Q_COMPLETE = SelectField("IRBStatus",
                              choices=[((q.STATUS, q.DETAIL), q.DETAIL) for q in IRBStatus.all()])
+
+
+class IRBInfoForm(ModelForm, FlaskForm):
+    class Meta:
+        model = IRBInfo
+        hidden = 'SS_STUDY_ID'
 
 
 class InvestigatorForm(FlaskForm):
@@ -114,6 +120,11 @@ class StudyTable(Table):
         'account_balance', 'edit_study_sponsor', url_kwargs=dict(study_id='STUDYID'),
         anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Edit Sponsor(s)'},
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Edit Sponsor(s)'}
+    )
+    irb_info = LinkCol(
+        'irb_info', 'edit_irb_info', url_kwargs=dict(study_id='STUDYID'),
+        anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Edit Info'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Edit Info'}
     )
     STUDYID = Col('Study Id')
     TITLE = Col('Title')

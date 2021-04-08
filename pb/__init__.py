@@ -160,9 +160,11 @@ def site_map():
 # **************************
 # WEB FORMS
 # **************************
-from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, ConfirmDeleteForm, StudySponsorForm
+from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, ConfirmDeleteForm, StudySponsorForm, \
+    IRBInfoForm
 from pb.models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
-    StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor, SponsorSchema, StudySponsorSchema, IRBStatus, IRBStatusSchema
+    StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor, SponsorSchema, StudySponsorSchema, IRBStatus, \
+    IRBStatusSchema, IRBInfo, IRBInfoSchema
 from pb.ldap.ldap_service import LdapService
 
 
@@ -235,6 +237,29 @@ def edit_study(study_id):
         _update_study(study, form)
         flash('Study updated successfully!', 'success')
         return redirect_home()
+    return render_template(
+        'form.html',
+        form=form,
+        action=action,
+        title=title,
+        description_map={},
+        base_href=BASE_HREF
+    )
+
+
+@app.route('/irb_info/<study_id>', methods=['GET', 'POST'])
+def edit_irb_info(study_id):
+    irb_info = db.session.query(IRBInfo).filter(IRBInfo.SS_STUDY_ID == study_id).first()
+    form = IRBInfoForm(request.form, obj=irb_info)
+    action = BASE_HREF + "/irb_info/" + study_id
+    title = "Edit IRB Info #" + study_id
+    # if request.method == 'GET':
+    #     form.SS_STUDY_ID.data = study_id
+    if request.method == 'POST':
+        if form.validate():
+            _update_irb_info(study_id, irb_info, form)
+            flash('IRB Info updated successfully!', 'success')
+            return redirect_home()
     return render_template(
         'form.html',
         form=form,
@@ -471,6 +496,26 @@ def _update_study(study, form):
 
     db.session.add(study)
     db.session.commit()
+
+
+def _update_irb_info(study_id, irb_info, form):
+    if irb_info is None:
+        irb_info = IRBInfo(SS_STUDY_ID=study_id)
+    irb_info.UVA_STUDY_TRACKING = form.UVA_STUDY_TRACKING.data
+    irb_info.DATE_MODIFIED = form.DATE_MODIFIED.data
+    irb_info.IRB_ADMINISTRATIVE_REVIEWER = form.IRB_ADMINISTRATIVE_REVIEWER.data
+    irb_info.AGENDA_DATE = form.AGENDA_DATE.data
+    irb_info.IRB_REVIEW_TYPE = form.IRB_REVIEW_TYPE.data
+    irb_info.IRBEVENT = form.IRBEVENT.data
+    irb_info.IRB_STATUS = form.IRB_STATUS.data
+    irb_info.RB_OF_RECORD = form.RB_OF_RECORD.data
+    irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = form.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES.data
+    irb_info.STUDYIRBREVIEWERADMIN = form.STUDYIRBREVIEWERADMIN.data
+
+    db.session.add(irb_info)
+    db.session.commit()
+
+    print('_update_irb_info')
 
 
 def _allowed_file(filename):
