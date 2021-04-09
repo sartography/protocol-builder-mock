@@ -16,38 +16,9 @@ from sqlalchemy import func
 PROTOCOLS = {}
 
 
-def get_user_studies(uva_id):
-    studies = db.session.query(Study).filter(Study.NETBADGEID == uva_id).all()
-    return StudySchema(many=True).dump(studies)
-
-
-def required_docs(studyid):
-    docs = db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == studyid).all()
-    return RequiredDocumentSchema(many=True).dump(docs)
-
-
-def investigators(studyid):
-    inv = db.session.query(Investigator).filter(Investigator.STUDYID == studyid).all()
-    return InvestigatorSchema(many=True).dump(inv)
-
-
-def get_study_details(studyid):
-    details = db.session.query(StudyDetails).filter(StudyDetails.STUDYID == studyid).first()
-    return StudyDetailsSchema().dump(details)
-
-
-def sponsors(studyid):
-    sponsors = db.session.query(StudySponsor).filter(StudySponsor.SS_STUDY == studyid).all()
-    return StudySponsorSchema(many=True).dump(sponsors)
-
-
-def check_study(studyid):
-    irb_status = db.session.query(IRBStatus).filter(IRBStatus.STUDYID == studyid).first()
-    return IRBStatusSchema().dump(irb_status)
-
-
 def get_form(id, requirement_code):
     return
+
 
 connexion_app = connexion.FlaskApp('Protocol Builder', specification_dir='pb')
 app = connexion_app.app
@@ -62,8 +33,6 @@ else:
     app.config.root_path = app.instance_path
     app.config.from_pyfile('config.py', silent=True)
 
-connexion_app.add_api('api.yml', base_path='/v2.0')
-
 # Convert list of allowed origins to list of regexes
 origins_re = [r"^https?:\/\/%s(.*)" % o.replace('.', '\.') for o in app.config['CORS_ALLOW_ORIGINS']]
 cors = CORS(connexion_app.app, origins=origins_re)
@@ -76,6 +45,8 @@ session = db.session
 
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
+
+connexion_app.add_api('api.yml', base_path='/v2.0')
 
 # Set the path of the static directory
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
