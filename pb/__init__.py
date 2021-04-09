@@ -423,6 +423,7 @@ def del_study(study_id):
             db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).delete()
             db.session.query(StudySponsor).filter(StudySponsor.SS_STUDY == study_id).delete()
             db.session.query(IRBStatus).filter(IRBStatus.STUDYID == study_id).delete()
+            db.session.query(IRBInfo).filter(IRBInfo.SS_STUDY_ID == study_id).delete()
             study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
             session.delete(study)
             db.session.commit()
