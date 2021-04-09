@@ -1,7 +1,8 @@
 from pb import session
-from pb.models import Investigator, InvestigatorSchema, IRBStatus, IRBStatusSchema, \
-                      RequiredDocument, RequiredDocumentSchema, Study, StudySchema, \
-                      StudyDetails, StudyDetailsSchema, StudySponsor, StudySponsorSchema
+from pb.models import Investigator, InvestigatorSchema, IRBInfo, IRBInfoSchema, \
+                      IRBStatus, IRBStatusSchema, RequiredDocument, RequiredDocumentSchema, \
+                      Study, StudySchema, StudyDetails, StudyDetailsSchema, \
+                      StudySponsor, StudySponsorSchema
 
 
 def get_user_studies(uva_id):
@@ -32,3 +33,8 @@ def get_study_details(studyid):
 def check_study(studyid):
     irb_status = session.query(IRBStatus).filter(IRBStatus.STUDYID == studyid).first()
     return IRBStatusSchema().dump(irb_status)
+
+
+def current_irb_info(studyid):
+    irb_info = session.query(IRBInfo).filter(IRBInfo.SS_STUDY_ID == studyid).first()
+    return IRBInfoSchema().dump(irb_info)
