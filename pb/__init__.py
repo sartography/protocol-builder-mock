@@ -162,7 +162,7 @@ def index():
 @app.route('/user_studies/<uva_id>', methods=['GET'])
 def user_studies(uva_id):
     if uva_id == 'all':
-        return redirect(f"/")
+        return redirect(BASE_HREF + "/")
     studies = db.session.query(Study).filter(Study.NETBADGEID == uva_id).order_by(Study.DATE_MODIFIED.desc()).all()
     return render_study_template(studies)
 
@@ -422,6 +422,7 @@ def del_study(study_id):
             db.session.query(Investigator).filter(Investigator.STUDYID == study_id).delete()
             db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).delete()
             db.session.query(StudySponsor).filter(StudySponsor.SS_STUDY == study_id).delete()
+            db.session.query(IRBStatus).filter(IRBStatus.STUDYID == study_id).delete()
             study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
             session.delete(study)
             db.session.commit()
