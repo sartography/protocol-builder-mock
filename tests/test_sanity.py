@@ -118,7 +118,8 @@ class Sanity_Check_Test(unittest.TestCase):
         self.assertEqual(1, count)
 
         # Add Sponsor
-        self.app.post(f'/study_sponsor/{study.STUDYID}', data={'SPONSOR_IDS': [961, 2775]})
+        self.load_sponsors()
+        self.app.post(f'/study_sponsor/{study.STUDYID}', data={'SPONSOR_IDS': [101, 102]})
         count = StudySponsor.query.filter(StudySponsor.SS_STUDY == study.STUDYID).count()
         self.assertEqual(2, count)
 
