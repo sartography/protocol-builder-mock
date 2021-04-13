@@ -11,8 +11,9 @@ import string
 from pb import app, db, session
 from pb.forms import StudyForm, StudySponsorForm
 from pb.ldap.ldap_service import LdapService
-from pb.models import Study, RequiredDocument, Sponsor, StudySponsor
+from pb.models import Study, RequiredDocument, Sponsor, StudySponsor, IRBStatus, Investigator, IRBInfo, StudyDetails
 from example_data import ExampleDataLoader
+
 
 class Sanity_Check_Test(unittest.TestCase):
     auths = {}
@@ -93,11 +94,58 @@ class Sanity_Check_Test(unittest.TestCase):
         self.assertEqual(num_docs_before, num_docs_after)
         self.assertEqual(num_studies_before, num_studies_after)
 
+    def test_delete_study(self):
+        # Create study
+        study = self.add_study()
+
+        # Add requirements and Q_COMPLETE
+        form = StudyForm(formdata=None, obj=study)
+        for r in form.requirements:
+            form.data['requirements'].append(r.data)
+        form.Q_COMPLETE.data = "('No Error', 'Passed validation.')"
+        self.app.post('/study/%i' % study.STUDYID, data=form.data, follow_redirects=False)
+        # Assert we have them
+        count = RequiredDocument.query.filter(Study.STUDYID == study.STUDYID).count()
+        self.assertGreater(count, 0)
+        status = IRBStatus.query.filter(IRBStatus.STUDYID == study.STUDYID).first()
+        self.assertEqual('No Error', status.STATUS)
+        self.assertEqual('Passed validation.', status.DETAIL)
+
+
+        # Add Investigator
+        self.app.post(f'/investigator/{study.STUDYID}', data={'NETBADGEID': 'dhf8r', 'INVESTIGATORTYPE': 'PI'})
+        count = Investigator.query.filter(Investigator.STUDYID == study.STUDYID).count()
+        self.assertEqual(1, count)
+
+        # Add Sponsor
+        self.app.post(f'/study_sponsor/{study.STUDYID}', data={'SPONSOR_IDS': [961, 2775]})
+        count = StudySponsor.query.filter(StudySponsor.SS_STUDY == study.STUDYID).count()
+        self.assertEqual(2, count)
+
+        # Add IRB Info
+        self.app.post(f'/irb_info/{study.STUDYID}', data={'UVA_STUDY_TRACKING': 'asdf'})
+        irb_info = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).first()
+        self.assertEqual(irb_info.UVA_STUDY_TRACKING, 'asdf')
+
+
+        # Delete the study
+        self.app.post(f'/del_study/{study.STUDYID}', data={'confirm': True})
+
+        u = Study.query.filter(Study.STUDYID == study.STUDYID).first()
+        self.assertIsNone(u)
+        status = IRBStatus.query.filter(IRBStatus.STUDYID == study.STUDYID).first()
+        self.assertIsNone(status)
+        count = Investigator.query.filter(Investigator.STUDYID == study.STUDYID).count()
+        self.assertEqual(0, count)
+        count = StudySponsor.query.filter(StudySponsor.SS_STUDY == study.STUDYID).count()
+        self.assertEqual(0, count)
+        count = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).count()
+        self.assertEqual(0, count)
+
     def test_add_sponsors(self):
         """Load sponsors twice in a row to make sure duplicates aren't created."""
         self.load_sponsors()
         self.load_sponsors()
-
 
     def test_add_and_edit_study_sponsor(self):
         """Add and edit a study sponsor"""
@@ -149,7 +197,6 @@ class Sanity_Check_Test(unittest.TestCase):
             uids.append(user['uid'])
         self.assertIn('dhf8r', uids)
 
-
     def test_user_studies(self):
         studies1 = self.app.get(f'/user_studies')
         self.assertEqual('308 PERMANENT REDIRECT', studies1.status)
@@ -167,6 +214,7 @@ class Sanity_Check_Test(unittest.TestCase):
         study = self.add_study(title=title)
         self.assertEqual(title, study.TITLE)
 
+    # This test fails because SQLite has an issue with date data from csv file
     # def test_update_study_from_csv(self):
     #     study = self.add_study()
     #     f = open('tests/data/ExampleStudyID15370.csv', 'rb')
@@ -175,19 +223,24 @@ class Sanity_Check_Test(unittest.TestCase):
     #     print(r)
     #     print('test_update_study_from_csv')
 
-    # def test_study_details_validation(self):
-    #
-    #     test_study = self.add_study()
-    #     data = {'IS_IND': 1, 'IND_1': 1234}
-    #     r = self.app.post(f'/study_details/{test_study.STUDYID}', data=data, follow_redirects=False)
-    #     self.assertNotIn('Form did not validate!', r.data.decode('utf-8'))
-    #
-    #     print('test_study_details_validation')
-    #
+    def test_study_details_validation(self):
+
+        test_study = self.add_study()
+        data = {'IS_IND': 1, 'IND_1': 1234}
+        self.app.post(f'/study_details/{test_study.STUDYID}', data=data, follow_redirects=False)
+        detail = StudyDetails.query.filter(StudyDetails.STUDYID == test_study.STUDYID).first()
+        self.assertEqual(detail.IS_IND, 1)
+        self.assertEqual(detail.IND_1, '1234')
+
+    # Can't figure out a good way to test failing state.
+    # We may not really need this, because validation happens in the front end, not in python
     # def test_study_details_validation_fail(self):
     #     test_study = self.add_study()
     #     data = {'IS_IND': 1, 'IND_1': 1234, 'IS_IDE': 'b'}
-    #     r = self.app.post(f'/study_details/{test_study.STUDYID}', data=data, follow_redirects=False)
-    #     self.assertIn('Form did not validate!', r.data.decode('utf-8'))
-    #
+    #     with self.assertRaises(Exception) as ex:
+    #         r = self.app.post(f'/study_details/{test_study.STUDYID}', data=data, follow_redirects=False)
+    #         self.assertEqual(r.errors['IS_IDE'], 'Not a valid integer value')
+    #         print('test_study_details_validation_fail')
+    #     detail = StudyDetails.query.filter(StudyDetails.STUDYID == test_study.STUDYID).first()
+    #     self.assertIsNone(detail)
     #     print('test_study_details_validation_fail')
