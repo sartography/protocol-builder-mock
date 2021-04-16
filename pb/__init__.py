@@ -16,38 +16,9 @@ from sqlalchemy import func
 PROTOCOLS = {}
 
 
-def get_user_studies(uva_id):
-    studies = db.session.query(Study).filter(Study.NETBADGEID == uva_id).all()
-    return StudySchema(many=True).dump(studies)
-
-
-def required_docs(studyid):
-    docs = db.session.query(RequiredDocument).filter(RequiredDocument.STUDYID == studyid).all()
-    return RequiredDocumentSchema(many=True).dump(docs)
-
-
-def investigators(studyid):
-    inv = db.session.query(Investigator).filter(Investigator.STUDYID == studyid).all()
-    return InvestigatorSchema(many=True).dump(inv)
-
-
-def get_study_details(studyid):
-    details = db.session.query(StudyDetails).filter(StudyDetails.STUDYID == studyid).first()
-    return StudyDetailsSchema().dump(details)
-
-
-def sponsors(studyid):
-    sponsors = db.session.query(StudySponsor).filter(StudySponsor.SS_STUDY == studyid).all()
-    return StudySponsorSchema(many=True).dump(sponsors)
-
-
-def check_study(studyid):
-    irb_status = db.session.query(IRBStatus).filter(IRBStatus.STUDYID == studyid).first()
-    return IRBStatusSchema().dump(irb_status)
-
-
 def get_form(id, requirement_code):
     return
+
 
 connexion_app = connexion.FlaskApp('Protocol Builder', specification_dir='pb')
 app = connexion_app.app
@@ -62,8 +33,6 @@ else:
     app.config.root_path = app.instance_path
     app.config.from_pyfile('config.py', silent=True)
 
-connexion_app.add_api('api.yml', base_path='/v2.0')
-
 # Convert list of allowed origins to list of regexes
 origins_re = [r"^https?:\/\/%s(.*)" % o.replace('.', '\.') for o in app.config['CORS_ALLOW_ORIGINS']]
 cors = CORS(connexion_app.app, origins=origins_re)
@@ -76,6 +45,8 @@ session = db.session
 
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
+
+connexion_app.add_api('api.yml', base_path='/v2.0')
 
 # Set the path of the static directory
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -160,9 +131,11 @@ def site_map():
 # **************************
 # WEB FORMS
 # **************************
-from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, ConfirmDeleteForm, StudySponsorForm
+from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, ConfirmDeleteForm, StudySponsorForm, \
+    IRBInfoForm
 from pb.models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
-    StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor, SponsorSchema, StudySponsorSchema, IRBStatus, IRBStatusSchema
+    StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor, SponsorSchema, StudySponsorSchema, IRBStatus, \
+    IRBStatusSchema, IRBInfo, IRBInfoSchema
 from pb.ldap.ldap_service import LdapService
 
 
@@ -235,6 +208,29 @@ def edit_study(study_id):
         _update_study(study, form)
         flash('Study updated successfully!', 'success')
         return redirect_home()
+    return render_template(
+        'form.html',
+        form=form,
+        action=action,
+        title=title,
+        description_map={},
+        base_href=BASE_HREF
+    )
+
+
+@app.route('/irb_info/<study_id>', methods=['GET', 'POST'])
+def edit_irb_info(study_id):
+    irb_info = db.session.query(IRBInfo).filter(IRBInfo.SS_STUDY_ID == study_id).first()
+    form = IRBInfoForm(request.form, obj=irb_info)
+    action = BASE_HREF + "/irb_info/" + study_id
+    title = "Edit IRB Info #" + study_id
+    # if request.method == 'GET':
+    #     form.SS_STUDY_ID.data = study_id
+    if request.method == 'POST':
+        if form.validate():
+            _update_irb_info(study_id, irb_info, form)
+            flash('IRB Info updated successfully!', 'success')
+            return redirect_home()
     return render_template(
         'form.html',
         form=form,
@@ -427,6 +423,7 @@ def del_study(study_id):
             db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).delete()
             db.session.query(StudySponsor).filter(StudySponsor.SS_STUDY == study_id).delete()
             db.session.query(IRBStatus).filter(IRBStatus.STUDYID == study_id).delete()
+            db.session.query(IRBInfo).filter(IRBInfo.SS_STUDY_ID == study_id).delete()
             study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
             session.delete(study)
             db.session.commit()
@@ -471,6 +468,24 @@ def _update_study(study, form):
         db.session.add(q_status)
 
     db.session.add(study)
+    db.session.commit()
+
+
+def _update_irb_info(study_id, irb_info, form):
+    if irb_info is None:
+        irb_info = IRBInfo(SS_STUDY_ID=study_id)
+    irb_info.UVA_STUDY_TRACKING = form.UVA_STUDY_TRACKING.data
+    irb_info.DATE_MODIFIED = form.DATE_MODIFIED.data
+    irb_info.IRB_ADMINISTRATIVE_REVIEWER = form.IRB_ADMINISTRATIVE_REVIEWER.data
+    irb_info.AGENDA_DATE = form.AGENDA_DATE.data
+    irb_info.IRB_REVIEW_TYPE = form.IRB_REVIEW_TYPE.data
+    irb_info.IRBEVENT = form.IRBEVENT.data
+    irb_info.IRB_STATUS = form.IRB_STATUS.data
+    irb_info.IRB_OF_RECORD = form.IRB_OF_RECORD.data
+    irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = form.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES.data
+    irb_info.STUDYIRBREVIEWERADMIN = form.STUDYIRBREVIEWERADMIN.data
+
+    db.session.add(irb_info)
     db.session.commit()
 
 

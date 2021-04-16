@@ -69,6 +69,7 @@ class Study(db.Model):
     NETBADGEID = db.Column(db.String(), nullable=False)
     DATE_MODIFIED = db.Column(db.DateTime(timezone=True), default=func.now())
     Q_COMPLETE = db.relationship("IRBStatus", backref="study", lazy='dynamic')
+    irb_info = db.relationship("IRBInfo", backref="study", lazy='dynamic')
     requirements = db.relationship("RequiredDocument", backref="study", lazy='dynamic')
     investigators = db.relationship("Investigator", backref="study", lazy='dynamic')
     study_details = db.relationship("StudyDetails", uselist=False, backref="study")
@@ -81,6 +82,27 @@ class StudySchema(ma.Schema):
         fields = ("STUDYID", "HSRNUMBER", "TITLE", "NETBADGEID",
                   "DATE_MODIFIED")
 
+
+class IRBInfo(db.Model):
+    SS_STUDY_ID = db.Column(db.Integer, db.ForeignKey('study.STUDYID'), primary_key=True)
+    UVA_STUDY_TRACKING = db.Column(db.String(), nullable=False, default='')
+    DATE_MODIFIED = db.Column(db.Date, nullable=True)
+    IRB_ADMINISTRATIVE_REVIEWER = db.Column(db.String(), nullable=False, default='')
+    AGENDA_DATE = db.Column(db.Date, nullable=True)
+    IRB_REVIEW_TYPE = db.Column(db.String(), nullable=False, default='')
+    IRBEVENT = db.Column(db.String(), nullable=False, default='')
+    IRB_STATUS = db.Column(db.String(), nullable=False, default='')
+    IRB_OF_RECORD = db.Column(db.String(), nullable=False, default='')
+    UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = db.Column(db.Integer(), nullable=True)
+    STUDYIRBREVIEWERADMIN = db.Column(db.String(), nullable=False, default='')
+
+
+class IRBInfoSchema(ma.Schema):
+    class Meta:
+        # Fields to expose
+        fields = ("UVA_STUDY_TRACKING", "DATE_MODIFIED", "IRB_ADMINISTRATIVE_REVIEWER",
+                  "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRBEVENT", "IRB_STATUS", "IRB_OF_RECORD",
+                  "UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES", "STUDYIRBREVIEWERADMIN")
 
 class Investigator(db.Model):
     id = db.Column(db.Integer, primary_key=True)

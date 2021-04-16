@@ -20,7 +20,7 @@ paths:
       tags:
       - CR-Connect
       summary: A list of all studies related to a given UVA ID
-      operationId: pb.get_user_studies
+      operationId: pb.api.get_user_studies
       description: "By passing in a valid UVA Id (ex: dhf8r) it will return a list of all studies that exist for that user in Protocol Builder"
       parameters:
       - in: query
@@ -49,7 +49,7 @@ paths:
       tags:
         - CR-Connect
       summary: Required documents
-      operationId: pb.required_docs
+      operationId: pb.api.required_docs
       description: A list of all documents Protocol Builder considers required, given input from the PI
       parameters:
       - in: query
@@ -72,7 +72,7 @@ paths:
       tags:
         - CR-Connect
       summary: Personnel associated with this study.
-      operationId: pb.investigators
+      operationId: pb.api.investigators
       description: A list of everyone that is associated with the study, including the PI, Study Coordinator, etc... This is currently returned on the "study" endpoint with other information.
       parameters:
       - in: query
@@ -95,7 +95,7 @@ paths:
       tags:
         - CR-Connect
       summary: Sponsors associated with a study.
-      operationId: pb.sponsors
+      operationId: pb.api.sponsors
       description: A list of all the sponsors related to a study
       parameters:
         - in: query
@@ -124,7 +124,7 @@ paths:
     get:
       tags:
       - CR-Connect
-      operationId: pb.get_study_details
+      operationId: pb.api.get_study_details
       summary: Details about a specific protocol.
       responses:
         200:
@@ -145,7 +145,7 @@ paths:
     get:
       tags:
       - CR-Connect
-      operationId: pb.check_study
+      operationId: pb.api.check_study
       summary: IRB Status about a particular study.
       responses:
         200:
@@ -154,6 +154,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IRBStatus"
+  /current_irb_info/{studyid}:
+    parameters:
+      - name: studyid
+        in: path
+        required: true
+        description: The id of the study
+        schema:
+          type: integer
+          format: int32
+    get:
+      tags:
+      - CR-Connect
+      operationId: pb.api.current_irb_info
+      summary: IRB Info about a particular study
+      responses:
+        200:
+          description: IRB Info about the study
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IRBInfo"
 components:
   schemas:
     Study:
@@ -264,6 +285,51 @@ components:
           type: string
           example: Passed Validation
           description: Detail about the study status
+    IRBInfo:
+      type: object
+      properties:
+        SS_STUDY_ID:
+          type: number
+          example: 12345
+          description: The study id from Protocol Builder
+        UVA_STUDY_TRACKING:
+          type: string
+          example: HSR170023
+          description: Unknown
+        DATE_MODIFIED:
+          type: string
+          example: 2021-04-20T00:00:00+00:00
+          description: Unknown
+        IRB_ADMINISTRATIVE_REVIEWER:
+          type: string
+          description: Unknown
+        AGENDA_DATE:
+          type: string
+          example: 2021-04-20T00:00:00+00:00
+          description: Unknown
+        IRB_REVIEW_TYPE:
+          type: string
+          example: Full Committee
+          description: Unknown
+        IRBEVENT:
+          type: string
+          example: Receipt of Protocol Continuation
+          description: Unknown
+        IRB_STATUS:
+          type: string
+          example: Closed to enrollment, follow-up only
+          description: Unknown
+        IRB_OF_RECORD:
+          type: string
+          example: IRB-HSR
+          description: Unknown
+        UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES:
+          type: integer
+          example: 0
+          description: Unknown
+        STUDYIRBREVIEWERADMIN:
+          type: string
+          description: Unknown
     StudyDetail:
       type: object
       properties:

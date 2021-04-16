@@ -10,6 +10,7 @@ DEVELOPMENT = True
 TESTING = True
 SQLALCHEMY_DATABASE_URI = environ.get('SQLALCHEMY_DATABASE_URI', default="sqlite:///app.db")
 SECRET_KEY = 'a really really really really long secret key'
+WTF_CSRF_ENABLED = False
 
 print('### USING TESTING CONFIG: ###')
 print('SQLALCHEMY_DATABASE_URI = ', SQLALCHEMY_DATABASE_URI)
