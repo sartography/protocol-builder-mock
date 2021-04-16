@@ -481,14 +481,12 @@ def _update_irb_info(study_id, irb_info, form):
     irb_info.IRB_REVIEW_TYPE = form.IRB_REVIEW_TYPE.data
     irb_info.IRBEVENT = form.IRBEVENT.data
     irb_info.IRB_STATUS = form.IRB_STATUS.data
-    irb_info.RB_OF_RECORD = form.RB_OF_RECORD.data
+    irb_info.IRB_OF_RECORD = form.IRB_OF_RECORD.data
     irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = form.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES.data
     irb_info.STUDYIRBREVIEWERADMIN = form.STUDYIRBREVIEWERADMIN.data
 
     db.session.add(irb_info)
     db.session.commit()
-
-    print('_update_irb_info')
 
 
 def _allowed_file(filename):

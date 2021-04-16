@@ -92,7 +92,7 @@ class IRBInfo(db.Model):
     IRB_REVIEW_TYPE = db.Column(db.String(), nullable=False, default='')
     IRBEVENT = db.Column(db.String(), nullable=False, default='')
     IRB_STATUS = db.Column(db.String(), nullable=False, default='')
-    RB_OF_RECORD = db.Column(db.String(), nullable=False, default='')
+    IRB_OF_RECORD = db.Column(db.String(), nullable=False, default='')
     UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = db.Column(db.Integer(), nullable=True)
     STUDYIRBREVIEWERADMIN = db.Column(db.String(), nullable=False, default='')
 
@@ -101,7 +101,7 @@ class IRBInfoSchema(ma.Schema):
     class Meta:
         # Fields to expose
         fields = ("UVA_STUDY_TRACKING", "DATE_MODIFIED", "IRB_ADMINISTRATIVE_REVIEWER",
-                  "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRBEVENT", "IRB_STATUS", "RB_OF_RECORD",
+                  "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRBEVENT", "IRB_STATUS", "IRB_OF_RECORD",
                   "UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES", "STUDYIRBREVIEWERADMIN")
 
 class Investigator(db.Model):
