@@ -205,7 +205,7 @@ class Sanity_Check_Test(unittest.TestCase):
             if header[0] == 'Location':
                 self.assertIn('user_studies', header[1])
         studies2 = self.app.get(f'/user_studies/')
-        self.assertEqual('302 FOUND', studies2.status)
+        self.assertEqual('200 OK', studies2.status)
         for header in studies2.headers:
             if header[0] == 'Location':
                 self.assertNotIn('user_studies', header[1])
