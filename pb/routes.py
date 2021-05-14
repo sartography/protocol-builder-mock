@@ -36,7 +36,7 @@ def user_studies(uva_id):
         studies = db.session.query(Study).filter(Study.NETBADGEID == uva_id).order_by(Study.DATE_MODIFIED.desc()).all()
     current_user = get_current_user(request)
     update_selected_user(current_user, uva_id)
-    return render_study_template(studies)
+    return render_study_template(studies, uva_id)
 
 
 @app.route('/new_study', methods=['GET', 'POST'])

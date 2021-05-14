@@ -51,15 +51,16 @@ def update_selected_user(user, selected_user):
     return db_selected_user
 
 
-def render_study_template(studies):
+def render_study_template(studies, uva_id):
     table = StudyTable(studies)
     users = []
-    [users.append(study.NETBADGEID) for study in studies if study.NETBADGEID not in users]
+    [users.append(study.NETBADGEID) for study in db.session.query(Study).all() if study.NETBADGEID not in users]
     return render_template(
         'index.html',
         table=table,
         base_href=BASE_HREF,
-        users=users
+        users=users,
+        selected_user=uva_id
     )
 
 def _update_study(study, form):

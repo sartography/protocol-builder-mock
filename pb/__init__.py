@@ -107,7 +107,6 @@ def load_example_sponsors():
     from example_data import ExampleDataLoader
     ExampleDataLoader().load_sponsors()
 
-
 if __name__ == '__main__':
     # run our standalone gevent server
     app.run(port=4200)
