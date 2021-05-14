@@ -17,12 +17,12 @@ def index():
     # If they have a selected_user,
     # redirect to /user_studies/{selected_user}
     # Otherwise, redirect to /user_studies/all
-    redirect_url = BASE_HREF + "/user_studies/all"
+    redirect_url = url_for("user_studies", uva_id="all")
     current_user = get_current_user(request)
     if current_user:
         selected_user = get_selected_user(current_user)
         if selected_user:
-            redirect_url = BASE_HREF + "/user_studies/" + selected_user
+            redirect_url = url_for(user_studies, uva_id="selected_user")
     return redirect(redirect_url)
 
 
@@ -224,7 +224,8 @@ def edit_study_sponsor(study_id):
 @app.route('/del_study_sponsor/<study_sponsor_id>', methods=['GET', 'POST'])
 def del_study_sponsor(study_sponsor_id):
     study_sponsor_id = int(study_sponsor_id)
-    study_sponsor_model: StudySponsor = db.session.query(StudySponsor).filter(StudySponsor.id == study_sponsor_id).first()
+    study_sponsor_model: StudySponsor = db.session.query(StudySponsor).filter(
+        StudySponsor.id == study_sponsor_id).first()
 
     if study_sponsor_model is None:
         flash('StudySponsor not found.', 'warn')
@@ -308,13 +309,12 @@ def del_study(study_id):
 
 @app.route('/study_details/<study_id>', methods=['GET', 'POST'])
 def study_details(study_id):
-
     study_details = db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).first()
     if not study_details:
         study_details = StudyDetails(STUDYID=study_id)
     form = StudyDetailsForm(request.form, obj=study_details)
 
-    action = BASE_HREF + "/study_details/" + study_id
+    action = url_for("study_details", uva_id=study_id)
     title = "Edit Study Details for Study #" + study_id
     details = "Numeric fields can be 1 for true, 0 or false, or Null if not applicable."
 
@@ -370,4 +370,3 @@ def site_map():
             url = app.confg['APPLICATION_ROOT'].strip('/') + url_for(rule.endpoint, **(rule.defaults or {}))
             links.append((url, rule.endpoint))
     return json.dumps({"links": links})
-
