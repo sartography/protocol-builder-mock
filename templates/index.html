@@ -20,10 +20,10 @@
     <label>Only Show Studies for: </label>
     <select name="uva_id" id="uva_id" onchange="selectStudies()">
         <option value="">Select User</option>
-        <option value="all">All Users</option>
+        <option value="all"   {% if selected_user=='all' %}selected{% endif %}>All Users</option>
         {%  if users %}
             {% for user in users %}
-                <option value="{{ user }}">{{ user }}</option>
+                <option value="{{ user }}"  {% if selected_user==user %}selected{% endif %}>{{ user }}</option>
             {% endfor %}
         {% endif %}
     </select>
