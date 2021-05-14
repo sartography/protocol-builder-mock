@@ -5,6 +5,7 @@ import yaml
 from io import TextIOWrapper
 
 import connexion
+from flask import g
 from flask_cors import CORS
 from flask import url_for, json, redirect, render_template, request, flash
 from flask_assets import Environment, Bundle
@@ -135,7 +136,7 @@ from pb.forms import StudyForm, StudyTable, InvestigatorForm, StudyDetailsForm, 
     IRBInfoForm
 from pb.models import Study, RequiredDocument, Investigator, StudySchema, RequiredDocumentSchema, InvestigatorSchema, \
     StudyDetails, StudyDetailsSchema, StudySponsor, Sponsor, SponsorSchema, StudySponsorSchema, IRBStatus, \
-    IRBStatusSchema, IRBInfo, IRBInfoSchema
+    IRBStatusSchema, IRBInfo, IRBInfoSchema, SelectedUser
 from pb.ldap.ldap_service import LdapService
 
 
@@ -151,19 +152,72 @@ def render_study_template(studies):
     )
 
 
+def _is_production():
+    return 'PRODUCTION' in app.config and app.config['PRODUCTION']
+
+
+def _get_request_uid(req):
+    uid = None
+    if _is_production():
+        if 'user' in g and g.user is not None:
+            return g.user.uid
+        uid = req.headers.get("Uid")
+        if not uid:
+            uid = req.headers.get("X-Remote-Uid")
+    else:
+        uid = 'current_user'
+
+    return uid
+
+
+def get_current_user(request):
+    current_user = _get_request_uid(request)
+    return current_user
+
+
+def get_selected_user(current_user):
+    result = db.session.query(SelectedUser).filter(SelectedUser.user_id == current_user).first()
+    if result:
+        selected_user = result.selected_user
+        return selected_user
+
+
+def update_selected_user(user, selected_user):
+    model = SelectedUser(user_id=user, selected_user=selected_user)
+    db_selected_user = db.session.query(SelectedUser).filter(SelectedUser.user_id==user).first()
+    if db_selected_user:
+        db_selected_user.selected_user = selected_user
+    else:
+        db_selected_user = model
+        db.session.add(db_selected_user)
+    db.session.commit()
+    return db_selected_user
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # display results
-    studies = db.session.query(Study).order_by(Study.DATE_MODIFIED.desc()).all()
-    return render_study_template(studies)
+    # If they have a selected_user,
+    # redirect to /user_studies/{selected_user}
+    # Otherwise, redirect to /user_studies/all
+    redirect_url = BASE_HREF + "/user_studies/all"
+    current_user = get_current_user(request)
+    if current_user:
+        selected_user = get_selected_user(current_user)
+        if selected_user:
+            redirect_url = BASE_HREF + "/user_studies/" + selected_user
+    return redirect(redirect_url)
 
 
 @app.route('/user_studies/', defaults={'uva_id': 'all'})
 @app.route('/user_studies/<uva_id>', methods=['GET'])
 def user_studies(uva_id):
     if uva_id == 'all':
-        return redirect(BASE_HREF + "/")
-    studies = db.session.query(Study).filter(Study.NETBADGEID == uva_id).order_by(Study.DATE_MODIFIED.desc()).all()
+        # return redirect(BASE_HREF + "/")
+        studies = db.session.query(Study).order_by(Study.DATE_MODIFIED.desc()).all()
+    else:
+        studies = db.session.query(Study).filter(Study.NETBADGEID == uva_id).order_by(Study.DATE_MODIFIED.desc()).all()
+    current_user = get_current_user(request)
+    update_selected_user(current_user, uva_id)
     return render_study_template(studies)
 
 

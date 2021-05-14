@@ -281,9 +281,19 @@ class StudyDetails(db.Model):
     REVIEWTYPENAME = db.Column(db.String, nullable=True)
 
 
-
 class StudyDetailsSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = StudyDetails
         load_instance = True
         include_relationships = False
+
+
+class SelectedUser(db.Model):
+    user_id = db.Column(db.String(), primary_key=True)
+    selected_user = db.Column(db.String(), nullable=True)
+
+
+class SelectedUserSchema(ma.Schema):
+    class Meta:
+        fields = ("user_id", "selected_user")
+
