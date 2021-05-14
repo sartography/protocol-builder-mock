@@ -22,7 +22,7 @@ def index():
     if current_user:
         selected_user = get_selected_user(current_user)
         if selected_user:
-            redirect_url = url_for("user_studies", uva_id="selected_user")
+            redirect_url = url_for("user_studies", uva_id=selected_user)
     return redirect(redirect_url)
 
 
