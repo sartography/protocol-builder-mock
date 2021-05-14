@@ -122,7 +122,7 @@ class StudyTable(Table):
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Edit Sponsor(s)'}
     )
     irb_info = LinkCol(
-        'irb_info', 'edit_irb_info', url_kwargs=dict(study_id='STUDYID'),
+        'info', 'edit_irb_info', url_kwargs=dict(study_id='STUDYID'),
         anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Edit Info'},
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Edit Info'}
     )
