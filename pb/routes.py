@@ -314,7 +314,7 @@ def study_details(study_id):
         study_details = StudyDetails(STUDYID=study_id)
     form = StudyDetailsForm(request.form, obj=study_details)
 
-    action = url_for("study_details", uva_id=study_id)
+    action = url_for("study_details", study_id=study_id)
     title = "Edit Study Details for Study #" + study_id
     details = "Numeric fields can be 1 for true, 0 or false, or Null if not applicable."
 
