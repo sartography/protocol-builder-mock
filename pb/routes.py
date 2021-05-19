@@ -3,7 +3,7 @@ from pb import app, db, description_map, session
 from pb.ldap.ldap_service import LdapService
 from pb.pb_mock import get_current_user, get_selected_user, update_selected_user, \
     render_study_template, _update_study, redirect_home, _update_irb_info, _allowed_file, \
-    process_csv_study_details, has_no_empty_params
+    process_csv_study_details, has_no_empty_params, update_required_document_list
 from pb.forms import StudyForm, IRBInfoForm, InvestigatorForm, ConfirmDeleteForm, StudySponsorForm, StudyDetailsForm
 from pb.models import Study, StudyDetails, IRBInfo, IRBStatus, Investigator, Sponsor, StudySponsor, RequiredDocument
 
@@ -370,3 +370,8 @@ def site_map():
             url = app.confg['APPLICATION_ROOT'].strip('/') + url_for(rule.endpoint, **(rule.defaults or {}))
             links.append((url, rule.endpoint))
     return json.dumps({"links": links})
+
+
+@app.route('/update_document_list')
+def update_document_list():
+    update_required_document_list()
