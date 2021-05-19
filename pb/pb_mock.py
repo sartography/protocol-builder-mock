@@ -1,12 +1,20 @@
-from pb.models import Study, RequiredDocument, StudyDetails, IRBStatus, IRBInfo, SelectedUser
-from pb.forms import StudyTable
-
 from pb import BASE_HREF, app, db, session
+from pb.forms import StudyTable
+from pb.models import IRBInfo, IRBStatus, RequiredDocument, RequiredDocumentsList, \
+    StudyDetails, SelectedUser, Study
+
 from flask import g, render_template, redirect, url_for
+from io import TextIOWrapper
 from sqlalchemy import func
+
 import datetime
 import csv
-from io import TextIOWrapper
+import requests
+import json
+
+
+def _is_development():
+    return 'DEVELOPMENT' in app.config and app.config['DEVELOPMENT']
 
 
 def _is_production():
@@ -157,3 +165,35 @@ def has_no_empty_params(rule):
 
 def redirect_home():
     return redirect(url_for('index'))
+
+
+def _get_required_document_list():
+    document_list = []
+    if _is_production():
+        rv = requests.get('https://hrpp.irb.virginia.edu/webservices/crconnect/crconnect.cfc?method=CrConnectAuxDocList')
+        if rv.ok:
+            document_list = json.loads(rv.text)['CRCONNECTDOCS']
+
+    elif _is_development():
+        with open(r'pb/static/json/aux_doc_list.json') as file:
+            data = file.read()
+            obj = json.loads(data)
+            document_list = obj['CRCONNECTDOCS']
+
+    return document_list
+
+
+def update_required_document_list():
+    docs = _get_required_document_list()
+    if docs:
+        statement = 'DELETE FROM required_documents_list where "AUXDOCID" is not NULL;'
+        session.flush()
+        session.execute(statement)
+        session.commit()
+        session.flush()
+        for doc in docs:
+            aux_doc_id = doc['SS_AUXILIARY_DOC_TYPE']
+            aux_doc = doc['AUXILIARY_DOC']
+            model = RequiredDocumentsList(AUXDOCID=aux_doc_id, AUXDOC=aux_doc)
+            session.add(model)
+        session.commit()
