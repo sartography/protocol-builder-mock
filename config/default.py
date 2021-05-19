@@ -9,6 +9,7 @@ FLASK_PORT = environ.get('PORT0') or environ.get('FLASK_PORT', default="5001")
 CORS_ALLOW_ORIGINS = re.split(r',\s*', environ.get('CORS_ALLOW_ORIGINS', default="localhost:5000"))
 DEVELOPMENT = environ.get('DEVELOPMENT', default="true") == "true"
 TESTING = environ.get('TESTING', default="false") == "true"
+PRODUCTION = (environ.get('PRODUCTION', default="false") == "true")
 
 # Add trailing slash to base path
 APPLICATION_ROOT = re.sub(r'//', '/', '/%s/' % environ.get('APPLICATION_ROOT', default="/").strip('/'))
