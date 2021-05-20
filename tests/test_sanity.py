@@ -11,7 +11,8 @@ import string
 from pb import app, db, session
 from pb.forms import StudyForm, StudySponsorForm
 from pb.ldap.ldap_service import LdapService
-from pb.models import Study, RequiredDocument, Sponsor, StudySponsor, IRBStatus, Investigator, IRBInfo, StudyDetails
+from pb.models import Study, RequiredDocument, RequiredDocumentsList, Sponsor, StudySponsor, IRBStatus, Investigator, IRBInfo, StudyDetails
+from pb.pb_mock import _get_required_document_list, update_required_document_list
 from example_data import ExampleDataLoader
 
 
@@ -245,3 +246,13 @@ class Sanity_Check_Test(unittest.TestCase):
     #     detail = StudyDetails.query.filter(StudyDetails.STUDYID == test_study.STUDYID).first()
     #     self.assertIsNone(detail)
     #     print('test_study_details_validation_fail')
+
+    def test_update_required_documents_list(self):
+        master_list = _get_required_document_list()
+        update_required_document_list()
+        all_documents = RequiredDocumentsList().all()
+        self.assertEqual(len(master_list), len(all_documents))
+        pairs = list(zip(master_list, all_documents))
+        for pair in pairs:
+            self.assertEqual(pair[0]['AUXILIARY_DOC'], pair[1].AUXDOC)
+            self.assertEqual(str(pair[0]['SS_AUXILIARY_DOC_TYPE']), pair[1].AUXDOCID)
