@@ -3,16 +3,26 @@ from flask_wtf import FlaskForm
 from wtforms import SelectMultipleField, StringField, BooleanField, SelectField, validators, HiddenField, DateField, IntegerField
 from wtforms_alchemy import ModelForm
 
-from pb.models import RequiredDocument, Investigator, StudyDetails, IRBStatus, IRBInfo
+from pb.models import RequiredDocument, RequiredDocumentsList, Investigator, StudyDetails, IRBStatus, IRBInfo
 
 
+def get_study_form_choices():
+    form_choices = RequiredDocumentsList().all()
+    # form_choices = RequiredDocument().all()
+    return form_choices
+
+    # choices = [(rd.AUXDOCID, rd.AUXDOC) for rd in required_documents]
+    # return choices
+
+from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 class StudyForm(FlaskForm):
     STUDYID = HiddenField()
     TITLE = StringField('Title', [validators.DataRequired()])
     NETBADGEID = StringField('User UVA Computing Id', [validators.DataRequired()])
-    requirements = SelectMultipleField("Documents",
-                                       render_kw={'class': 'multi'},
-                                       choices=[(rd.AUXDOCID, rd.AUXDOC) for rd in RequiredDocument.all()])
+    requirements = QuerySelectMultipleField("Documents",
+                                            render_kw={'class': 'multi'},
+                                            query_factory=get_study_form_choices,
+                                            get_label='AUXDOC')
     HSRNUMBER = StringField('HSR Number')
     Q_COMPLETE = SelectField("IRBStatus",
                              choices=[((q.STATUS, q.DETAIL), q.DETAIL) for q in IRBStatus.all()])

@@ -1,7 +1,7 @@
-from pb import BASE_HREF, app, db, session
-from pb.forms import StudyTable
 from pb.models import IRBInfo, IRBStatus, RequiredDocument, RequiredDocumentsList, \
     StudyDetails, SelectedUser, Study
+from pb.forms import StudyTable
+from pb import BASE_HREF, app, db, session
 
 from flask import g, render_template, redirect, url_for
 from io import TextIOWrapper

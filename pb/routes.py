@@ -71,7 +71,11 @@ def edit_study(study_id):
         action = BASE_HREF + "/study/" + study_id
         title = "Edit Study #" + study_id
         if study.requirements:
-            form.requirements.data = list(map(lambda r: r.AUXDOCID, list(study.requirements)))
+            # form.requirements.data = list(map(lambda r: r.AUXDOCID, list(study.requirements)))
+            requirements_data = []
+            for r in study.requirements:
+                requirements_data.append(r)
+            form.requirements.data = requirements_data
         if study.Q_COMPLETE and study.Q_COMPLETE.first():
             form.Q_COMPLETE.data = "('" + study.Q_COMPLETE.first().STATUS + "', '" + study.Q_COMPLETE.first().DETAIL + "')"
         else:
@@ -375,3 +379,6 @@ def site_map():
 @app.route('/update_document_list')
 def update_document_list():
     update_required_document_list()
+    # flash('Document list updated successfully!', 'success')
+    # # return redirect_home()
+    # return redirect(url_for('user_studies'))

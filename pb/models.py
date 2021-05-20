@@ -137,17 +137,27 @@ class InvestigatorSchema(ma.Schema):
         fields = ("NETBADGEID", "INVESTIGATORTYPE", "INVESTIGATORTYPEFULL")
 
 
-class RequiredDocumentsList(db.Model):
-    AUXDOCID = db.Column(db.String(), nullable=False, primary_key=True)
-    AUXDOC = db.Column(db.String(), nullable=False, default="")
-
-
 def get_all_required_documents():
     all_required_documents = []
     result = db.session.query(RequiredDocumentsList).all()
     for doc in result:
         all_required_documents.append(RequiredDocument(AUXDOCID=doc.AUXDOCID, AUXDOC=doc.AUXDOC))
     return all_required_documents
+
+
+class RequiredDocumentsList(db.Model):
+    AUXDOCID = db.Column(db.String(), nullable=False, primary_key=True)
+    AUXDOC = db.Column(db.String(), nullable=False, default="")
+
+    # @staticmethod
+    def all(self):
+        # return get_all_required_documents()
+        all_required_documents = []
+        result = self.query.all()
+        for doc in result:
+            all_required_documents.append(doc)
+            # all_required_documents.append(RequiredDocument(AUXDOCID=doc.AUXDOCID, AUXDOC=doc.AUXDOC))
+        return all_required_documents
 
 
 class RequiredDocument(db.Model):
@@ -158,8 +168,7 @@ class RequiredDocument(db.Model):
 
     @staticmethod
     def all():
-        docs = get_all_required_documents()
-        return docs
+        return get_all_required_documents()
 
 
 class RequiredDocumentSchema(ma.Schema):
@@ -278,4 +287,5 @@ class SelectedUser(db.Model):
 class SelectedUserSchema(ma.Schema):
     class Meta:
         fields = ("user_id", "selected_user")
+
 
