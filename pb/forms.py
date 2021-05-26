@@ -12,7 +12,7 @@ class StudyForm(FlaskForm):
     NETBADGEID = StringField('User UVA Computing Id', [validators.DataRequired()])
     requirements = SelectMultipleField("Documents",
                                        render_kw={'class': 'multi'},
-                                       choices=[(rd.AUXDOCID, rd.AUXDOC) for rd in RequiredDocument().all()])
+                                       choices=[(rd.AUXDOCID, rd.AUXDOC) for rd in RequiredDocument.all()])
     HSRNUMBER = StringField('HSR Number')
     Q_COMPLETE = SelectField("IRBStatus",
                              choices=[((q.STATUS, q.DETAIL), q.DETAIL) for q in IRBStatus.all()])
