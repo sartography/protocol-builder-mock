@@ -145,8 +145,39 @@ class RequiredDocument(db.Model):
 
     @staticmethod
     def all():
-        return get_all_required_documents()
-
+        docs = [RequiredDocument(AUXDOCID=1, AUXDOC="Investigators Brochure"),
+                RequiredDocument(AUXDOCID=6, AUXDOC="Cancer Center's PRC Approval Form"),
+                RequiredDocument(AUXDOCID=8, AUXDOC="SOM CTO IND/IDE Review Letter"),
+                RequiredDocument(AUXDOCID=9, AUXDOC="HIRE Approval"),
+                RequiredDocument(AUXDOCID=10, AUXDOC="Cancer Center's PRC Approval Waiver"),
+                RequiredDocument(AUXDOCID=12, AUXDOC="Certificate of Confidentiality Application"),
+                RequiredDocument(AUXDOCID=14, AUXDOC="Institutional Biosafety Committee Approval"),
+                RequiredDocument(AUXDOCID=18, AUXDOC="SOM CTO Approval Letter - UVA PI Multisite Trial"),
+                RequiredDocument(AUXDOCID=20,
+                                 AUXDOC="IRB Approval or Letter of Approval from Administration: Study Conducted at non- UVA Facilities "),
+                RequiredDocument(AUXDOCID=21, AUXDOC="New Medical Device Form"),
+                RequiredDocument(AUXDOCID=22, AUXDOC="SOM CTO Review regarding need for IDE"),
+                RequiredDocument(AUXDOCID=23, AUXDOC="SOM CTO Review regarding need for IND"),
+                RequiredDocument(AUXDOCID=25, AUXDOC="Scientific Pre-review Documentation"),
+                RequiredDocument(AUXDOCID=26, AUXDOC="IBC Number"),
+                RequiredDocument(AUXDOCID=32, AUXDOC="IDS - Investigational Drug Service Approval"),
+                RequiredDocument(AUXDOCID=36, AUXDOC="RDRC Approval "),
+                RequiredDocument(AUXDOCID=40, AUXDOC="SBS/IRB Approval-FERPA"),
+                RequiredDocument(AUXDOCID=41, AUXDOC="HIRE Standard Radiation Language"),
+                RequiredDocument(AUXDOCID=42, AUXDOC="COI Management Plan "),
+                RequiredDocument(AUXDOCID=43, AUXDOC="SOM CTO Approval Letter-Non UVA, Non Industry PI MultiSite Study"),
+                RequiredDocument(AUXDOCID=44, AUXDOC="GRIME Approval"),
+                RequiredDocument(AUXDOCID=45, AUXDOC="GMEC Approval"),
+                RequiredDocument(AUXDOCID=46, AUXDOC="IRB Reliance Agreement Request Form- IRB-HSR is IRB of Record"),
+                RequiredDocument(AUXDOCID=47, AUXDOC="Non UVA IRB Approval - Initial and Last Continuation"),
+                RequiredDocument(AUXDOCID=48, AUXDOC="MR Physicist Approval- Use of Gadolinium"),
+                RequiredDocument(AUXDOCID=49, AUXDOC="SOM CTO Approval- Non- UVA Academia PI of IDE"),
+                RequiredDocument(AUXDOCID=51, AUXDOC="IDS Waiver"),
+                RequiredDocument(AUXDOCID=52, AUXDOC="Package Inserts"),
+                RequiredDocument(AUXDOCID=53, AUXDOC="IRB Reliance Agreement Request Form- IRB-HSR Not IRB of Record"),
+                RequiredDocument(AUXDOCID=54, AUXDOC="ESCRO Approval"),
+                RequiredDocument(AUXDOCID=57, AUXDOC="Laser Safety Officer Approval")]
+        return docs
 
 class RequiredDocumentSchema(ma.Schema):
     class Meta:
