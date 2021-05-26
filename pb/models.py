@@ -146,25 +146,33 @@ class RequiredDocument(db.Model):
     @staticmethod
     def all():
         docs = [RequiredDocument(AUXDOCID=1, AUXDOC="Investigators Brochure"),
+                RequiredDocument(AUXDOCID=2, AUXDOC="Screening Log"),
+                RequiredDocument(AUXDOCID=3, AUXDOC="Protocol"),
                 RequiredDocument(AUXDOCID=6, AUXDOC="Cancer Center's PRC Approval Form"),
+                RequiredDocument(AUXDOCID=7, AUXDOC="GCRC Approval Form"),
                 RequiredDocument(AUXDOCID=8, AUXDOC="SOM CTO IND/IDE Review Letter"),
                 RequiredDocument(AUXDOCID=9, AUXDOC="HIRE Approval"),
                 RequiredDocument(AUXDOCID=10, AUXDOC="Cancer Center's PRC Approval Waiver"),
+                RequiredDocument(AUXDOCID=11, AUXDOC="HSR Grant"),
                 RequiredDocument(AUXDOCID=12, AUXDOC="Certificate of Confidentiality Application"),
                 RequiredDocument(AUXDOCID=14, AUXDOC="Institutional Biosafety Committee Approval"),
                 RequiredDocument(AUXDOCID=18, AUXDOC="SOM CTO Approval Letter - UVA PI Multisite Trial"),
-                RequiredDocument(AUXDOCID=20,
-                                 AUXDOC="IRB Approval or Letter of Approval from Administration: Study Conducted at non- UVA Facilities "),
+                RequiredDocument(AUXDOCID=19, AUXDOC="IRB Approval or Letter of Approval from Administration: Send Data or Specimens to UVA"),
+                RequiredDocument(AUXDOCID=20, AUXDOC="IRB Approval or Letter of Approval from Administration: Study Conducted at non- UVA Facilities "),
                 RequiredDocument(AUXDOCID=21, AUXDOC="New Medical Device Form"),
                 RequiredDocument(AUXDOCID=22, AUXDOC="SOM CTO Review regarding need for IDE"),
                 RequiredDocument(AUXDOCID=23, AUXDOC="SOM CTO Review regarding need for IND"),
+                RequiredDocument(AUXDOCID=24, AUXDOC="InfoSec Approval"),
                 RequiredDocument(AUXDOCID=25, AUXDOC="Scientific Pre-review Documentation"),
                 RequiredDocument(AUXDOCID=26, AUXDOC="IBC Number"),
                 RequiredDocument(AUXDOCID=32, AUXDOC="IDS - Investigational Drug Service Approval"),
+                RequiredDocument(AUXDOCID=33, AUXDOC="Data Security Plan"),
+                RequiredDocument(AUXDOCID=35, AUXDOC="Model Consent"),
                 RequiredDocument(AUXDOCID=36, AUXDOC="RDRC Approval "),
+                RequiredDocument(AUXDOCID=39, AUXDOC="Age of Majority Cover Letter and Consent"),
                 RequiredDocument(AUXDOCID=40, AUXDOC="SBS/IRB Approval-FERPA"),
                 RequiredDocument(AUXDOCID=41, AUXDOC="HIRE Standard Radiation Language"),
-                RequiredDocument(AUXDOCID=42, AUXDOC="COI Management Plan "),
+                RequiredDocument(AUXDOCID=42, AUXDOC="COI Management Plan"),
                 RequiredDocument(AUXDOCID=43, AUXDOC="SOM CTO Approval Letter-Non UVA, Non Industry PI MultiSite Study"),
                 RequiredDocument(AUXDOCID=44, AUXDOC="GRIME Approval"),
                 RequiredDocument(AUXDOCID=45, AUXDOC="GMEC Approval"),
@@ -176,7 +184,9 @@ class RequiredDocument(db.Model):
                 RequiredDocument(AUXDOCID=52, AUXDOC="Package Inserts"),
                 RequiredDocument(AUXDOCID=53, AUXDOC="IRB Reliance Agreement Request Form- IRB-HSR Not IRB of Record"),
                 RequiredDocument(AUXDOCID=54, AUXDOC="ESCRO Approval"),
-                RequiredDocument(AUXDOCID=57, AUXDOC="Laser Safety Officer Approval")]
+                RequiredDocument(AUXDOCID=56, AUXDOC="Unaffiliated Investigator Agreement "),
+                RequiredDocument(AUXDOCID=57, AUXDOC="Laser Safety Officer Approval"),
+                RequiredDocument(AUXDOCID=58, AUXDOC="FDA Letter granting IND/IDE# or exemption")]
         return docs
 
 class RequiredDocumentSchema(ma.Schema):
@@ -295,5 +305,4 @@ class SelectedUser(db.Model):
 class SelectedUserSchema(ma.Schema):
     class Meta:
         fields = ("user_id", "selected_user")
-
 
