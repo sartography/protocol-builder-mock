@@ -3,7 +3,7 @@ from pb import app, db, description_map, session
 from pb.ldap.ldap_service import LdapService
 from pb.pb_mock import get_current_user, get_selected_user, update_selected_user, \
     render_study_template, _update_study, redirect_home, _update_irb_info, _allowed_file, \
-    process_csv_study_details, has_no_empty_params, verify_required_document_list
+    process_csv_study_details, has_no_empty_params, verify_required_document_list, verify_study_details_list
 from pb.forms import StudyForm, IRBInfoForm, InvestigatorForm, ConfirmDeleteForm, StudySponsorForm, StudyDetailsForm
 from pb.models import Study, StudyDetails, IRBInfo, IRBStatus, Investigator, Sponsor, StudySponsor, RequiredDocument
 
@@ -385,4 +385,9 @@ def verify_document_list():
 
 @app.route('/verify_study_details')
 def verify_study_details():
-    pass
+    verify = verify_study_details_list()
+    if verify:
+        flash('Study details are up to date.', 'success')
+    else:
+        flash('Study details are not up to date.', 'failure')
+    return redirect_home()
