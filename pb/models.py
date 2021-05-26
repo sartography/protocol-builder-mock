@@ -214,6 +214,7 @@ class IRBStatusSchema(ma.Schema):
 
 class StudyDetails(db.Model):
     STUDYID = db.Column(db.Integer, db.ForeignKey('study.STUDYID'), primary_key=True)
+    UVA_STUDY_TRACKING = db.Column(db.String, nullable=True)
     IS_IND = db.Column(db.Integer, nullable=True)
     IND_1 = db.Column(db.String, nullable=True)
     IND_2 = db.Column(db.String, nullable=True)
