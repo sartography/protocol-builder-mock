@@ -45,7 +45,12 @@
     </div> <!-- no float -->
 
     <div class="float-right">
-        <button onclick="updateDocumentList();">Update Document List</button>
+        <div>
+            <button onclick="verifyStudyDetails();">Verify Study Details</button>
+        </div>
+        <div>
+            <button onclick="verifyDocumentList();">Verify Document List</button>
+        </div>
     </div>
 
 </div><!-- float wrapper -->
@@ -72,8 +77,17 @@
     }
 </script>
 <script>
-    function updateDocumentList() {
-        let url = "{{base_href + url_for('update_document_list')}}";
+    function verifyDocumentList() {
+        let url = "{{base_href + url_for('verify_document_list')}}";
+        $.ajax({
+            url: url,
+            success: function (result) {
+                alert(result);
+            }
+        });
+    }
+    function verifyStudyDetails() {
+        let url = "{{base_href + url_for('verify_study_details')}}";
         $.ajax({
             url: url,
             success: function (result) {
