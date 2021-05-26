@@ -227,6 +227,7 @@ def verify_required_document_list():
         # update_required_document_list()
     return verify
 
+
 # def update_required_document_list(master_json):
 #     docs = _get_required_document_list()
 #     # RequiredDocument().update_master(docs)
@@ -245,3 +246,48 @@ def verify_required_document_list():
 #             model = RequiredDocumentsList(AUXDOCID=aux_doc_id, AUXDOC=aux_doc)
 #             session.add(model)
 #         session.commit()
+def _get_study_details_list():
+    details_list = []
+    if _is_production():
+        rv = requests.get('https://hrpp.irb.virginia.edu/webservices/crconnect/crconnect.cfc?method=Study&studyid=15370')
+        if rv.ok:
+            details_list = json.loads(rv.text)
+
+    elif _is_development():
+        with open(r'pb/static/json/study_details_list.json') as file:
+            data = file.read()
+            obj = json.loads(data)
+            details_list = obj
+
+    return details_list
+
+
+def verify_study_details_list():
+    study_details_list = _get_study_details_list()
+    study_details = study_details_list[0]
+    details = []
+    for key in study_details.keys():
+        details.append(key)
+    column_statement = "select column_name from information_schema.columns where table_name = 'study_details'"
+    result = session.execute(column_statement)
+    column_names = []
+    for row in result:
+        column_names.append(row[0])
+    verify = compare_the_lists(details, column_names)
+    if not verify:
+        missing_details, extra_columns = _process_study_details(details, column_names)
+        print(f'Missing Details: {missing_details}')
+        print(f'Extra Columns: {extra_columns}')
+    return verify
+
+
+def _process_study_details(details, column_names):
+    missing_details = []
+    extra_columns = []
+    for x in details:
+        if x not in column_names:
+            missing_details.append(x)
+    for y in column_names:
+        if y not in details:
+            extra_columns.append(y)
+    return missing_details, extra_columns
