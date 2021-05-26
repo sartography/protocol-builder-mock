@@ -1,5 +1,4 @@
-from pb.models import IRBInfo, IRBStatus, RequiredDocument, \
-    StudyDetails, SelectedUser, Study
+from pb.models import IRBInfo, IRBStatus, RequiredDocument, StudyDetails, SelectedUser, Study
 from pb.forms import StudyTable
 from pb import BASE_HREF, app, db, session
 
