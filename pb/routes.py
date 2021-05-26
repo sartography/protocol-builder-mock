@@ -68,14 +68,8 @@ def edit_study(study_id):
     study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
     form = StudyForm(request.form, obj=study)
     if request.method == 'GET':
-        action = BASE_HREF + "/study/" + study_id
-        title = "Edit Study #" + study_id
         if study.requirements:
-            # form.requirements.data = list(map(lambda r: r.AUXDOCID, list(study.requirements)))
-            requirements_data = []
-            for r in study.requirements:
-                requirements_data.append(r)
-            form.requirements.data = requirements_data
+            form.requirements.data = list(map(lambda r: r.AUXDOCID, list(study.requirements)))
         if study.Q_COMPLETE and study.Q_COMPLETE.first():
             form.Q_COMPLETE.data = "('" + study.Q_COMPLETE.first().STATUS + "', '" + study.Q_COMPLETE.first().DETAIL + "')"
         else:
@@ -84,6 +78,8 @@ def edit_study(study_id):
         _update_study(study, form)
         flash('Study updated successfully!', 'success')
         return redirect_home()
+    action = BASE_HREF + "/study/" + study_id
+    title = "Edit Study #" + study_id
     return render_template(
         'form.html',
         form=form,
