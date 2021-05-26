@@ -46,10 +46,15 @@
 
     <div class="float-right">
         <div>
-            <button onclick="verifyStudyDetails();">Verify Study Details</button>
+            <form name="verify_study_details" method="get" action="{{base_href + url_for('verify_study_details')}}">
+                <button onclick="verifyStudyDetails();">Verify Study Details</button>
+            </form>
+
         </div>
         <div>
-            <button onclick="verifyDocumentList();">Verify Document List</button>
+            <form name="verify_document_list" method="get" action="{{base_href + url_for('verify_document_list')}}">
+                <button onclick="verifyDocumentList();">Verify Document List</button>
+            </form>
         </div>
     </div>
 
