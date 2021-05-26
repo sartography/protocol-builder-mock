@@ -12,7 +12,6 @@ from pb import app, db, session
 from pb.forms import StudyForm, StudySponsorForm
 from pb.ldap.ldap_service import LdapService
 from pb.models import Study, RequiredDocument, Sponsor, StudySponsor, IRBStatus, Investigator, IRBInfo, StudyDetails
-# from pb.pb_mock import _get_required_document_list, update_required_document_list
 from example_data import ExampleDataLoader
 
 
