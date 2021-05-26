@@ -70,6 +70,7 @@ def render_study_template(studies, uva_id):
         selected_user=uva_id
     )
 
+
 def _update_study(study, form):
     if study.STUDYID is None:
         # quick hack to get auto-increment without creating a bunch of hassle, this is not
@@ -213,7 +214,6 @@ def verify_required_document_list():
             doc['AUXILIARY_DOC'] = doc['AUXILIARY_DOC'].replace("\r", '')
             doc['AUXILIARY_DOC'] = doc['AUXILIARY_DOC'].replace("\n", '')
             required_documents_list.append({'AUXDOCID': doc['SS_AUXILIARY_DOC_TYPE'], 'AUXDOC': doc['AUXILIARY_DOC']})
-            # required_documents_list.append(RequiredDocument(AUXDOCID=doc['SS_AUXILIARY_DOC_TYPE'], AUXDOC=doc['AUXILIARY_DOC']))
 
     verify = compare_the_lists(required_documents_list, local_documents_list)
     if not verify:
@@ -223,28 +223,9 @@ def verify_required_document_list():
             to_print += f"RequiredDocument(AUXDOCID={rd['AUXDOCID']}, AUXDOC=\"{rd['AUXDOC']}\"), "
         to_print += ']'
         print(to_print)
-        # update_required_document_list()
     return verify
 
 
-# def update_required_document_list(master_json):
-#     docs = _get_required_document_list()
-#     # RequiredDocument().update_master(docs)
-#     if docs:
-#         # required_documents_list = []
-#         statement = 'DELETE FROM required_documents_list where "AUXDOCID" is not NULL;'
-#         session.flush()
-#         session.execute(statement)
-#         session.commit()
-#         session.flush()
-#         for doc in docs:
-#             # required_documents_list.append({'AUXDOCID': doc['SS_AUXILIARY_DOC_TYPE'],
-#             #                                 'AUXDOC': doc['AUXILIARY_DOC']})
-#             aux_doc_id = doc['SS_AUXILIARY_DOC_TYPE']
-#             aux_doc = doc['AUXILIARY_DOC']
-#             model = RequiredDocumentsList(AUXDOCID=aux_doc_id, AUXDOC=aux_doc)
-#             session.add(model)
-#         session.commit()
 def _get_study_details_list():
     details_list = []
     if _is_production():
@@ -275,6 +256,7 @@ def verify_study_details_list():
     verify = compare_the_lists(details, column_names)
     if not verify:
         missing_details, extra_columns = _process_study_details(details, column_names)
+        # Print this to make it easier to update the table
         print(f'Missing Details: {missing_details}')
         print(f'Extra Columns: {extra_columns}')
     return verify
