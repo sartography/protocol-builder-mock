@@ -1,4 +1,4 @@
-from pb.models import IRBInfo, IRBStatus, RequiredDocument, RequiredDocumentsList, \
+from pb.models import IRBInfo, IRBStatus, RequiredDocument, \
     StudyDetails, SelectedUser, Study
 from pb.forms import StudyTable
 from pb import BASE_HREF, app, db, session
@@ -183,17 +183,65 @@ def _get_required_document_list():
     return document_list
 
 
-def update_required_document_list():
-    docs = _get_required_document_list()
-    if docs:
-        statement = 'DELETE FROM required_documents_list where "AUXDOCID" is not NULL;'
-        session.flush()
-        session.execute(statement)
-        session.commit()
-        session.flush()
-        for doc in docs:
-            aux_doc_id = doc['SS_AUXILIARY_DOC_TYPE']
-            aux_doc = doc['AUXILIARY_DOC']
-            model = RequiredDocumentsList(AUXDOCID=aux_doc_id, AUXDOC=aux_doc)
-            session.add(model)
-        session.commit()
+def compare_the_lists(a, b):
+    if len(a) != len(b):
+        return False
+    for x in a:
+        if x not in b:
+            return False
+    for y in b:
+        if y not in a:
+            return False
+    return True
+
+
+def verify_required_document_list():
+    """We can view the master list at https://hrpp.irb.virginia.edu/webservices/crconnect/crconnect.cfc?method=CrConnectAuxDocList
+       Locally, the list is hardcoded into models.RequiredDocument.
+       This is not good. We need to automate this."""
+
+    # Grab the two lists--that are formatted differently,
+    # and build something we can compare.
+    local = RequiredDocument.all()
+    local_documents_list = []
+    for loc in local:
+        local_documents_list.append({'AUXDOCID': loc.AUXDOCID, 'AUXDOC': loc.AUXDOC})
+
+    required_documents_list = []
+    master_list = _get_required_document_list()
+    if master_list:
+        for doc in master_list:
+            doc['AUXILIARY_DOC'] = doc['AUXILIARY_DOC'].replace("\r", '')
+            doc['AUXILIARY_DOC'] = doc['AUXILIARY_DOC'].replace("\n", '')
+            required_documents_list.append({'AUXDOCID': doc['SS_AUXILIARY_DOC_TYPE'], 'AUXDOC': doc['AUXILIARY_DOC']})
+            # required_documents_list.append(RequiredDocument(AUXDOCID=doc['SS_AUXILIARY_DOC_TYPE'], AUXDOC=doc['AUXILIARY_DOC']))
+
+    verify = compare_the_lists(required_documents_list, local_documents_list)
+    if not verify:
+        # Printing this so it is easier to update the hardcoded list in models.RequiredDocument
+        to_print = '['
+        for rd in required_documents_list:
+            to_print += f"RequiredDocument(AUXDOCID={rd['AUXDOCID']}, AUXDOC=\"{rd['AUXDOC']}\"), "
+        to_print += ']'
+        print(to_print)
+        # update_required_document_list()
+    return verify
+
+# def update_required_document_list(master_json):
+#     docs = _get_required_document_list()
+#     # RequiredDocument().update_master(docs)
+#     if docs:
+#         # required_documents_list = []
+#         statement = 'DELETE FROM required_documents_list where "AUXDOCID" is not NULL;'
+#         session.flush()
+#         session.execute(statement)
+#         session.commit()
+#         session.flush()
+#         for doc in docs:
+#             # required_documents_list.append({'AUXDOCID': doc['SS_AUXILIARY_DOC_TYPE'],
+#             #                                 'AUXDOC': doc['AUXILIARY_DOC']})
+#             aux_doc_id = doc['SS_AUXILIARY_DOC_TYPE']
+#             aux_doc = doc['AUXILIARY_DOC']
+#             model = RequiredDocumentsList(AUXDOCID=aux_doc_id, AUXDOC=aux_doc)
+#             session.add(model)
+#         session.commit()
