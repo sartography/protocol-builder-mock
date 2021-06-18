@@ -83,6 +83,51 @@ class StudySchema(ma.Schema):
                   "DATE_MODIFIED")
 
 
+class IRBInfoEvent(db.Model):
+    STUDY_ID = db.Column(db.Integer, db.ForeignKey('irb_info.SS_STUDY_ID'), primary_key=True)
+    EVENT_ID = db.Column(db.String(), nullable=False, default='')
+    EVENT = db.Column(db.String(), nullable=False, default='')
+
+    @staticmethod
+    def all():
+        event = [IRBInfoEvent(EVENT_ID='', EVENT=''),
+                 IRBInfoEvent(EVENT_ID='299', EVENT='PreReview Returned to PI New Protocol'),
+                 IRBInfoEvent(EVENT_ID='57', EVENT='Approval New Protocol'),
+                 IRBInfoEvent(EVENT_ID='312', EVENT='Condition Response Accepted-New Protocol'),
+                 IRBInfoEvent(EVENT_ID='316', EVENT='Deferred New Protocol'),
+                 IRBInfoEvent(EVENT_ID='62', EVENT='Closed by PI')]
+        return event
+
+
+class IRBInfoEventSchema(ma.Schema):
+    class Meta:
+        load_instance = True
+        include_relationships = True
+        fields = ("EVENT_ID", "EVENT")
+
+
+class IRBInfoStatus(db.Model):
+    STUDY_ID = db.Column(db.Integer, db.ForeignKey('irb_info.SS_STUDY_ID'), primary_key=True)
+    STATUS_ID = db.Column(db.String(), nullable=False, default='')
+    STATUS = db.Column(db.String(), nullable=False, default='')
+
+    @staticmethod
+    def all():
+        status = [IRBInfoStatus(STATUS_ID='', STATUS=''),
+                  IRBInfoStatus(STATUS_ID='31', STATUS='PreReview Complete New Protocol'),
+                  IRBInfoStatus(STATUS_ID='2', STATUS='Open to enrollment'),
+                  IRBInfoStatus(STATUS_ID='39', STATUS='Withdrawn'),
+                  IRBInfoStatus(STATUS_ID='37', STATUS='Disapproved')]
+        return status
+
+
+class IRBInfoStatusSchema(ma.Schema):
+    class Meta:
+        load_instance = True
+        include_relationships = True
+        fields = ("STATUS_ID", "STATUS")
+
+
 class IRBInfo(db.Model):
     SS_STUDY_ID = db.Column(db.Integer, db.ForeignKey('study.STUDYID'), primary_key=True)
     UVA_STUDY_TRACKING = db.Column(db.String(), nullable=False, default='')
