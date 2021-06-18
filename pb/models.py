@@ -135,8 +135,8 @@ class IRBInfo(db.Model):
     IRB_ADMINISTRATIVE_REVIEWER = db.Column(db.String(), nullable=False, default='')
     AGENDA_DATE = db.Column(db.Date, nullable=True)
     IRB_REVIEW_TYPE = db.Column(db.String(), nullable=False, default='')
-    IRBEVENT = db.Column(db.String(), nullable=False, default='')
-    IRB_STATUS = db.Column(db.String(), nullable=False, default='')
+    IRBEVENT = db.relationship("IRBInfoEvent", backref="irb_info", lazy='dynamic')
+    IRB_STATUS = db.relationship("IRBInfoStatus", backref="irb_info", lazy='dynamic')
     IRB_OF_RECORD = db.Column(db.String(), nullable=False, default='')
     UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = db.Column(db.Integer(), nullable=True)
     STUDYIRBREVIEWERADMIN = db.Column(db.String(), nullable=False, default='')
@@ -144,9 +144,11 @@ class IRBInfo(db.Model):
 
 class IRBInfoSchema(ma.Schema):
     class Meta:
-        # Fields to expose
+        load_instance = True
+        include_relationships = True
+        include_fk = True
         fields = ("UVA_STUDY_TRACKING", "DATE_MODIFIED", "IRB_ADMINISTRATIVE_REVIEWER",
-                  "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRBEVENT", "IRB_STATUS", "IRB_OF_RECORD",
+                  "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRB_OF_RECORD",
                   "UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES", "STUDYIRBREVIEWERADMIN")
 
 class Investigator(db.Model):
