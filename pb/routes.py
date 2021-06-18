@@ -96,8 +96,19 @@ def edit_irb_info(study_id):
     form = IRBInfoForm(request.form, obj=irb_info)
     action = BASE_HREF + "/irb_info/" + study_id
     title = "Edit IRB Info #" + study_id
-    # if request.method == 'GET':
-    #     form.SS_STUDY_ID.data = study_id
+    if request.method == 'GET':
+        if irb_info.IRBEVENT and irb_info.IRBEVENT.first():
+            event = irb_info.IRBEVENT.first().EVENT
+            event_id = irb_info.IRBEVENT.first().EVENT_ID
+            event_data_string = "('" + event_id + "', '" + event + "')"
+            form.IRBEVENT.data = event_data_string
+        if irb_info.IRB_STATUS and irb_info.IRB_STATUS.first():
+            status = irb_info.IRB_STATUS.first().STATUS
+            status_id = irb_info.IRB_STATUS.first().STATUS_ID
+            status_data_string = "('" + status_id + "', '" + status + "')"
+            form.IRB_STATUS.data = status_data_string
+        if isinstance(irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES, int):
+            form.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES.data = irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES
     if request.method == 'POST':
         if form.validate():
             _update_irb_info(study_id, irb_info, form)
