@@ -1,6 +1,8 @@
 from marshmallow import fields
 from sqlalchemy import func
 from pb import db, ma
+from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
+from sqlalchemy.orm import backref
 
 
 class Sponsor(db.Model):
@@ -99,11 +101,13 @@ class IRBInfoEvent(db.Model):
         return event
 
 
-class IRBInfoEventSchema(ma.Schema):
+class IRBInfoEventSchema(SQLAlchemySchema):
     class Meta:
+        model = IRBInfoEvent
+        include_fk = True
         load_instance = True
-        include_relationships = True
-        fields = ("EVENT_ID", "EVENT")
+        # include_relationships = True
+        EVENT = auto_field()
 
 
 class IRBInfoStatus(db.Model):
@@ -121,11 +125,13 @@ class IRBInfoStatus(db.Model):
         return status
 
 
-class IRBInfoStatusSchema(ma.Schema):
+class IRBInfoStatusSchema(SQLAlchemySchema):
     class Meta:
+        model = IRBInfoStatus
+        include_fk = True
         load_instance = True
-        include_relationships = True
-        fields = ("STATUS_ID", "STATUS")
+        # include_relationships = True
+        STATUS = auto_field()
 
 
 class IRBInfo(db.Model):
@@ -135,18 +141,21 @@ class IRBInfo(db.Model):
     IRB_ADMINISTRATIVE_REVIEWER = db.Column(db.String(), nullable=False, default='')
     AGENDA_DATE = db.Column(db.Date, nullable=True)
     IRB_REVIEW_TYPE = db.Column(db.String(), nullable=False, default='')
-    IRBEVENT = db.relationship("IRBInfoEvent", backref="irb_info", lazy='dynamic')
-    IRB_STATUS = db.relationship("IRBInfoStatus", backref="irb_info", lazy='dynamic')
+    IRBEVENT = db.relationship("IRBInfoEvent", backref=backref("irb_info"), lazy='dynamic')
+    IRB_STATUS = db.relationship("IRBInfoStatus", backref=backref("irb_info"), lazy='dynamic')
     IRB_OF_RECORD = db.Column(db.String(), nullable=False, default='')
     UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = db.Column(db.Integer(), nullable=True)
     STUDYIRBREVIEWERADMIN = db.Column(db.String(), nullable=False, default='')
 
 
-class IRBInfoSchema(ma.Schema):
+class IRBInfoSchema(SQLAlchemySchema):
     class Meta:
-        load_instance = True
+        model = IRBInfo
+        # include_fk = True
         include_relationships = True
-        include_fk = True
+        load_instance = True
+        IRBEVENT = auto_field()
+        IRB_STATUS = auto_field()
         fields = ("UVA_STUDY_TRACKING", "DATE_MODIFIED", "IRB_ADMINISTRATIVE_REVIEWER",
                   "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRB_OF_RECORD",
                   "UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES", "STUDYIRBREVIEWERADMIN")
