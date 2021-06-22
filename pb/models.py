@@ -103,11 +103,12 @@ class IRBInfoEvent(db.Model):
 
 class IRBInfoEventSchema(SQLAlchemySchema):
     class Meta:
-        model = IRBInfoEvent
+        # model = IRBInfoEvent
         include_fk = True
         load_instance = True
         # include_relationships = True
-        EVENT = auto_field()
+        # EVENT = auto_field()
+        column = IRBInfoEvent.EVENT
 
 
 class IRBInfoStatus(db.Model):
@@ -127,11 +128,12 @@ class IRBInfoStatus(db.Model):
 
 class IRBInfoStatusSchema(SQLAlchemySchema):
     class Meta:
-        model = IRBInfoStatus
+        # model = IRBInfoStatus
         include_fk = True
         load_instance = True
         # include_relationships = True
-        STATUS = auto_field()
+        # STATUS = auto_field()
+        column = IRBInfoStatus.STATUS
 
 
 class IRBInfo(db.Model):
@@ -154,8 +156,8 @@ class IRBInfoSchema(SQLAlchemySchema):
         # include_fk = True
         include_relationships = True
         load_instance = True
-        IRBEVENT = auto_field()
-        IRB_STATUS = auto_field()
+        # IRBEVENT = fields.Nested('IRBEVENT')
+        # IRB_STATUS = fields.Nested('IRB_STATUS')
         fields = ("UVA_STUDY_TRACKING", "DATE_MODIFIED", "IRB_ADMINISTRATIVE_REVIEWER",
                   "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRB_OF_RECORD",
                   "UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES", "STUDYIRBREVIEWERADMIN")
