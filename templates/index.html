@@ -13,37 +13,57 @@
 <body>
 <h2>Protocol Builder Mock</h2>
 
-<p>
-    <a class="btn btn-primary" href="{{ url_for('.new_study') }}"> New Study </a>
-</p>
-<p>
-    <label>Only Show Studies for: </label>
-    <select name="uva_id" id="uva_id" onchange="selectStudies()">
-        <option value="">Select User</option>
-        <option value="all"   {% if selected_user=='all' %}selected{% endif %}>All Users</option>
-        {%  if users %}
-            {% for user in users %}
-                <option value="{{ user }}"  {% if selected_user==user %}selected{% endif %}>{{ user }}</option>
-            {% endfor %}
-        {% endif %}
-    </select>
-</p>
+<div class="float-wrapper">
 
-{% with messages = get_flashed_messages(with_categories=True) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert {{ category }}">
-                <span class="btn-close" onclick="hideElement(this.parentElement);">&times;</span>
-                {{ message|safe }}
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
+    <div> <!-- no float -->
+        <p>
+            <a class="btn btn-primary" href="{{ url_for('.new_study') }}"> New Study </a>
+        </p>
+        <p>
+            <label>Only Show Studies for: </label>
+            <select name="uva_id" id="uva_id" onchange="selectStudies()">
+                <option value="">Select User</option>
+                <option value="all"   {% if selected_user=='all' %}selected{% endif %}>All Users</option>
+                {%  if users %}
+                    {% for user in users %}
+                        <option value="{{ user }}"  {% if selected_user==user %}selected{% endif %}>{{ user }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">
+                        <span class="btn-close" onclick="hideElement(this.parentElement);">&times;</span>
+                        {{ message|safe }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div> <!-- no float -->
+
+    <div class="float-right">
+        <div>
+            <form name="verify_study_details" method="get" action="{{base_href + url_for('verify_study_details')}}">
+                <button onclick="verifyStudyDetails();">Verify Study Details</button>
+            </form>
+
+        </div>
+        <div>
+            <form name="verify_document_list" method="get" action="{{base_href + url_for('verify_document_list')}}">
+                <button onclick="verifyDocumentList();">Verify Document List</button>
+            </form>
+        </div>
+    </div>
+
+</div><!-- float wrapper -->
 
 <h3>Current Studies</h3>
 {{ table }}
 
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script>
     const hideElement = (el) => {
         el.classList.add('fade-out');
@@ -59,6 +79,26 @@
     function selectStudies() {
         let uva_id = document.getElementById('uva_id').value;
         window.location.href = "{{base_href}}/user_studies/" + uva_id;
+    }
+</script>
+<script>
+    function verifyDocumentList() {
+        let url = "{{base_href + url_for('verify_document_list')}}";
+        $.ajax({
+            url: url,
+            success: function (result) {
+                alert(result);
+            }
+        });
+    }
+    function verifyStudyDetails() {
+        let url = "{{base_href + url_for('verify_study_details')}}";
+        $.ajax({
+            url: url,
+            success: function (result) {
+                alert(result);
+            }
+        });
     }
 </script>
 </body>

@@ -1,12 +1,19 @@
-from pb.models import Study, RequiredDocument, StudyDetails, IRBStatus, IRBInfo, SelectedUser
+from pb.models import IRBInfo, IRBStatus, RequiredDocument, StudyDetails, SelectedUser, Study
 from pb.forms import StudyTable
-
 from pb import BASE_HREF, app, db, session
+
 from flask import g, render_template, redirect, url_for
+from io import TextIOWrapper
 from sqlalchemy import func
+
 import datetime
 import csv
-from io import TextIOWrapper
+import requests
+import json
+
+
+def _is_development():
+    return 'DEVELOPMENT' in app.config and app.config['DEVELOPMENT']
 
 
 def _is_production():
@@ -62,6 +69,7 @@ def render_study_template(studies, uva_id):
         users=users,
         selected_user=uva_id
     )
+
 
 def _update_study(study, form):
     if study.STUDYID is None:
@@ -157,3 +165,110 @@ def has_no_empty_params(rule):
 
 def redirect_home():
     return redirect(url_for('index'))
+
+
+def _get_required_document_list():
+    document_list = []
+    if _is_production():
+        rv = requests.get('https://hrpp.irb.virginia.edu/webservices/crconnect/crconnect.cfc?method=CrConnectAuxDocList')
+        if rv.ok:
+            document_list = json.loads(rv.text)['CRCONNECTDOCS']
+
+    elif _is_development():
+        with open(r'pb/static/json/aux_doc_list.json') as file:
+            data = file.read()
+            obj = json.loads(data)
+            document_list = obj['CRCONNECTDOCS']
+
+    return document_list
+
+
+def compare_the_lists(a, b):
+    if len(a) != len(b):
+        return False
+    for x in a:
+        if x not in b:
+            return False
+    for y in b:
+        if y not in a:
+            return False
+    return True
+
+
+def verify_required_document_list():
+    """We can view the master list at https://hrpp.irb.virginia.edu/webservices/crconnect/crconnect.cfc?method=CrConnectAuxDocList
+       Locally, the list is hardcoded into models.RequiredDocument.
+       This is not good. We need to automate this."""
+
+    # Grab the two lists--that are formatted differently,
+    # and build something we can compare.
+    local = RequiredDocument.all()
+    local_documents_list = []
+    for loc in local:
+        local_documents_list.append({'AUXDOCID': loc.AUXDOCID, 'AUXDOC': loc.AUXDOC})
+
+    required_documents_list = []
+    master_list = _get_required_document_list()
+    if master_list:
+        for doc in master_list:
+            doc['AUXILIARY_DOC'] = doc['AUXILIARY_DOC'].replace("\r", '')
+            doc['AUXILIARY_DOC'] = doc['AUXILIARY_DOC'].replace("\n", '')
+            required_documents_list.append({'AUXDOCID': doc['SS_AUXILIARY_DOC_TYPE'], 'AUXDOC': doc['AUXILIARY_DOC']})
+
+    verify = compare_the_lists(required_documents_list, local_documents_list)
+    if not verify:
+        # Printing this so it is easier to update the hardcoded list in models.RequiredDocument
+        to_print = '['
+        for rd in required_documents_list:
+            to_print += f"RequiredDocument(AUXDOCID={rd['AUXDOCID']}, AUXDOC=\"{rd['AUXDOC']}\"), "
+        to_print += ']'
+        print(to_print)
+    return verify
+
+
+def _get_study_details_list():
+    details_list = []
+    if _is_production():
+        rv = requests.get('https://hrpp.irb.virginia.edu/webservices/crconnect/crconnect.cfc?method=Study&studyid=15370')
+        if rv.ok:
+            details_list = json.loads(rv.text)
+
+    elif _is_development():
+        with open(r'pb/static/json/study_details_list.json') as file:
+            data = file.read()
+            obj = json.loads(data)
+            details_list = obj
+
+    return details_list
+
+
+def verify_study_details_list():
+    study_details_list = _get_study_details_list()
+    study_details = study_details_list[0]
+    details = []
+    for key in study_details.keys():
+        details.append(key)
+    column_statement = "select column_name from information_schema.columns where table_name = 'study_details'"
+    result = session.execute(column_statement)
+    column_names = []
+    for row in result:
+        column_names.append(row[0])
+    verify = compare_the_lists(details, column_names)
+    if not verify:
+        missing_details, extra_columns = _process_study_details(details, column_names)
+        # Print this to make it easier to update the table
+        print(f'Missing Details: {missing_details}')
+        print(f'Extra Columns: {extra_columns}')
+    return verify
+
+
+def _process_study_details(details, column_names):
+    missing_details = []
+    extra_columns = []
+    for x in details:
+        if x not in column_names:
+            missing_details.append(x)
+    for y in column_names:
+        if y not in details:
+            extra_columns.append(y)
+    return missing_details, extra_columns
