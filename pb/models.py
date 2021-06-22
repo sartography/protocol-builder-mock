@@ -143,24 +143,33 @@ class IRBInfo(db.Model):
     IRB_ADMINISTRATIVE_REVIEWER = db.Column(db.String(), nullable=False, default='')
     AGENDA_DATE = db.Column(db.Date, nullable=True)
     IRB_REVIEW_TYPE = db.Column(db.String(), nullable=False, default='')
-    IRBEVENT = db.relationship("IRBInfoEvent", backref=backref("irb_info"), lazy='dynamic')
-    IRB_STATUS = db.relationship("IRBInfoStatus", backref=backref("irb_info"), lazy='dynamic')
+    IRBEVENT = db.relationship("IRBInfoEvent", backref=backref("irb_info_event"), lazy='dynamic')
+    IRB_STATUS = db.relationship("IRBInfoStatus", backref=backref("irb_info_status"), lazy='dynamic')
     IRB_OF_RECORD = db.Column(db.String(), nullable=False, default='')
     UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = db.Column(db.Integer(), nullable=True)
     STUDYIRBREVIEWERADMIN = db.Column(db.String(), nullable=False, default='')
 
 
-class IRBInfoSchema(SQLAlchemySchema):
+class IRBInfoSchema(ma.Schema):
     class Meta:
-        # model = IRBInfo
-        include_fk = True
+        model = IRBInfo
         include_relationships = True
         load_instance = True
-        # IRBEVENT = auto_field()
-        # IRB_STATUS = fields.Nested('IRB_STATUS')
         fields = ("UVA_STUDY_TRACKING", "DATE_MODIFIED", "IRB_ADMINISTRATIVE_REVIEWER",
-                  "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRB_OF_RECORD",
+                  "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRB_OF_RECORD", "IRBEVENT", "IRB_STATUS",
                   "UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES", "STUDYIRBREVIEWERADMIN")
+
+    IRBEVENT = fields.Method("get_event")
+    IRB_STATUS = fields.Method("get_status")
+
+    @staticmethod
+    def get_event(obj):
+        return obj.IRBEVENT[0].EVENT
+
+    @staticmethod
+    def get_status(obj):
+        return obj.IRB_STATUS[0].STATUS
+
 
 class Investigator(db.Model):
     id = db.Column(db.Integer, primary_key=True)
