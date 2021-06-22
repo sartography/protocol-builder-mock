@@ -108,7 +108,7 @@ class IRBInfoEventSchema(SQLAlchemySchema):
         load_instance = True
         # include_relationships = True
         # EVENT = auto_field()
-        column = IRBInfoEvent.EVENT
+        # column = IRBInfoEvent.EVENT
 
 
 class IRBInfoStatus(db.Model):
@@ -152,11 +152,11 @@ class IRBInfo(db.Model):
 
 class IRBInfoSchema(SQLAlchemySchema):
     class Meta:
-        model = IRBInfo
-        # include_fk = True
+        # model = IRBInfo
+        include_fk = True
         include_relationships = True
         load_instance = True
-        # IRBEVENT = fields.Nested('IRBEVENT')
+        # IRBEVENT = auto_field()
         # IRB_STATUS = fields.Nested('IRB_STATUS')
         fields = ("UVA_STUDY_TRACKING", "DATE_MODIFIED", "IRB_ADMINISTRATIVE_REVIEWER",
                   "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRB_OF_RECORD",
