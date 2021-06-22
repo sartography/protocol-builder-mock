@@ -1,7 +1,7 @@
 from marshmallow import fields
 from sqlalchemy import func
 from pb import db, ma
-from marshmallow_sqlalchemy import SQLAlchemySchema, auto_field
+from marshmallow_sqlalchemy import SQLAlchemySchema
 from sqlalchemy.orm import backref
 
 
@@ -103,12 +103,7 @@ class IRBInfoEvent(db.Model):
 
 class IRBInfoEventSchema(SQLAlchemySchema):
     class Meta:
-        # model = IRBInfoEvent
-        include_fk = True
-        load_instance = True
-        # include_relationships = True
-        # EVENT = auto_field()
-        # column = IRBInfoEvent.EVENT
+        model = IRBInfoEvent
 
 
 class IRBInfoStatus(db.Model):
@@ -128,12 +123,7 @@ class IRBInfoStatus(db.Model):
 
 class IRBInfoStatusSchema(SQLAlchemySchema):
     class Meta:
-        # model = IRBInfoStatus
-        include_fk = True
-        load_instance = True
-        # include_relationships = True
-        # STATUS = auto_field()
-        column = IRBInfoStatus.STATUS
+        model = IRBInfoStatus
 
 
 class IRBInfo(db.Model):
