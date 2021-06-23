@@ -97,7 +97,6 @@ class Sanity_Check_Test(unittest.TestCase):
     def test_delete_study(self):
         # Create study
         study = self.add_study()
-        study_id = study.STUDYID
 
         # Add requirements and Q_COMPLETE
         form = StudyForm(formdata=None, obj=study)
@@ -124,21 +123,21 @@ class Sanity_Check_Test(unittest.TestCase):
         count = StudySponsor.query.filter(StudySponsor.SS_STUDY == study.STUDYID).count()
         self.assertEqual(2, count)
 
-        # Add IRB Info
-        tracking_string = 'some tracking data'
-        event = 'Approval New Protocol'
-        event_id = '57'
-        event_string = f"('{event_id}', '{event}')"
-
-        status = 'Open to enrollment'
-        status_id ='2'
-        status_string = f"('{status_id}', '{status}')"
-
-        self.app.post(f'/irb_info/{study_id}', data={'UVA_STUDY_TRACKING': tracking_string, 'IRBEVENT': event_string, 'IRB_STATUS': status_string})
-        irb_info = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).first()
-        self.assertEqual(irb_info.UVA_STUDY_TRACKING, tracking_string)
-        self.assertEqual(irb_info.IRBEVENT[0].EVENT, event)
-        self.assertEqual(irb_info.IRB_STATUS[0].STATUS, status)
+        # # Add IRB Info
+        # tracking_string = 'some tracking data'
+        # event = 'Approval New Protocol'
+        # event_id = '57'
+        # event_string = f"('{event_id}', '{event}')"
+        #
+        # status = 'Open to enrollment'
+        # status_id ='2'
+        # status_string = f"('{status_id}', '{status}')"
+        #
+        # self.app.post(f'/irb_info/{study.STUDYID}', data={'UVA_STUDY_TRACKING': tracking_string, 'IRBEVENT': event_string, 'IRB_STATUS': status_string})
+        # irb_info = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).first()
+        # self.assertEqual(irb_info.UVA_STUDY_TRACKING, tracking_string)
+        # self.assertEqual(irb_info.IRBEVENT[0].EVENT, event)
+        # self.assertEqual(irb_info.IRB_STATUS[0].STATUS, status)
 
 
         # Delete the study
