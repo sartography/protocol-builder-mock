@@ -111,6 +111,8 @@ def _update_study(study, form):
 def _update_irb_info(study_id, irb_info, form):
     if irb_info is None:
         irb_info = IRBInfo(SS_STUDY_ID=study_id)
+        db.session.add(irb_info)
+        db.session.commit()
     irb_info.UVA_STUDY_TRACKING = form.UVA_STUDY_TRACKING.data
     irb_info.DATE_MODIFIED = form.DATE_MODIFIED.data
     irb_info.IRB_ADMINISTRATIVE_REVIEWER = form.IRB_ADMINISTRATIVE_REVIEWER.data
