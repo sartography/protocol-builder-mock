@@ -5,7 +5,7 @@ from pb.pb_mock import get_current_user, get_selected_user, update_selected_user
     render_study_template, _update_study, redirect_home, _update_irb_info, _allowed_file, \
     process_csv_study_details, has_no_empty_params, verify_required_document_list, verify_study_details_list
 from pb.forms import StudyForm, IRBInfoForm, InvestigatorForm, ConfirmDeleteForm, StudySponsorForm, StudyDetailsForm
-from pb.models import Study, StudyDetails, IRBInfo, IRBStatus, Investigator, Sponsor, StudySponsor, RequiredDocument
+from pb.models import Study, StudyDetails, IRBInfo, IRBInfoEvent, IRBInfoStatus, IRBStatus, Investigator, Sponsor, StudySponsor, RequiredDocument
 
 import json
 
@@ -307,6 +307,8 @@ def del_study(study_id):
             db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).delete()
             db.session.query(StudySponsor).filter(StudySponsor.SS_STUDY == study_id).delete()
             db.session.query(IRBStatus).filter(IRBStatus.STUDYID == study_id).delete()
+            db.session.query(IRBInfoEvent).filter(IRBInfoEvent.STUDY_ID == study_id).delete()
+            db.session.query(IRBInfoStatus).filter(IRBInfoStatus.STUDY_ID == study_id).delete()
             db.session.query(IRBInfo).filter(IRBInfo.SS_STUDY_ID == study_id).delete()
             study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
             session.delete(study)
