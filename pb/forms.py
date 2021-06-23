@@ -65,7 +65,7 @@ class StudySponsorForm(FlaskForm):
 class StudyDetailsForm(ModelForm, FlaskForm):
     class Meta:
         model = StudyDetails
-        only = ['IS_IND', 'IND_1', 'IND_2', 'IND_3', 'IS_UVA_IND', 'IS_IDE', 'IDE',
+        only = ['IS_IND', 'UVA_STUDY_TRACKING', 'IND_1', 'IND_2', 'IND_3', 'IS_UVA_IND', 'IS_IDE', 'IDE',
                 'IS_UVA_IDE', 'IS_CHART_REVIEW', 'IS_RADIATION', 'GCRC_NUMBER', 'IS_GCRC',
                 'IS_PRC_DSMP', 'IS_PRC', 'PRC_NUMBER', 'IS_IBC', 'IBC_NUMBER',
                 'IS_SPONSOR_TRACKING', 'SPONSOR_TRACKING', 'SPONSORS_PROTOCOL_REVISION_DATE',

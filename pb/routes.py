@@ -3,7 +3,7 @@ from pb import app, db, description_map, session
 from pb.ldap.ldap_service import LdapService
 from pb.pb_mock import get_current_user, get_selected_user, update_selected_user, \
     render_study_template, _update_study, redirect_home, _update_irb_info, _allowed_file, \
-    process_csv_study_details, has_no_empty_params
+    process_csv_study_details, has_no_empty_params, verify_required_document_list, verify_study_details_list
 from pb.forms import StudyForm, IRBInfoForm, InvestigatorForm, ConfirmDeleteForm, StudySponsorForm, StudyDetailsForm
 from pb.models import Study, StudyDetails, IRBInfo, IRBStatus, Investigator, Sponsor, StudySponsor, RequiredDocument
 
@@ -68,8 +68,6 @@ def edit_study(study_id):
     study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
     form = StudyForm(request.form, obj=study)
     if request.method == 'GET':
-        action = BASE_HREF + "/study/" + study_id
-        title = "Edit Study #" + study_id
         if study.requirements:
             form.requirements.data = list(map(lambda r: r.AUXDOCID, list(study.requirements)))
         if study.Q_COMPLETE and study.Q_COMPLETE.first():
@@ -80,6 +78,8 @@ def edit_study(study_id):
         _update_study(study, form)
         flash('Study updated successfully!', 'success')
         return redirect_home()
+    action = BASE_HREF + "/study/" + study_id
+    title = "Edit Study #" + study_id
     return render_template(
         'form.html',
         form=form,
@@ -381,3 +381,24 @@ def site_map():
             url = app.confg['APPLICATION_ROOT'].strip('/') + url_for(rule.endpoint, **(rule.defaults or {}))
             links.append((url, rule.endpoint))
     return json.dumps({"links": links})
+
+
+@app.route('/verify_document_list', methods=['GET'])
+def verify_document_list():
+    verify = verify_required_document_list()
+    if verify:
+        flash('Document list is up to date.', 'success')
+    else:
+        flash('The document list is not up to date.', 'failure')
+
+    return redirect_home()
+
+
+@app.route('/verify_study_details')
+def verify_study_details():
+    verify = verify_study_details_list()
+    if verify:
+        flash('Study details are up to date.', 'success')
+    else:
+        flash('Study details are not up to date.', 'failure')
+    return redirect_home()
