@@ -91,6 +91,9 @@ def _update_study(study, form):
         if r.checked:
             requirement = RequiredDocument(AUXDOCID=r.data, AUXDOC=r.label.text, study=study)
             db.session.add(requirement)
+            if r.data == 39:
+                requirement_2 = RequiredDocument(AUXDOCID=39, AUXDOC='Consent-Age of Majority Cover Letter', study=study)
+                db.session.add(requirement_2)
 
     q_data = eval(form.Q_COMPLETE.data)
     if q_data:
