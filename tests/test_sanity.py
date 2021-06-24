@@ -138,10 +138,10 @@ class Sanity_Check_Test(unittest.TestCase):
         count = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).count()
         self.assertGreater(count, 0)
 
-        # irb_info = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).first()
-        # self.assertEqual(irb_info.UVA_STUDY_TRACKING, tracking_string)
-        # self.assertEqual(irb_info.IRBEVENT[0].EVENT, event)
-        # self.assertEqual(irb_info.IRB_STATUS[0].STATUS, status)
+        irb_info = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).first()
+        self.assertEqual(irb_info.UVA_STUDY_TRACKING, tracking_string)
+        self.assertEqual(irb_info.IRBEVENT[0].EVENT, event)
+        self.assertEqual(irb_info.IRB_STATUS[0].STATUS, status)
 
 
         # Delete the study
@@ -206,8 +206,6 @@ class Sanity_Check_Test(unittest.TestCase):
         needle = 'funk'
         result = LdapService.users_as_json(needle)
         users = json.loads(result)
-        print(f'len of users: {len(users)}')
-        # self.assertEqual(2, len(users))
         uids = []
         for user in users:
             uids.append(user['uid'])
@@ -230,14 +228,14 @@ class Sanity_Check_Test(unittest.TestCase):
         study = self.add_study(title=title)
         self.assertEqual(title, study.TITLE)
 
-    # This test fails because SQLite has an issue with date data from csv file
-    # def test_update_study_from_csv(self):
-    #     study = self.add_study()
-    #     f = open('tests/data/ExampleStudyID15370.csv', 'rb')
-    #     r = self.app.post(f'/study_details/{study.STUDYID}', data={'file': [f]}, follow_redirects=False)
-    #
-    #     print(r)
-    #     print('test_update_study_from_csv')
+    def test_update_study_from_csv(self):
+        study = self.add_study()
+        f = open('tests/data/ExampleStudyID15370.csv', 'rb')
+        r = self.app.post(f'/study_details/{study.STUDYID}', data={'file': [f]}, follow_redirects=False)
+        api_result = db.session.query(StudyDetails).filter(StudyDetails.STUDYID==study.STUDYID).first()
+        self.assertEqual(api_result.IDE, '1234')
+        self.assertEqual(api_result.IND_1, 'abc')
+
 
     def test_study_details_validation(self):
 
@@ -247,16 +245,3 @@ class Sanity_Check_Test(unittest.TestCase):
         detail = StudyDetails.query.filter(StudyDetails.STUDYID == test_study.STUDYID).first()
         self.assertEqual(detail.IS_IND, 1)
         self.assertEqual(detail.IND_1, '1234')
-
-    # Can't figure out a good way to test failing state.
-    # We may not really need this, because validation happens in the front end, not in python
-    # def test_study_details_validation_fail(self):
-    #     test_study = self.add_study()
-    #     data = {'IS_IND': 1, 'IND_1': 1234, 'IS_IDE': 'b'}
-    #     with self.assertRaises(Exception) as ex:
-    #         r = self.app.post(f'/study_details/{test_study.STUDYID}', data=data, follow_redirects=False)
-    #         self.assertEqual(r.errors['IS_IDE'], 'Not a valid integer value')
-    #         print('test_study_details_validation_fail')
-    #     detail = StudyDetails.query.filter(StudyDetails.STUDYID == test_study.STUDYID).first()
-    #     self.assertIsNone(detail)
-    #     print('test_study_details_validation_fail')
