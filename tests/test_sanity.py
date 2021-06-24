@@ -66,7 +66,8 @@ class Sanity_Check_Test(unittest.TestCase):
         assert added_study
 
         num_docs_before = RequiredDocument.query.filter(Study.STUDYID == added_study.STUDYID).count()
-        self.assertEqual(num_reqs, num_docs_before)
+        # We get 1 extra document, because code 39 adds 2 documents
+        self.assertEqual(num_reqs+1, num_docs_before)
 
         return added_study
 
