@@ -5,7 +5,7 @@ from pb.pb_mock import get_current_user, get_selected_user, update_selected_user
     render_study_template, _update_study, redirect_home, _update_irb_info, _allowed_file, \
     process_csv_study_details, has_no_empty_params, verify_required_document_list, verify_study_details_list
 from pb.forms import StudyForm, IRBInfoForm, InvestigatorForm, ConfirmDeleteForm, StudySponsorForm, StudyDetailsForm
-from pb.models import Study, StudyDetails, IRBInfo, IRBStatus, Investigator, Sponsor, StudySponsor, RequiredDocument
+from pb.models import Study, StudyDetails, IRBInfo, IRBInfoEvent, IRBInfoStatus, IRBStatus, Investigator, Sponsor, StudySponsor, RequiredDocument
 
 import json
 
@@ -96,8 +96,19 @@ def edit_irb_info(study_id):
     form = IRBInfoForm(request.form, obj=irb_info)
     action = BASE_HREF + "/irb_info/" + study_id
     title = "Edit IRB Info #" + study_id
-    # if request.method == 'GET':
-    #     form.SS_STUDY_ID.data = study_id
+    if request.method == 'GET':
+        if irb_info.IRBEVENT and irb_info.IRBEVENT.first():
+            event = irb_info.IRBEVENT.first().EVENT
+            event_id = irb_info.IRBEVENT.first().EVENT_ID
+            event_data_string = "('" + event_id + "', '" + event + "')"
+            form.IRBEVENT.data = event_data_string
+        if irb_info.IRB_STATUS and irb_info.IRB_STATUS.first():
+            status = irb_info.IRB_STATUS.first().STATUS
+            status_id = irb_info.IRB_STATUS.first().STATUS_ID
+            status_data_string = "('" + status_id + "', '" + status + "')"
+            form.IRB_STATUS.data = status_data_string
+        if isinstance(irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES, int):
+            form.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES.data = irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES
     if request.method == 'POST':
         if form.validate():
             _update_irb_info(study_id, irb_info, form)
@@ -296,6 +307,8 @@ def del_study(study_id):
             db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).delete()
             db.session.query(StudySponsor).filter(StudySponsor.SS_STUDY == study_id).delete()
             db.session.query(IRBStatus).filter(IRBStatus.STUDYID == study_id).delete()
+            db.session.query(IRBInfoEvent).filter(IRBInfoEvent.STUDY_ID == study_id).delete()
+            db.session.query(IRBInfoStatus).filter(IRBInfoStatus.STUDY_ID == study_id).delete()
             db.session.query(IRBInfo).filter(IRBInfo.SS_STUDY_ID == study_id).delete()
             study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
             session.delete(study)

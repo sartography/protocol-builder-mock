@@ -1,4 +1,4 @@
-from pb.models import IRBInfo, IRBStatus, RequiredDocument, StudyDetails, SelectedUser, Study
+from pb.models import IRBInfo, IRBStatus, RequiredDocument, StudyDetails, SelectedUser, Study, IRBInfoEvent, IRBInfoStatus
 from pb.forms import StudyTable
 from pb import BASE_HREF, app, db, session
 
@@ -91,6 +91,9 @@ def _update_study(study, form):
         if r.checked:
             requirement = RequiredDocument(AUXDOCID=r.data, AUXDOC=r.label.text, study=study)
             db.session.add(requirement)
+            if r.data == 39:
+                requirement_2 = RequiredDocument(AUXDOCID=39, AUXDOC='Consent-Age of Majority Cover Letter', study=study)
+                db.session.add(requirement_2)
 
     q_data = eval(form.Q_COMPLETE.data)
     if q_data:
@@ -111,13 +114,42 @@ def _update_study(study, form):
 def _update_irb_info(study_id, irb_info, form):
     if irb_info is None:
         irb_info = IRBInfo(SS_STUDY_ID=study_id)
+        db.session.add(irb_info)
+        db.session.commit()
     irb_info.UVA_STUDY_TRACKING = form.UVA_STUDY_TRACKING.data
     irb_info.DATE_MODIFIED = form.DATE_MODIFIED.data
     irb_info.IRB_ADMINISTRATIVE_REVIEWER = form.IRB_ADMINISTRATIVE_REVIEWER.data
     irb_info.AGENDA_DATE = form.AGENDA_DATE.data
     irb_info.IRB_REVIEW_TYPE = form.IRB_REVIEW_TYPE.data
-    irb_info.IRBEVENT = form.IRBEVENT.data
-    irb_info.IRB_STATUS = form.IRB_STATUS.data
+
+    # irb_info.IRBEVENT = irb_info_event
+    if form.IRBEVENT.data:
+        event_data = eval(form.IRBEVENT.data)
+        if event_data:
+            event_id = event_data[0]
+            event = event_data[1]
+            irb_info_event = db.session.query(IRBInfoEvent).filter(IRBInfoEvent.STUDY_ID == study_id).first()
+            if irb_info_event:
+                irb_info_event.EVENT_ID = event_id
+                irb_info_event.EVENT = event
+            else:
+                irb_info_event = IRBInfoEvent(STUDY_ID=study_id, EVENT_ID=event_id, EVENT=event)
+            db.session.add(irb_info_event)
+
+    # irb_info.IRB_STATUS = form.IRB_STATUS.data
+    if form.IRB_STATUS.data:
+        status_data = eval(form.IRB_STATUS.data)
+        if status_data:
+            status_id = status_data[0]
+            status = status_data[1]
+            irb_info_status = db.session.query(IRBInfoStatus).filter(IRBInfoStatus.STUDY_ID == study_id).first()
+            if irb_info_status:
+                irb_info_status.STATUS_ID = status_id
+                irb_info_status.STATUS = status
+            else:
+                irb_info_status = IRBInfoStatus(STUDY_ID=study_id, STATUS_ID=status_id, STATUS=status)
+            db.session.add(irb_info_status)
+
     irb_info.IRB_OF_RECORD = form.IRB_OF_RECORD.data
     irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = form.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES.data
     irb_info.STUDYIRBREVIEWERADMIN = form.STUDYIRBREVIEWERADMIN.data

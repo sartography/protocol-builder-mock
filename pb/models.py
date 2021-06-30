@@ -1,6 +1,8 @@
 from marshmallow import fields
 from sqlalchemy import func
 from pb import db, ma
+from marshmallow_sqlalchemy import SQLAlchemySchema
+from sqlalchemy.orm import backref
 
 
 class Sponsor(db.Model):
@@ -83,6 +85,47 @@ class StudySchema(ma.Schema):
                   "DATE_MODIFIED")
 
 
+class IRBInfoEvent(db.Model):
+    STUDY_ID = db.Column(db.Integer, db.ForeignKey('irb_info.SS_STUDY_ID'), primary_key=True)
+    EVENT_ID = db.Column(db.String(), nullable=False, default='')
+    EVENT = db.Column(db.String(), nullable=False, default='')
+
+    @staticmethod
+    def all():
+        event = [IRBInfoEvent(EVENT_ID='', EVENT=''),
+                 IRBInfoEvent(EVENT_ID='299', EVENT='PreReview Returned to PI New Protocol'),
+                 IRBInfoEvent(EVENT_ID='57', EVENT='Approval New Protocol'),
+                 IRBInfoEvent(EVENT_ID='312', EVENT='Condition Response Accepted-New Protocol'),
+                 IRBInfoEvent(EVENT_ID='316', EVENT='Deferred New Protocol'),
+                 IRBInfoEvent(EVENT_ID='62', EVENT='Closed by PI')]
+        return event
+
+
+class IRBInfoEventSchema(SQLAlchemySchema):
+    class Meta:
+        model = IRBInfoEvent
+
+
+class IRBInfoStatus(db.Model):
+    STUDY_ID = db.Column(db.Integer, db.ForeignKey('irb_info.SS_STUDY_ID'), primary_key=True)
+    STATUS_ID = db.Column(db.String(), nullable=False, default='')
+    STATUS = db.Column(db.String(), nullable=False, default='')
+
+    @staticmethod
+    def all():
+        status = [IRBInfoStatus(STATUS_ID='', STATUS=''),
+                  IRBInfoStatus(STATUS_ID='31', STATUS='PreReview Complete New Protocol'),
+                  IRBInfoStatus(STATUS_ID='2', STATUS='Open to enrollment'),
+                  IRBInfoStatus(STATUS_ID='39', STATUS='Withdrawn'),
+                  IRBInfoStatus(STATUS_ID='37', STATUS='Disapproved')]
+        return status
+
+
+class IRBInfoStatusSchema(SQLAlchemySchema):
+    class Meta:
+        model = IRBInfoStatus
+
+
 class IRBInfo(db.Model):
     SS_STUDY_ID = db.Column(db.Integer, db.ForeignKey('study.STUDYID'), primary_key=True)
     UVA_STUDY_TRACKING = db.Column(db.String(), nullable=False, default='')
@@ -90,8 +133,8 @@ class IRBInfo(db.Model):
     IRB_ADMINISTRATIVE_REVIEWER = db.Column(db.String(), nullable=False, default='')
     AGENDA_DATE = db.Column(db.Date, nullable=True)
     IRB_REVIEW_TYPE = db.Column(db.String(), nullable=False, default='')
-    IRBEVENT = db.Column(db.String(), nullable=False, default='')
-    IRB_STATUS = db.Column(db.String(), nullable=False, default='')
+    IRBEVENT = db.relationship("IRBInfoEvent", backref=backref("irb_info_event"), lazy='dynamic')
+    IRB_STATUS = db.relationship("IRBInfoStatus", backref=backref("irb_info_status"), lazy='dynamic')
     IRB_OF_RECORD = db.Column(db.String(), nullable=False, default='')
     UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = db.Column(db.Integer(), nullable=True)
     STUDYIRBREVIEWERADMIN = db.Column(db.String(), nullable=False, default='')
@@ -99,10 +142,24 @@ class IRBInfo(db.Model):
 
 class IRBInfoSchema(ma.Schema):
     class Meta:
-        # Fields to expose
+        model = IRBInfo
+        include_relationships = True
+        load_instance = True
         fields = ("UVA_STUDY_TRACKING", "DATE_MODIFIED", "IRB_ADMINISTRATIVE_REVIEWER",
-                  "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRBEVENT", "IRB_STATUS", "IRB_OF_RECORD",
+                  "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRB_OF_RECORD", "IRBEVENT", "IRB_STATUS",
                   "UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES", "STUDYIRBREVIEWERADMIN")
+
+    IRBEVENT = fields.Method("get_event")
+    IRB_STATUS = fields.Method("get_status")
+
+    @staticmethod
+    def get_event(obj):
+        return obj.IRBEVENT[0].EVENT
+
+    @staticmethod
+    def get_status(obj):
+        return obj.IRB_STATUS[0].STATUS
+
 
 class Investigator(db.Model):
     id = db.Column(db.Integer, primary_key=True)

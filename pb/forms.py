@@ -2,8 +2,10 @@ from flask_table import Table, Col, LinkCol, BoolCol, DatetimeCol, NestedTableCo
 from flask_wtf import FlaskForm
 from wtforms import SelectMultipleField, StringField, BooleanField, SelectField, validators, HiddenField, DateField, IntegerField
 from wtforms_alchemy import ModelForm
+from wtforms.widgets.html5 import DateInput
+from wtforms.validators import Optional
 
-from pb.models import RequiredDocument, Investigator, StudyDetails, IRBStatus, IRBInfo
+from pb.models import RequiredDocument, Investigator, StudyDetails, IRBStatus, IRBInfo, IRBInfoEvent, IRBInfoStatus
 
 
 class StudyForm(FlaskForm):
@@ -18,10 +20,31 @@ class StudyForm(FlaskForm):
                              choices=[((q.STATUS, q.DETAIL), q.DETAIL) for q in IRBStatus.all()])
 
 
-class IRBInfoForm(ModelForm, FlaskForm):
-    class Meta:
-        model = IRBInfo
-        hidden = 'SS_STUDY_ID'
+def irb_to_int(x):
+    if x == 'None':
+        return None
+    elif x == '0':
+        return 0
+    elif x == '1':
+        return 1
+
+
+class IRBInfoForm(FlaskForm):
+    SS_STUDY_ID = HiddenField()
+    UVA_STUDY_TRACKING = StringField('UVA_STUDY_TRACKING')
+    DATE_MODIFIED = DateField('DATE_MODIFIED', [Optional()], widget=DateInput())
+    IRB_ADMINISTRATIVE_REVIEWER = StringField('IRB_ADMINISTRATIVE_REVIEWER')
+    AGENDA_DATE = DateField('AGENDA_DATE', [Optional()], widget=DateInput())
+    IRB_REVIEW_TYPE = StringField('IRB_REVIEW_TYPE')
+    IRBEVENT = SelectField("IRBInfoEvent",
+                           choices=[((q.EVENT_ID, q.EVENT), q.EVENT) for q in IRBInfoEvent.all()])
+    IRB_STATUS = SelectField("IRBInfoStatus",
+                             choices=[((q.STATUS_ID, q.STATUS), q.STATUS) for q in IRBInfoStatus.all()])
+    IRB_OF_RECORD = StringField('IRB_OF_RECORD')
+    UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = SelectField('UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES',
+                                                             choices=['None', '0', '1'],
+                                                             coerce=irb_to_int)
+    STUDYIRBREVIEWERADMIN = StringField('STUDYIRBREVIEWERADMIN')
 
 
 class InvestigatorForm(FlaskForm):
