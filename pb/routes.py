@@ -90,26 +90,33 @@ def edit_study(study_id):
     )
 
 
+def _get_event_data_string(irb_info):
+    event = irb_info.IRBEVENT.first().EVENT
+    event_id = irb_info.IRBEVENT.first().EVENT_ID
+    event_data_string = "('" + event_id + "', '" + event + "')"
+    return event_data_string
+
+
+def _get_status_data_string(irb_info):
+    status = irb_info.IRB_STATUS.first().STATUS
+    status_id = irb_info.IRB_STATUS.first().STATUS_ID
+    status_data_string = "('" + status_id + "', '" + status + "')"
+    return status_data_string
+
+
 @app.route('/irb_info/<study_id>', methods=['GET', 'POST'])
 def edit_irb_info(study_id):
     irb_info = db.session.query(IRBInfo).filter(IRBInfo.SS_STUDY_ID == study_id).first()
     form = IRBInfoForm(request.form, obj=irb_info)
     action = BASE_HREF + "/irb_info/" + study_id
     title = "Edit IRB Info #" + study_id
-    if request.method == 'GET':
-        if irb_info:
-            if irb_info.IRBEVENT and irb_info.IRBEVENT.first():
-                event = irb_info.IRBEVENT.first().EVENT
-                event_id = irb_info.IRBEVENT.first().EVENT_ID
-                event_data_string = "('" + event_id + "', '" + event + "')"
-                form.IRBEVENT.data = event_data_string
-            if irb_info.IRB_STATUS and irb_info.IRB_STATUS.first():
-                status = irb_info.IRB_STATUS.first().STATUS
-                status_id = irb_info.IRB_STATUS.first().STATUS_ID
-                status_data_string = "('" + status_id + "', '" + status + "')"
-                form.IRB_STATUS.data = status_data_string
-            if isinstance(irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES, int):
-                form.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES.data = irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES
+    if request.method == 'GET' and irb_info:
+        if irb_info.IRBEVENT and irb_info.IRBEVENT.first():
+            form.IRBEVENT.data = _get_event_data_string(irb_info)
+        if irb_info.IRB_STATUS and irb_info.IRB_STATUS.first():
+            form.IRB_STATUS.data = _get_status_data_string(irb_info)
+        if isinstance(irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES, int):
+            form.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES.data = irb_info.UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES
     if request.method == 'POST':
         if form.validate():
             _update_irb_info(study_id, irb_info, form)
