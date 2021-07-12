@@ -236,12 +236,13 @@ class Sanity_Check_Test(unittest.TestCase):
         self.assertEqual(api_result.IDE, '1234')
         self.assertEqual(api_result.IND_1, 'abc')
 
-
-    def test_study_details_validation(self):
+    def test_study_details(self):
 
         test_study = self.add_study()
-        data = {'IS_IND': 1, 'IND_1': 1234}
+        data = {'IS_IND': 1, 'IND_1': '1234', 'REVIEW_TYPE': 3}
         self.app.post(f'/study_details/{test_study.STUDYID}', data=data, follow_redirects=False)
         detail = StudyDetails.query.filter(StudyDetails.STUDYID == test_study.STUDYID).first()
         self.assertEqual(detail.IS_IND, 1)
         self.assertEqual(detail.IND_1, '1234')
+        self.assertEqual(detail.REVIEW_TYPE, 3)
+        self.assertEqual(detail.REVIEWTYPENAME, 'Expedited')
