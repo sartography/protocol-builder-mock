@@ -328,6 +328,19 @@ def del_study(study_id):
         return redirect_home()
 
 
+def _get_review_type_name(review_type):
+    if review_type == '1':
+        return ''
+    elif review_type == '2':
+        return 'Full Committee'
+    elif review_type == '3':
+        return 'Expedited'
+    elif review_type == '23':
+        return 'Non-UVA IRB Full Board'
+    elif review_type == '24':
+        return 'Non-UVA IRB Expedited'
+
+
 @app.route('/study_details/<study_id>', methods=['GET', 'POST'])
 def study_details(study_id):
     study_details = db.session.query(StudyDetails).filter(StudyDetails.STUDYID == study_id).first()
@@ -356,6 +369,9 @@ def study_details(study_id):
 
         # update study details from the form
         elif form.validate():
+            if form.REVIEW_TYPE.data:
+                REVIEWTYPENAME = _get_review_type_name(form.REVIEW_TYPE.data)
+                study_details.REVIEWTYPENAME = REVIEWTYPENAME
             form.populate_obj(study_details)
             db.session.add(study_details)
             db.session.commit()
