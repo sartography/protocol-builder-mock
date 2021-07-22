@@ -62,34 +62,92 @@ class StudySponsorForm(FlaskForm):
     )
 
 
-class StudyDetailsForm(ModelForm, FlaskForm):
-    class Meta:
-        model = StudyDetails
-        only = ['IS_IND', 'UVA_STUDY_TRACKING', 'IND_1', 'IND_2', 'IND_3', 'IS_UVA_IND', 'IS_IDE', 'IDE',
-                'IS_UVA_IDE', 'IS_CHART_REVIEW', 'IS_RADIATION', 'GCRC_NUMBER', 'IS_GCRC',
-                'IS_PRC_DSMP', 'IS_PRC', 'PRC_NUMBER', 'IS_IBC', 'IBC_NUMBER',
-                'IS_SPONSOR_TRACKING', 'SPONSOR_TRACKING', 'SPONSORS_PROTOCOL_REVISION_DATE',
-                'IS_SPONSOR_MONITORING', 'IS_DSMB', 'IS_COMPLETE_NON_IRB_REGULATORY',
-                'IS_AUX', 'IS_SPONSOR', 'IS_GRANT', 'IS_COMMITTEE_CONFLICT', 'DSMB',
-                'DSMB_FREQUENCY', 'IS_DB', 'IS_UVA_DB', 'IS_CENTRAL_REG_DB',
-                'IS_CONSENT_WAIVER', 'IS_HGT', 'IS_GENE_TRANSFER', 'IS_TISSUE_BANKING',
-                'IS_SURROGATE_CONSENT', 'IS_ADULT_PARTICIPANT', 'IS_MINOR_PARTICIPANT',
-                'IS_MINOR', 'IS_BIOMEDICAL', 'IS_QUALITATIVE', 'IS_PI_SCHOOL',
-                'IS_PRISONERS_POP', 'IS_PREGNANT_POP', 'IS_FETUS_POP',
-                'IS_MENTAL_IMPAIRMENT_POP', 'IS_ELDERLY_POP', 'IS_OTHER_VULNERABLE_POP',
-                'OTHER_VULNERABLE_DESC', 'IS_MULTI_SITE', 'IS_UVA_LOCATION',
-                'NON_UVA_LOCATION', 'MULTI_SITE_LOCATIONS', 'IS_OUTSIDE_CONTRACT',
-                'IS_UVA_PI_MULTI', 'IS_NOT_PRC_WAIVER', 'IS_INSIDE_CONTRACT',
-                'IS_CANCER_PATIENT', 'UPLOAD_COMPLETE', 'IS_FUNDING_SOURCE',
-                'IS_CODED_RESEARCH', 'IS_OUTSIDE_SPONSOR', 'IS_PI_INITIATED',
-                'IS_ENGAGED_RESEARCH', 'IS_APPROVED_DEVICE', 'IS_FINANCIAL_CONFLICT',
-                'IS_NOT_CONSENT_WAIVER', 'IS_FOR_CANCER_CENTER', 'IS_REVIEW_BY_CENTRAL_IRB',
-                'IRBREVIEWERADMIN', 'IS_UVA_COLLABANALYSIS', 'REVIEW_TYPE', 'REVIEWTYPENAME']
+class StudyDetailsForm(FlaskForm):
+    STUDYID = HiddenField()
+    IS_IND = IntegerField(validators=[Optional()])
+    UVA_STUDY_TRACKING = StringField()
+    IND_1 = StringField()
+    IND_2 = StringField()
+    IND_3 = StringField()
+    IS_UVA_IND = IntegerField(validators=[Optional()])
+    IS_IDE = IntegerField(validators=[Optional()])
+    IDE = StringField()
+    IS_UVA_IDE = IntegerField(validators=[Optional()])
+    IS_CHART_REVIEW = IntegerField(validators=[Optional()])
+    IS_RADIATION = IntegerField(validators=[Optional()])
+    GCRC_NUMBER = StringField()
+    IS_GCRC = IntegerField(validators=[Optional()])
+    IS_PRC_DSMP = IntegerField(validators=[Optional()])
+    IS_PRC = IntegerField(validators=[Optional()])
+    PRC_NUMBER = StringField()
+    IS_IBC = IntegerField(validators=[Optional()])
+    IBC_NUMBER = StringField()
+    IS_SPONSOR_TRACKING = IntegerField(validators=[Optional()])
+    SPONSOR_TRACKING = IntegerField(validators=[Optional()])
+    SPONSORS_PROTOCOL_REVISION_DATE = DateField(validators=[Optional()])
+    IS_SPONSOR_MONITORING = IntegerField(validators=[Optional()])
+    IS_DSMB = IntegerField(validators=[Optional()])
+    IS_COMPLETE_NON_IRB_REGULATORY = IntegerField(validators=[Optional()])
+    IS_AUX = IntegerField(validators=[Optional()])
+    IS_SPONSOR = IntegerField(validators=[Optional()])
+    IS_GRANT = IntegerField(validators=[Optional()])
+    IS_COMMITTEE_CONFLICT = IntegerField(validators=[Optional()])
+    DSMB = StringField()
+    DSMB_FREQUENCY = IntegerField(validators=[Optional()])
+    IS_DB = IntegerField(validators=[Optional()])
+    IS_UVA_DB = IntegerField(validators=[Optional()])
+    IS_CENTRAL_REG_DB = IntegerField(validators=[Optional()])
+    IS_CONSENT_WAIVER = IntegerField(validators=[Optional()])
+    IS_HGT = IntegerField(validators=[Optional()])
+    IS_GENE_TRANSFER = IntegerField(validators=[Optional()])
+    IS_TISSUE_BANKING = IntegerField(validators=[Optional()])
+    IS_SURROGATE_CONSENT = IntegerField(validators=[Optional()])
+    IS_ADULT_PARTICIPANT = IntegerField(validators=[Optional()])
+    IS_MINOR_PARTICIPANT = IntegerField(validators=[Optional()])
+    IS_MINOR = IntegerField(validators=[Optional()])
+    IS_BIOMEDICAL = IntegerField(validators=[Optional()])
+    IS_QUALITATIVE = IntegerField(validators=[Optional()])
+    IS_PI_SCHOOL = IntegerField(validators=[Optional()])
+    IS_PRISONERS_POP = IntegerField(validators=[Optional()])
+    IS_PREGNANT_POP = IntegerField(validators=[Optional()])
+    IS_FETUS_POP = IntegerField(validators=[Optional()])
+    IS_MENTAL_IMPAIRMENT_POP = IntegerField(validators=[Optional()])
+    IS_ELDERLY_POP = IntegerField(validators=[Optional()])
+    IS_OTHER_VULNERABLE_POP = IntegerField(validators=[Optional()])
+    OTHER_VULNERABLE_DESC = StringField()
+    IS_MULTI_SITE = IntegerField(validators=[Optional()])
+    IS_UVA_LOCATION = IntegerField(validators=[Optional()])
+    NON_UVA_LOCATION = StringField()
+    MULTI_SITE_LOCATIONS = StringField()
+    IS_OUTSIDE_CONTRACT = IntegerField(validators=[Optional()])
+    IS_UVA_PI_MULTI = IntegerField(validators=[Optional()])
+    IS_NOT_PRC_WAIVER = IntegerField(validators=[Optional()])
+    IS_INSIDE_CONTRACT = IntegerField(validators=[Optional()])
+    IS_CANCER_PATIENT = IntegerField(validators=[Optional()])
+    UPLOAD_COMPLETE = IntegerField(validators=[Optional()])
+    IS_FUNDING_SOURCE = IntegerField(validators=[Optional()])
+    IS_CODED_RESEARCH = IntegerField(validators=[Optional()])
+    IS_OUTSIDE_SPONSOR = IntegerField(validators=[Optional()])
+    IS_PI_INITIATED = IntegerField(validators=[Optional()])
+    IS_ENGAGED_RESEARCH = IntegerField(validators=[Optional()])
+    IS_APPROVED_DEVICE = IntegerField(validators=[Optional()])
+    IS_FINANCIAL_CONFLICT = IntegerField(validators=[Optional()])
+    IS_NOT_CONSENT_WAIVER = IntegerField(validators=[Optional()])
+    IS_FOR_CANCER_CENTER = IntegerField(validators=[Optional()])
+    IS_REVIEW_BY_CENTRAL_IRB = IntegerField(validators=[Optional()])
+    IRBREVIEWERADMIN = StringField()
+    IS_UVA_COLLABANALYSIS = IntegerField(validators=[Optional()])
+    REVIEW_TYPE = SelectField("Review Type",
+                              choices=[('1', ('1 None')),
+                                       ('2', ('2 Full Committee')),
+                                       ('3', ('3 Expedited')),
+                                       ('23', ('23 Non-UVA IRB Full Board')),
+                                       ('24', ('24 Non-UVA IRB Expedited'))])
 
 
 class ConfirmDeleteForm(FlaskForm):
     confirm = BooleanField('Yes, really delete', default='checked',
-                              false_values=(False, 'false', 0, '0'))
+                           false_values=(False, 'false', 0, '0'))
 
 
 class RequirementsTable(Table):
