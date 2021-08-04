@@ -39,6 +39,21 @@ def user_studies(uva_id):
     return render_study_template(studies, uva_id)
 
 
+# Used by frontend in e2e tests
+# You can add valid=true to the url
+# to set REVIEW_TYPE and REVIEWTYPENAME
+@app.route('/new_test_study', methods=['POST'])
+def new_test_study():
+    form = StudyForm(request.form)
+    study = Study()
+    study.study_details = StudyDetails()
+    if 'valid' in request.args and request.args['valid'] == 'true':
+        study.study_details.REVIEW_TYPE = 2
+        study.study_details.REVIEWTYPENAME = 'Full Committee'
+    _update_study(study, form)
+    print('new_test_study')
+
+
 @app.route('/new_study', methods=['GET', 'POST'])
 def new_study():
     form = StudyForm(request.form)
