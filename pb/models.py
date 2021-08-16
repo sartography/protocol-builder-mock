@@ -66,7 +66,6 @@ class StudySponsorSchema(ma.Schema):
 
 class Study(db.Model):
     STUDYID = db.Column(db.Integer, primary_key=True)
-    HSRNUMBER = db.Column(db.String())
     TITLE = db.Column(db.Text(), nullable=False)
     NETBADGEID = db.Column(db.String(), nullable=False)
     DATE_MODIFIED = db.Column(db.DateTime(timezone=True), default=func.now())
@@ -81,7 +80,7 @@ class Study(db.Model):
 class StudySchema(ma.Schema):
     class Meta:
         # Fields to expose
-        fields = ("STUDYID", "HSRNUMBER", "TITLE", "NETBADGEID",
+        fields = ("STUDYID", "TITLE", "NETBADGEID",
                   "DATE_MODIFIED")
 
 
