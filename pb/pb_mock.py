@@ -85,7 +85,6 @@ def _update_study(study, form):
     study.TITLE = form.TITLE.data
     study.NETBADGEID = form.NETBADGEID.data
     study.DATE_MODIFIED = datetime.datetime.now()
-    study.HSRNUMBER = form.HSRNUMBER.data
 
     for r in form.requirements:
         if r.checked:
