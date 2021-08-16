@@ -94,7 +94,9 @@ class IRBInfoEvent(db.Model):
     def all():
         event = [IRBInfoEvent(EVENT_ID='', EVENT=''),
                  IRBInfoEvent(EVENT_ID='299', EVENT='PreReview Returned to PI New Protocol'),
+                 IRBInfoEvent(EVENT_ID='2', EVENT='Pending Full Committee Review'),
                  IRBInfoEvent(EVENT_ID='57', EVENT='Approval New Protocol'),
+                 IRBInfoEvent(EVENT_ID='300', EVENT='Approvable with Conditions-New Protocol'),
                  IRBInfoEvent(EVENT_ID='312', EVENT='Condition Response Accepted-New Protocol'),
                  IRBInfoEvent(EVENT_ID='316', EVENT='Deferred New Protocol'),
                  IRBInfoEvent(EVENT_ID='62', EVENT='Closed by PI')]
@@ -114,6 +116,7 @@ class IRBInfoStatus(db.Model):
     @staticmethod
     def all():
         status = [IRBInfoStatus(STATUS_ID='', STATUS=''),
+                  IRBInfoStatus(STATUS_ID='30', STATUS='In PreReview New Protocol'),
                   IRBInfoStatus(STATUS_ID='31', STATUS='PreReview Complete New Protocol'),
                   IRBInfoStatus(STATUS_ID='2', STATUS='Open to enrollment'),
                   IRBInfoStatus(STATUS_ID='39', STATUS='Withdrawn'),
@@ -146,19 +149,29 @@ class IRBInfoSchema(ma.Schema):
         include_relationships = True
         load_instance = True
         fields = ("UVA_STUDY_TRACKING", "DATE_MODIFIED", "IRB_ADMINISTRATIVE_REVIEWER",
-                  "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRB_OF_RECORD", "IRBEVENT", "IRB_STATUS",
+                  "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRB_OF_RECORD", "IRBEVENT", "IRBEVENT_ID", "IRB_STATUS", "IRB_STATUS_ID",
                   "UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES", "STUDYIRBREVIEWERADMIN")
 
     IRBEVENT = fields.Method("get_event")
+    IRBEVENT_ID = fields.Method("get_event_id")
     IRB_STATUS = fields.Method("get_status")
+    IRB_STATUS_ID = fields.Method("get_status_id")
 
     @staticmethod
     def get_event(obj):
         return obj.IRBEVENT[0].EVENT
 
     @staticmethod
+    def get_event_id(obj):
+        return obj.IRBEVENT[0].EVENT_ID
+
+    @staticmethod
     def get_status(obj):
         return obj.IRB_STATUS[0].STATUS
+
+    @staticmethod
+    def get_status_id(obj):
+        return obj.IRB_STATUS[0].STATUS_ID
 
 
 class Investigator(db.Model):
