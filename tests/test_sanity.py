@@ -141,7 +141,9 @@ class Sanity_Check_Test(unittest.TestCase):
         irb_info = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).first()
         self.assertEqual(irb_info.UVA_STUDY_TRACKING, tracking_string)
         self.assertEqual(irb_info.IRBEVENT[0].EVENT, event)
+        self.assertEqual(irb_info.IRBEVENT[0].EVENT_ID, event_id)
         self.assertEqual(irb_info.IRB_STATUS[0].STATUS, status)
+        self.assertEqual(irb_info.IRB_STATUS[0].STATUS_ID, status_id)
 
 
         # Delete the study
