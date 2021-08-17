@@ -184,10 +184,6 @@ components:
           type: number
           example: 11770
           description: The unique id of the study in Protocol Builder.  Sometimes referenced as the "HSR Submission number" if you are looking at Protocol Builder
-        HSRNUMBER:
-          type: number
-          example: 15378
-          description: This is the number users use to lookup and reference when talking about non SOM protocols in IRB Online and displayed in more documentation.   Its only used in IRB Online.  Its not an auto increment.
         TITLE:
           type: string
           format: string
