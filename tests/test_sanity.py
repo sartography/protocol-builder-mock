@@ -9,6 +9,7 @@ import unittest
 import random
 import string
 from pb import app, db, session
+from pb.api import current_irb_info
 from pb.forms import StudyForm, StudySponsorForm
 from pb.ldap.ldap_service import LdapService
 from pb.models import Study, RequiredDocument, Sponsor, StudySponsor, IRBStatus, Investigator, IRBInfo, StudyDetails, IRBInfoEvent, IRBInfoStatus
@@ -248,3 +249,14 @@ class Sanity_Check_Test(unittest.TestCase):
         self.assertEqual(detail.IND_1, '1234')
         self.assertEqual(detail.REVIEW_TYPE, 3)
         self.assertEqual(detail.REVIEWTYPENAME, 'Expedited')
+
+    def test_study_no_info(self):
+        study = self.add_study()
+        irb_info = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).first()
+        self.assertIsNone(irb_info)
+        api_irb_info = current_irb_info(study.STUDYID)
+        self.assertEqual(4, len(api_irb_info))
+        self.assertIsNone(api_irb_info['IRB_STATUS'])
+        self.assertIsNone(api_irb_info['IRB_STATUS_ID'])
+        self.assertIsNone(api_irb_info['IRBEVENT'])
+        self.assertIsNone(api_irb_info['IRBEVENT_ID'])

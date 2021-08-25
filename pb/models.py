@@ -158,19 +158,23 @@ class IRBInfoSchema(ma.Schema):
 
     @staticmethod
     def get_event(obj):
-        return obj.IRBEVENT[0].EVENT
+        if obj is not None and hasattr(obj, 'IRBEVENT'):
+            return obj.IRBEVENT[0].EVENT
 
     @staticmethod
     def get_event_id(obj):
-        return obj.IRBEVENT[0].EVENT_ID
+        if obj is not None and hasattr(obj, 'IRBEVENT'):
+            return obj.IRBEVENT[0].EVENT_ID
 
     @staticmethod
     def get_status(obj):
-        return obj.IRB_STATUS[0].STATUS
+        if obj is not None and hasattr(obj, 'IRB_STATUS'):
+            return obj.IRB_STATUS[0].STATUS
 
     @staticmethod
     def get_status_id(obj):
-        return obj.IRB_STATUS[0].STATUS_ID
+        if obj is not None and hasattr(obj, 'IRB_STATUS'):
+            return obj.IRB_STATUS[0].STATUS_ID
 
 
 class Investigator(db.Model):
