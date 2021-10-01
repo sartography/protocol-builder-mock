@@ -291,7 +291,7 @@ components:
         UVA_STUDY_TRACKING:
           type: string
           example: HSR170023
-          description: Unknown
+          description: 'Number provided to PB by CRC1 - HSRYY#### (YY = two digit year, #### sequential number)'
         DATE_MODIFIED:
           type: string
           example: 2021-04-20T00:00:00+00:00
