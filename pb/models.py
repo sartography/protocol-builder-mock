@@ -2,7 +2,7 @@ from marshmallow import fields
 from sqlalchemy import func
 from pb import db, ma
 from marshmallow_sqlalchemy import SQLAlchemySchema
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import backref, dynamic
 
 
 class Sponsor(db.Model):
@@ -75,13 +75,10 @@ class Study(db.Model):
     investigators = db.relationship("Investigator", backref="study", lazy='dynamic')
     study_details = db.relationship("StudyDetails", uselist=False, backref="study")
     sponsors = db.relationship("StudySponsor", back_populates="study", cascade="all, delete, delete-orphan")
-
-
-class StudySchema(ma.Schema):
-    class Meta:
-        # Fields to expose
-        fields = ("STUDYID", "TITLE", "NETBADGEID",
-                  "DATE_MODIFIED")
+    # This is a hack to get PB Mock up and running
+    # We need to decide what to do about HSRNUMBER
+    # TODO: Resolve HSRNUMBER issue
+    HSRNUMBER = "0"
 
 
 class IRBInfoEvent(db.Model):
@@ -207,64 +204,88 @@ class Investigator(db.Model):
 
 class InvestigatorSchema(ma.Schema):
     class Meta:
-        fields = ("NETBADGEID", "INVESTIGATORTYPE", "INVESTIGATORTYPEFULL")
+        fields = ("STUDYID", "NETBADGEID", "INVESTIGATORTYPE", "INVESTIGATORTYPEFULL")
 
 
 class RequiredDocument(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    AUXDOCID = db.Column(db.String(), nullable=False, default="")
-    AUXDOC = db.Column(db.String(), nullable=False, default="")
+    SS_AUXILIARY_DOC_TYPE_ID = db.Column(db.String(), nullable=False, default="")
+    AUXILIARY_DOC = db.Column(db.String(), nullable=False, default="")
     STUDYID = db.Column(db.Integer, db.ForeignKey('study.STUDYID'))
 
     @staticmethod
     def all():
-        docs = [RequiredDocument(AUXDOCID=1, AUXDOC="Investigators Brochure"),
-                RequiredDocument(AUXDOCID=2, AUXDOC="Screening Log"),
-                RequiredDocument(AUXDOCID=3, AUXDOC="Protocol"),
-                RequiredDocument(AUXDOCID=6, AUXDOC="Cancer Center's PRC Approval Form"),
-                RequiredDocument(AUXDOCID=7, AUXDOC="GCRC Approval Form"),
-                RequiredDocument(AUXDOCID=8, AUXDOC="SOM CTO IND/IDE Review Letter"),
-                RequiredDocument(AUXDOCID=9, AUXDOC="HIRE Approval"),
-                RequiredDocument(AUXDOCID=10, AUXDOC="Cancer Center's PRC Approval Waiver"),
-                RequiredDocument(AUXDOCID=11, AUXDOC="HSR Grant"),
-                RequiredDocument(AUXDOCID=12, AUXDOC="Certificate of Confidentiality Application"),
-                RequiredDocument(AUXDOCID=14, AUXDOC="Institutional Biosafety Committee Approval"),
-                RequiredDocument(AUXDOCID=18, AUXDOC="SOM CTO Approval Letter - UVA PI Multisite Trial"),
-                RequiredDocument(AUXDOCID=19, AUXDOC="IRB Approval or Letter of Approval from Administration: Send Data or Specimens to UVA"),
-                RequiredDocument(AUXDOCID=20, AUXDOC="IRB Approval or Letter of Approval from Administration: Study Conducted at non- UVA Facilities "),
-                RequiredDocument(AUXDOCID=21, AUXDOC="New Medical Device Form"),
-                RequiredDocument(AUXDOCID=22, AUXDOC="SOM CTO Review regarding need for IDE"),
-                RequiredDocument(AUXDOCID=23, AUXDOC="SOM CTO Review regarding need for IND"),
-                RequiredDocument(AUXDOCID=24, AUXDOC="InfoSec Approval"),
-                RequiredDocument(AUXDOCID=25, AUXDOC="Scientific Pre-review Documentation"),
-                RequiredDocument(AUXDOCID=26, AUXDOC="IBC Number"),
-                RequiredDocument(AUXDOCID=32, AUXDOC="IDS - Investigational Drug Service Approval"),
-                RequiredDocument(AUXDOCID=33, AUXDOC="Data Security Plan"),
-                RequiredDocument(AUXDOCID=35, AUXDOC="Model Consent"),
-                RequiredDocument(AUXDOCID=36, AUXDOC="RDRC Approval "),
-                RequiredDocument(AUXDOCID=39, AUXDOC="Age of Majority Cover Letter and Consent"),
-                RequiredDocument(AUXDOCID=40, AUXDOC="SBS/IRB Approval-FERPA"),
-                RequiredDocument(AUXDOCID=41, AUXDOC="HIRE Standard Radiation Language"),
-                RequiredDocument(AUXDOCID=42, AUXDOC="COI Management Plan"),
-                RequiredDocument(AUXDOCID=43, AUXDOC="SOM CTO Approval Letter-Non UVA, Non Industry PI MultiSite Study"),
-                RequiredDocument(AUXDOCID=44, AUXDOC="GRIME Approval"),
-                RequiredDocument(AUXDOCID=45, AUXDOC="GMEC Approval"),
-                RequiredDocument(AUXDOCID=46, AUXDOC="IRB Reliance Agreement Request Form- IRB-HSR is IRB of Record"),
-                RequiredDocument(AUXDOCID=47, AUXDOC="Non UVA IRB Approval - Initial and Last Continuation"),
-                RequiredDocument(AUXDOCID=48, AUXDOC="MR Physicist Approval- Use of Gadolinium"),
-                RequiredDocument(AUXDOCID=49, AUXDOC="SOM CTO Approval- Non- UVA Academia PI of IDE"),
-                RequiredDocument(AUXDOCID=51, AUXDOC="IDS Waiver"),
-                RequiredDocument(AUXDOCID=52, AUXDOC="Package Inserts"),
-                RequiredDocument(AUXDOCID=53, AUXDOC="IRB Reliance Agreement Request Form- IRB-HSR Not IRB of Record"),
-                RequiredDocument(AUXDOCID=54, AUXDOC="ESCRO Approval"),
-                RequiredDocument(AUXDOCID=56, AUXDOC="Unaffiliated Investigator Agreement "),
-                RequiredDocument(AUXDOCID=57, AUXDOC="Laser Safety Officer Approval"),
-                RequiredDocument(AUXDOCID=58, AUXDOC="FDA Letter granting IND/IDE# or exemption")]
+        docs = [RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=1, AUXILIARY_DOC="Investigators Brochure"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=2, AUXILIARY_DOC="Screening Log"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=3, AUXILIARY_DOC="Protocol"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=6, AUXILIARY_DOC="Cancer Center's PRC Approval Form"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=7, AUXILIARY_DOC="GCRC Approval Form"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=8, AUXILIARY_DOC="SOM CTO IND/IDE Review Letter"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=9, AUXILIARY_DOC="HIRE Approval"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=10, AUXILIARY_DOC="Cancer Center's PRC Approval Waiver"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=11, AUXILIARY_DOC="HSR Grant"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=12, AUXILIARY_DOC="Certificate of Confidentiality Application"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=14, AUXILIARY_DOC="Institutional Biosafety Committee Approval"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=18, AUXILIARY_DOC="SOM CTO Approval Letter - UVA PI Multisite Trial"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=19, AUXILIARY_DOC="IRB Approval or Letter of Approval from Administration: Send Data or Specimens to UVA"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=20, AUXILIARY_DOC="IRB Approval or Letter of Approval from Administration: Study Conducted at non- UVA Facilities "),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=21, AUXILIARY_DOC="New Medical Device Form"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=22, AUXILIARY_DOC="SOM CTO Review regarding need for IDE"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=23, AUXILIARY_DOC="SOM CTO Review regarding need for IND"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=24, AUXILIARY_DOC="InfoSec Approval"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=25, AUXILIARY_DOC="Scientific Pre-review Documentation"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=26, AUXILIARY_DOC="IBC Number"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=32, AUXILIARY_DOC="IDS - Investigational Drug Service Approval"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=33, AUXILIARY_DOC="Data Security Plan"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=35, AUXILIARY_DOC="Model Consent"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=36, AUXILIARY_DOC="RDRC Approval "),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=39, AUXILIARY_DOC="Age of Majority Cover Letter and Consent"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=40, AUXILIARY_DOC="SBS/IRB Approval-FERPA"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=41, AUXILIARY_DOC="HIRE Standard Radiation Language"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=42, AUXILIARY_DOC="COI Management Plan"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=43, AUXILIARY_DOC="SOM CTO Approval Letter-Non UVA, Non Industry PI MultiSite Study"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=44, AUXILIARY_DOC="GRIME Approval"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=45, AUXILIARY_DOC="GMEC Approval"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=46, AUXILIARY_DOC="IRB Reliance Agreement Request Form- IRB-HSR is IRB of Record"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=47, AUXILIARY_DOC="Non UVA IRB Approval - Initial and Last Continuation"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=48, AUXILIARY_DOC="MR Physicist Approval- Use of Gadolinium"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=49, AUXILIARY_DOC="SOM CTO Approval- Non- UVA Academia PI of IDE"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=51, AUXILIARY_DOC="IDS Waiver"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=52, AUXILIARY_DOC="Package Inserts"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=53, AUXILIARY_DOC="IRB Reliance Agreement Request Form- IRB-HSR Not IRB of Record"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=54, AUXILIARY_DOC="ESCRO Approval"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=56, AUXILIARY_DOC="Unaffiliated Investigator Agreement "),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=57, AUXILIARY_DOC="Laser Safety Officer Approval"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=58, AUXILIARY_DOC="FDA Letter granting IND/IDE# or exemption")]
         return docs
+
 
 class RequiredDocumentSchema(ma.Schema):
     class Meta:
-        fields = ("AUXDOCID", "AUXDOC")
+        i_aux_docs = []
+        include_relationships = True
+        load_instance = True
+        fields = ("AUXDOCS", "OTHERDOCS", "TEMPLATEDOCS")
+        # fields = ("SS_AUXILIARY_DOC_TYPE_ID", "AUXILIARY_DOC")
+
+    AUXDOCS = fields.Method("get_aux_docs")
+    OTHERDOCS = fields.Method("get_other_docs")
+    TEMPLATEDOCS = fields.Method("get_template_docs")
+
+    @staticmethod
+    def get_aux_docs(obj):
+        aux_docs = []
+        if obj is not None and hasattr(obj, 'AUXILIARY_DOC') and hasattr(obj, 'SS_AUXILIARY_DOC_TYPE_ID'):
+            aux_docs.append({'AUXILIARY_DOC': obj.AUXILIARY_DOC, 'SS_AUXILIARY_DOC_TYPE_ID': obj.SS_AUXILIARY_DOC_TYPE_ID})
+        return aux_docs
+
+    @staticmethod
+    def get_other_docs(obj):
+        return []
+
+    @staticmethod
+    def get_template_docs(obj):
+        return []
 
 
 class IRBStatus(db.Model):
@@ -283,6 +304,30 @@ class IRBStatus(db.Model):
 class IRBStatusSchema(ma.Schema):
     class Meta:
         fields = ("STATUS", "DETAIL")
+
+
+class StudySchema(ma.Schema):
+    class Meta:
+        include_relationships = True
+        load_instance = True
+        # Fields to expose
+        fields = ("STUDYID", "TITLE", "NETBADGEID",
+                  "DATE_MODIFIED", "Q_COMPLETE", "HSRNUMBER")
+    Q_COMPLETE = fields.Method("get_q_complete")
+    # TODO: Resolve HSRNUMBER issue
+    # Currently, we set HSRNUMBER to 0 in the model
+
+    @staticmethod
+    def get_q_complete(obj):
+        """Ultimately, this will be calculated based on the contents of Q_COMPLETE.
+        For now, we return the contents of Q_COMPLETE"""
+        # TODO: Calculate whatever we need to calculate.
+        # TODO: Currently, we don't return HSRNUMBER,
+        #  but we don't currently use it in CR Connect either
+        if obj is not None and hasattr(obj, 'Q_COMPLETE'):
+            if len(obj.Q_COMPLETE.all()) > 0:
+                return {'STATUS': obj.Q_COMPLETE[0].STATUS, 'DETAIL': obj.Q_COMPLETE[0].DETAIL}
+        return {}
 
 
 class StudyDetails(db.Model):

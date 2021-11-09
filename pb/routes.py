@@ -84,7 +84,7 @@ def edit_study(study_id):
     form = StudyForm(request.form, obj=study)
     if request.method == 'GET':
         if study.requirements:
-            form.requirements.data = list(map(lambda r: r.AUXDOCID, list(study.requirements)))
+            form.requirements.data = list(map(lambda r: r.SS_AUXILIARY_DOC_TYPE_ID, list(study.requirements)))
         if study.Q_COMPLETE and study.Q_COMPLETE.first():
             form.Q_COMPLETE.data = "('" + study.Q_COMPLETE.first().STATUS + "', '" + study.Q_COMPLETE.first().DETAIL + "')"
         else:

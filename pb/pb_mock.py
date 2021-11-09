@@ -88,10 +88,10 @@ def _update_study(study, form):
 
     for r in form.requirements:
         if r.checked:
-            requirement = RequiredDocument(AUXDOCID=r.data, AUXDOC=r.label.text, study=study)
+            requirement = RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=r.data, AUXILIARY_DOC=r.label.text, study=study)
             db.session.add(requirement)
             if r.data == 39:
-                requirement_2 = RequiredDocument(AUXDOCID=39, AUXDOC='Consent-Age of Majority Cover Letter', study=study)
+                requirement_2 = RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=39, AUXILIARY_DOC='Consent-Age of Majority Cover Letter', study=study)
                 db.session.add(requirement_2)
 
     q_data = eval(form.Q_COMPLETE.data)
@@ -236,7 +236,7 @@ def verify_required_document_list():
     local = RequiredDocument.all()
     local_documents_list = []
     for loc in local:
-        local_documents_list.append({'AUXDOCID': loc.AUXDOCID, 'AUXDOC': loc.AUXDOC})
+        local_documents_list.append({'SS_AUXILIARY_DOC_TYPE_ID': loc.SS_AUXILIARY_DOC_TYPE_ID, 'AUXILIARY_DOC': loc.AUXILIARY_DOC})
 
     required_documents_list = []
     master_list = _get_required_document_list()
@@ -244,14 +244,14 @@ def verify_required_document_list():
         for doc in master_list:
             doc['AUXILIARY_DOC'] = doc['AUXILIARY_DOC'].replace("\r", '')
             doc['AUXILIARY_DOC'] = doc['AUXILIARY_DOC'].replace("\n", '')
-            required_documents_list.append({'AUXDOCID': doc['SS_AUXILIARY_DOC_TYPE'], 'AUXDOC': doc['AUXILIARY_DOC']})
+            required_documents_list.append({'SS_AUXILIARY_DOC_TYPE_ID': doc['SS_AUXILIARY_DOC_TYPE'], 'AUXILIARY_DOC': doc['AUXILIARY_DOC']})
 
     verify = compare_the_lists(required_documents_list, local_documents_list)
     if not verify:
         # Printing this so it is easier to update the hardcoded list in models.RequiredDocument
         to_print = '['
         for rd in required_documents_list:
-            to_print += f"RequiredDocument(AUXDOCID={rd['AUXDOCID']}, AUXDOC=\"{rd['AUXDOC']}\"), "
+            to_print += f"RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID={rd['SS_AUXILIARY_DOC_TYPE_ID']}, AUXILIARY_DOC=\"{rd['AUXILIARY_DOC']}\"), "
         to_print += ']'
         print(to_print)
     return verify

@@ -14,7 +14,7 @@ class StudyForm(FlaskForm):
     NETBADGEID = StringField('User UVA Computing Id', [validators.DataRequired()])
     requirements = SelectMultipleField("Documents",
                                        render_kw={'class': 'multi'},
-                                       choices=[(rd.AUXDOCID, rd.AUXDOC) for rd in RequiredDocument.all()])
+                                       choices=[(rd.SS_AUXILIARY_DOC_TYPE_ID, rd.AUXILIARY_DOC) for rd in RequiredDocument.all()])
     Q_COMPLETE = SelectField("IRBStatus",
                              choices=[((q.STATUS, q.DETAIL), q.DETAIL) for q in IRBStatus.all()])
 
@@ -150,8 +150,8 @@ class ConfirmDeleteForm(FlaskForm):
 
 
 class RequirementsTable(Table):
-    AUXDOCID = Col('Code')
-    AUXDOC = Col('Name')
+    SS_AUXILIARY_DOC_TYPE_ID = Col('Code')
+    AUXILIARY_DOC = Col('Name')
 
 
 class InvestigatorsTable(Table):
