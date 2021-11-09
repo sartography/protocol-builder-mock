@@ -27,7 +27,7 @@ def sponsors(studyid):
 
 def get_study_details(studyid):
     details = session.query(StudyDetails).filter(StudyDetails.STUDYID == studyid).first()
-    return StudyDetailsSchema().dump(details)
+    return [StudyDetailsSchema().dump(details)]
 
 
 def check_study(studyid):
