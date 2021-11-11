@@ -12,7 +12,10 @@ def get_user_studies(uva_id):
 
 def required_docs(studyid):
     docs = session.query(RequiredDocument).filter(RequiredDocument.STUDYID == studyid).all()
-    return RequiredDocumentSchema(many=True).dump(docs)
+    docs_schema = RequiredDocumentSchema(many=True).dump(docs)
+    return {'AUXDOCS': docs_schema,
+            'TEMPLATEDOCS': [],
+            'OTHERDOCS': []}
 
 
 def investigators(studyid):
