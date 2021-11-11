@@ -262,30 +262,7 @@ class RequiredDocument(db.Model):
 
 class RequiredDocumentSchema(ma.Schema):
     class Meta:
-        i_aux_docs = []
-        include_relationships = True
-        load_instance = True
-        fields = ("AUXDOCS", "OTHERDOCS", "TEMPLATEDOCS")
-        # fields = ("SS_AUXILIARY_DOC_TYPE_ID", "AUXILIARY_DOC")
-
-    AUXDOCS = fields.Method("get_aux_docs")
-    OTHERDOCS = fields.Method("get_other_docs")
-    TEMPLATEDOCS = fields.Method("get_template_docs")
-
-    @staticmethod
-    def get_aux_docs(obj):
-        aux_docs = []
-        if obj is not None and hasattr(obj, 'AUXILIARY_DOC') and hasattr(obj, 'SS_AUXILIARY_DOC_TYPE_ID'):
-            aux_docs.append({'AUXILIARY_DOC': obj.AUXILIARY_DOC, 'SS_AUXILIARY_DOC_TYPE_ID': obj.SS_AUXILIARY_DOC_TYPE_ID})
-        return aux_docs
-
-    @staticmethod
-    def get_other_docs(obj):
-        return []
-
-    @staticmethod
-    def get_template_docs(obj):
-        return []
+        fields = ("SS_AUXILIARY_DOC_TYPE_ID", "AUXILIARY_DOC")
 
 
 class IRBStatus(db.Model):
