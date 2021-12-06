@@ -2,12 +2,12 @@ from pb import session
 from pb.models import Investigator, InvestigatorSchema, IRBInfo, IRBInfoSchema, \
                       IRBStatus, IRBStatusSchema, RequiredDocument, RequiredDocumentSchema, \
                       Study, StudySchema, StudyDetails, StudyDetailsSchema, \
-                      StudySponsor, StudySponsorSchema
+                      StudySponsor, StudySponsorSchema, CreatorStudySchema
 
 
 def get_user_studies(uva_id):
     studies = session.query(Study).filter(Study.NETBADGEID == uva_id).all()
-    return StudySchema(many=True).dump(studies)
+    return CreatorStudySchema(many=True).dump(studies)
 
 
 def required_docs(studyid):
