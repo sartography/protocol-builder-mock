@@ -283,6 +283,20 @@ class IRBStatusSchema(ma.Schema):
         fields = ("STATUS", "DETAIL")
 
 
+class CreatorStudySchema(ma.Schema):
+    class Meta:
+        model = Study
+        include_relationships = True
+        load_instance = True
+        fields = ["STUDYID", "TITLE", "DATECREATED", "DATELASTMODIFIED"]
+    DATECREATED = DATELASTMODIFIED = fields.Method("get_dates")
+
+    @staticmethod
+    def get_dates(obj):
+        if obj is not None and hasattr(obj, "DATE_MODIFIED"):
+            return obj.DATE_MODIFIED
+
+
 class StudySchema(ma.Schema):
     class Meta:
         include_relationships = True
