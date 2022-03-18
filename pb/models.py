@@ -288,13 +288,19 @@ class CreatorStudySchema(ma.Schema):
         model = Study
         include_relationships = True
         load_instance = True
-        fields = ["STUDYID", "TITLE", "DATECREATED", "DATELASTMODIFIED"]
+        fields = ["STUDYID", "TITLE", "DATECREATED", "DATELASTMODIFIED", "REVIEW_TYPE"]
     DATECREATED = DATELASTMODIFIED = fields.Method("get_dates")
+    REVIEW_TYPE = fields.Method("get_review_type")
 
     @staticmethod
     def get_dates(obj):
         if obj is not None and hasattr(obj, "DATE_MODIFIED"):
             return obj.DATE_MODIFIED
+
+    @staticmethod
+    def get_review_type(obj):
+        if obj is not None and hasattr(obj, "study_details"):
+            return obj.study_details.REVIEW_TYPE
 
 
 class StudySchema(ma.Schema):
