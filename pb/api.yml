@@ -634,3 +634,11 @@ components:
           type: string
           example: "dhf8r"
           description: Netbadge id of IRB staff assinged to do the review
+        REVIEW_TYPE:
+          type: integer
+          example: 2
+          description: ID of the Review Type
+        REVIEWTYPENAME:
+          type: string
+          example: Non-UVA IRB Full Board
+          description: Human readable version of Review Type
