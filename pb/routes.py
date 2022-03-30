@@ -350,10 +350,8 @@ def _get_review_type_name(review_type):
         return 'Full Committee'
     elif review_type == '3':
         return 'Expedited'
-    elif review_type == '23':
-        return 'Non-UVA IRB Full Board'
-    elif review_type == '24':
-        return 'Non-UVA IRB Expedited'
+    elif review_type == '21':
+        return 'Review by Non-UVA IRB'
 
 
 @app.route('/study_details/<study_id>', methods=['GET', 'POST'])

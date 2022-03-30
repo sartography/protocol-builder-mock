@@ -137,12 +137,11 @@ class StudyDetailsForm(FlaskForm):
     IS_REVIEW_BY_CENTRAL_IRB = IntegerField(validators=[Optional()], label='IS_REVIEW_BY_CENTRAL_IRB')
     IRBREVIEWERADMIN = StringField(label='IRBREVIEWERADMIN')
     IS_UVA_COLLABANALYSIS = IntegerField(validators=[Optional()], label='IS_UVA_COLLABANALYSIS')
-    REVIEW_TYPE = SelectField("REVIEW_TYPE",
+    REVIEW_TYPE = SelectField("REVIEW_TYPE/REVIEWTYPENAME",
                               choices=[('1', ('1 None')),
                                        ('2', ('2 Full Committee')),
                                        ('3', ('3 Expedited')),
-                                       ('23', ('23 Non-UVA IRB Full Board')),
-                                       ('24', ('24 Non-UVA IRB Expedited'))])
+                                       ('21', ('21 Review by Non-UVA IRB'))])
 
 
 class ConfirmDeleteForm(FlaskForm):
