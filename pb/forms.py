@@ -36,10 +36,10 @@ class IRBInfoForm(FlaskForm):
     AGENDA_DATE = DateField('AGENDA_DATE', [Optional()], widget=DateInput())
     IRB_REVIEW_TYPE = SelectField("IRB_REVIEW_TYPE",
                                   choices=['None', 'Full Committee', 'Expedited', 'Non-UVA IRB Full Board', 'Non-UVA IRB Expedited'])
-    IRBEVENT = SelectField("IRBInfoEvent",
-                           choices=[((q.EVENT_ID, q.EVENT), q.EVENT) for q in IRBInfoEvent.all()])
-    IRB_STATUS = SelectField("IRBInfoStatus",
-                             choices=[((q.STATUS_ID, q.STATUS), q.STATUS) for q in IRBInfoStatus.all()])
+    IRBEVENT = SelectField("IRBEVENT_ID / IRBEVENT",
+                           choices=[((q.EVENT_ID, q.EVENT), f"{q.EVENT_ID} {q.EVENT}") for q in IRBInfoEvent.all()])
+    IRB_STATUS = SelectField("IRB_STATUS_ID / IRB_STATUS",
+                             choices=[((q.STATUS_ID, q.STATUS), f"{q.STATUS_ID} {q.STATUS}") for q in IRBInfoStatus.all()])
     IRB_OF_RECORD = StringField('IRB_OF_RECORD')
     UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = SelectField('UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES',
                                                              choices=['None', '0', '1'],
