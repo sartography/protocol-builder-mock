@@ -147,12 +147,14 @@ class IRBInfoSchema(ma.Schema):
         load_instance = True
         fields = ("UVA_STUDY_TRACKING", "DATE_MODIFIED", "IRB_ADMINISTRATIVE_REVIEWER",
                   "AGENDA_DATE", "IRB_REVIEW_TYPE", "IRB_OF_RECORD", "IRBEVENT", "IRBEVENT_ID", "IRB_STATUS", "IRB_STATUS_ID",
-                  "UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES", "STUDYIRBREVIEWERADMIN")
+                  "UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES", "STUDYIRBREVIEWERADMIN", "STATUS", "DETAIL")
 
     IRBEVENT = fields.Method("get_event")
     IRBEVENT_ID = fields.Method("get_event_id")
     IRB_STATUS = fields.Method("get_status")
     IRB_STATUS_ID = fields.Method("get_status_id")
+    STATUS = fields.Method("get_online_status")
+    DETAIL = fields.Method("get_online_detail")
 
     @staticmethod
     def get_event(obj):
@@ -173,6 +175,34 @@ class IRBInfoSchema(ma.Schema):
     def get_status_id(obj):
         if obj is not None and hasattr(obj, 'IRB_STATUS'):
             return obj.IRB_STATUS[0].STATUS_ID
+
+    @staticmethod
+    def get_online_status(obj):
+        if obj is not None and hasattr(obj, 'IRB_ONLINE_STATUS') and obj.IRB_ONLINE_STATUS is not None:
+            return obj.IRB_ONLINE_STATUS
+
+    @staticmethod
+    def get_online_detail(obj):
+        if obj is not None and hasattr(obj, 'IRB_ONLINE_STATUS') and obj.IRB_ONLINE_STATUS is not None:
+            return 'Study downloaded to IRB Online.'
+
+
+class IRBInfoErrorSchema(ma.Schema):
+    class Meta:
+        model = IRBInfo
+        load_instance = True
+        fields = ('STATUS', 'DETAIL')
+
+    STATUS = fields.Method("get_online_status")
+    DETAIL = fields.Method("get_online_detail")
+
+    @staticmethod
+    def get_online_status(obj):
+        return 'Error'
+
+    @staticmethod
+    def get_online_detail(obj):
+        return 'Study not downloaded to IRB Online.'
 
 
 class Investigator(db.Model):
