@@ -1,5 +1,5 @@
 from pb import session
-from pb.models import Investigator, InvestigatorSchema, IRBInfo, IRBInfoSchema, \
+from pb.models import Investigator, InvestigatorSchema, IRBInfo, IRBInfoSchema, IRBInfoErrorSchema,\
                       IRBStatus, IRBStatusSchema, RequiredDocument, RequiredDocumentSchema, \
                       Study, StudySchema, StudyDetails, StudyDetailsSchema, \
                       StudySponsor, StudySponsorSchema, CreatorStudySchema
@@ -40,4 +40,9 @@ def check_study(studyid):
 
 def current_irb_info(studyid):
     irb_info = session.query(IRBInfo).filter(IRBInfo.SS_STUDY_ID == studyid).first()
-    return IRBInfoSchema().dump(irb_info)
+    if irb_info and hasattr(irb_info, 'IRB_ONLINE_STATUS') and irb_info.IRB_ONLINE_STATUS == 'Error':
+        # IRB Online returns a dictionary in this case
+        return IRBInfoErrorSchema().dump(irb_info)
+    else:
+        # IRB Online returns a list with 1 dictionary in this case
+        return IRBInfoSchema(many=True).dump([irb_info])
