@@ -45,6 +45,9 @@ class IRBInfoForm(FlaskForm):
                                                              choices=['None', '0', '1'],
                                                              coerce=irb_to_int)
     STUDYIRBREVIEWERADMIN = StringField('STUDYIRBREVIEWERADMIN')
+    IRB_ONLINE_STATUS = SelectField("STATUS / DETAIL",
+                                    choices=[('Error', 'Error / Study not downloaded to IRB Online.'),
+                                             ('Downloaded', 'Downloaded / Study downloaded to IRB Online.')])
 
 
 class InvestigatorForm(FlaskForm):

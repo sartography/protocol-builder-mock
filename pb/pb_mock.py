@@ -120,6 +120,7 @@ def _update_irb_info(study_id, irb_info, form):
     irb_info.IRB_ADMINISTRATIVE_REVIEWER = form.IRB_ADMINISTRATIVE_REVIEWER.data
     irb_info.AGENDA_DATE = form.AGENDA_DATE.data
     irb_info.IRB_REVIEW_TYPE = form.IRB_REVIEW_TYPE.data
+    irb_info.IRB_ONLINE_STATUS = form.IRB_ONLINE_STATUS.data
 
     # irb_info.IRBEVENT = irb_info_event
     if form.IRBEVENT.data:
