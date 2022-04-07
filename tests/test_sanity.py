@@ -135,7 +135,7 @@ class Sanity_Check_Test(unittest.TestCase):
         status_id ='2'
         status_string = f"('{status_id}', '{status}')"
 
-        self.app.post(f'/irb_info/{study.STUDYID}', data={'UVA_STUDY_TRACKING': tracking_string, 'IRBEVENT': event_string, 'IRB_STATUS': status_string, 'IRB_REVIEW_TYPE': 'Expedited'})
+        self.app.post(f'/irb_info/{study.STUDYID}', data={'UVA_STUDY_TRACKING': tracking_string, 'IRBEVENT': event_string, 'IRB_STATUS': status_string, 'IRB_REVIEW_TYPE': 'Expedited', 'IRB_ONLINE_STATUS': 'Downloaded'})
         count = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).count()
         self.assertGreater(count, 0)
 
@@ -255,8 +255,11 @@ class Sanity_Check_Test(unittest.TestCase):
         irb_info = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).first()
         self.assertIsNone(irb_info)
         api_irb_info = current_irb_info(study.STUDYID)
-        self.assertEqual(4, len(api_irb_info))
-        self.assertIsNone(api_irb_info['IRB_STATUS'])
-        self.assertIsNone(api_irb_info['IRB_STATUS_ID'])
-        self.assertIsNone(api_irb_info['IRBEVENT'])
-        self.assertIsNone(api_irb_info['IRBEVENT_ID'])
+        # IRB Online returns a list with 1 dictionary
+        self.assertEqual(1, len(api_irb_info))
+        self.assertIsNone(api_irb_info[0]['IRB_STATUS'])
+        self.assertIsNone(api_irb_info[0]['IRB_STATUS_ID'])
+        self.assertIsNone(api_irb_info[0]['IRBEVENT'])
+        self.assertIsNone(api_irb_info[0]['IRBEVENT_ID'])
+        self.assertIsNone(api_irb_info[0]['STATUS'])
+        self.assertIsNone(api_irb_info[0]['DETAIL'])
