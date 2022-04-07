@@ -137,6 +137,7 @@ class IRBInfo(db.Model):
     IRB_OF_RECORD = db.Column(db.String(), nullable=False, default='')
     UVA_IRB_HSR_IS_IRB_OF_RECORD_FOR_ALL_SITES = db.Column(db.Integer(), nullable=True)
     STUDYIRBREVIEWERADMIN = db.Column(db.String(), nullable=False, default='')
+    IRB_ONLINE_STATUS = db.Column(db.String(), nullable=True)
 
 
 class IRBInfoSchema(ma.Schema):
