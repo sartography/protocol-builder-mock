@@ -96,7 +96,8 @@ class IRBInfoEvent(db.Model):
                  IRBInfoEvent(EVENT_ID='312', EVENT='Condition Response Accepted-New Protocol'),
                  IRBInfoEvent(EVENT_ID='316', EVENT='Deferred New Protocol'),
                  IRBInfoEvent(EVENT_ID='346', EVENT='Receipt of Non-UVA Study'),
-                 IRBInfoEvent(EVENT_ID='62', EVENT='Closed by PI')]
+                 IRBInfoEvent(EVENT_ID='62', EVENT='Closed by PI'),
+                 IRBInfoEvent(EVENT_ID='63', EVENT='Receipt of New Protocol')]
         return event
 
 
