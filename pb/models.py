@@ -96,6 +96,7 @@ class IRBInfoEvent(db.Model):
                  IRBInfoEvent(EVENT_ID='312', EVENT='Condition Response Accepted-New Protocol'),
                  IRBInfoEvent(EVENT_ID='316', EVENT='Deferred New Protocol'),
                  IRBInfoEvent(EVENT_ID='346', EVENT='Receipt of Non-UVA Study'),
+                 IRBInfoEvent(EVENT_ID='317', EVENT='Disapproved New Protocol'),
                  IRBInfoEvent(EVENT_ID='62', EVENT='Closed by PI')]
         return event
 
@@ -117,7 +118,8 @@ class IRBInfoStatus(db.Model):
                   IRBInfoStatus(STATUS_ID='31', STATUS='PreReview Complete New Protocol'),
                   IRBInfoStatus(STATUS_ID='2', STATUS='Open to enrollment'),
                   IRBInfoStatus(STATUS_ID='39', STATUS='Withdrawn'),
-                  IRBInfoStatus(STATUS_ID='37', STATUS='Disapproved')]
+                  IRBInfoStatus(STATUS_ID='37', STATUS='Disapproved'),
+                  IRBInfoStatus(STATUS_ID='35', STATUS='Approvable with Conditions')]
         return status
 
 
