@@ -462,7 +462,6 @@ def edit_pre_review(study_id):
     if request.method == 'POST':
         if form.validate():
             pre_review = PreReview(
-                PROT_EVENT_ID=None,
                 SS_STUDY_ID=study_id,
                 DATEENTERED=form.DATEENTERED.data,
                 REVIEW_TYPE=form.REVIEW_TYPE.data,
