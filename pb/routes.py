@@ -491,3 +491,13 @@ def edit_pre_review(study_id):
         pre_reviews=pre_reviews
     )
 
+
+@app.route('/delete_pre_review/<pre_review_id>', methods=['POST'])
+def delete_pre_review(pre_review_id):
+    model = session.query(PreReview).filter(PreReview.PROT_EVENT_ID == pre_review_id).first()
+    study_id = model.SS_STUDY_ID
+    session.delete(model)
+    session.commit()
+
+    redirect_url = url_for("edit_pre_review", study_id=study_id)
+    return redirect(redirect_url)

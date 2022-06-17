@@ -24,6 +24,23 @@
     </form>
 {% endif %}
 
+{% if 'Edit Pre Review' in title %}
+  <div>
+    <div>Pre Reviews</div>
+    <div>
+      {% for review in pre_reviews %}
+        <div>
+          <p>Date: {{ review.DATEENTERED }}</p>
+          <p>&nbsp; &nbsp;Comments: {{ review.COMMENTS }}</p>
+          <form action="{{ review.form_action }}" method="post">
+            <input type=submit value=Delete label="Delete">
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
 <form action="{{ action }}" method="post">
 
     {{ form.csrf_token() }}
