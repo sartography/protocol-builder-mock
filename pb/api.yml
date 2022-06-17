@@ -175,6 +175,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IRBInfo"
+  /returned_to_pi/{study_id}:
+    parameters:
+      - name: study_id
+        in: path
+        required: true
+        description: The id of the study
+        schema:
+          type: integer
+          format: int32
+    get:
+      tags:
+      - CR-Connect
+      operationId: pb.api.returned_to_pi
+      summary: Info when study is returned to PI
+      responses:
+        200:
+          description: Pre Review info about the study
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PreReview"
 components:
   schemas:
     Study:
@@ -642,3 +663,66 @@ components:
           type: string
           example: Non-UVA IRB Full Board
           description: Human readable version of Review Type
+    PreReview:
+      type: object
+      properties:
+        SS_STUDY_ID:
+          type: number
+          example: 1
+          description: The unique id of the study in Protocol Builder.
+        PROT_EVENT_ID:
+          type: number
+          example: 2
+          description: The unique id of the Pre Review event
+        DATEENTERED:
+          type: string
+          format: date_time
+          example: "2022-07-03 00:00:00+00:00"
+          description: The date this Pre Review event occurred
+        REVIEW_TYPE:
+          type: number
+          example: 3
+          description: The ID of the review type
+        UVA_STUDY_TRACKING:
+          type: number
+          example: 4
+          description: An identifier for the study. Should be the same as SS_STUDY_ID
+        COMMENTS:
+          type: string
+          format: string
+          example: Returned because reasons
+          description: A comment about the Pre Review
+        IRBREVIEWERADMIN:
+          type: string
+          format: string
+          example: abc13
+          description: The UVA user uid of the Reviewer Admin
+        FNAME:
+          type: string
+          format: string
+          example: Joanne
+          description: The first name of the Reviewer
+        LNAME:
+          type: string
+          format: string
+          example: Smith
+          description: The last name of the Reviewer
+        LOGIN:
+          type: string
+          format: string
+          example: xyz3a
+          description: The UVA user uid of the Reviewer
+        EVENT_TYPE:
+          type: number
+          example: 299
+          description: The ID for the event type (should be 299)
+        STATUS:
+          type: string
+          format: string
+          example: Error
+          description: Used when study has *not* been returned to the PI
+        DETAIL:
+          type: string
+          format: string
+          example: No records found.
+          description: Used when study has *not* been returned to the PI

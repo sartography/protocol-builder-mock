@@ -2,7 +2,8 @@ from pb import session
 from pb.models import Investigator, InvestigatorSchema, IRBInfo, IRBInfoSchema, IRBInfoErrorSchema,\
                       IRBStatus, IRBStatusSchema, RequiredDocument, RequiredDocumentSchema, \
                       Study, StudySchema, StudyDetails, StudyDetailsSchema, \
-                      StudySponsor, StudySponsorSchema, CreatorStudySchema
+                      StudySponsor, StudySponsorSchema, CreatorStudySchema, \
+                      PreReview, PreReviewSchema, PreReviewErrorSchema
 
 
 def get_user_studies(uva_id):
@@ -46,3 +47,11 @@ def current_irb_info(studyid):
     else:
         # IRB Online returns a list with 1 dictionary in this case
         return IRBInfoSchema(many=True).dump([irb_info])
+
+
+def returned_to_pi(study_id):
+    results = session.query(PreReview).filter(PreReview.SS_STUDY_ID == study_id).all()
+    if results:
+        return PreReviewSchema(many=True).dump(results)
+    pre_review = PreReview(STATUS='Error', DETAIL='No records found.')
+    return PreReviewErrorSchema().dump(pre_review)
