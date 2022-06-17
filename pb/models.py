@@ -458,3 +458,38 @@ class SelectedUserSchema(ma.Schema):
     class Meta:
         fields = ("user_id", "selected_user")
 
+
+class PreReview(db.Model):
+    __tablename__ = 'pre_review'
+
+    PROT_EVENT_ID = db.Column(db.Integer, primary_key=True)
+    SS_STUDY_ID = db.Column(db.Integer, db.ForeignKey('study.STUDYID'))
+    DATEENTERED = db.Column(db.DateTime(timezone=True), default=func.now())
+    REVIEW_TYPE = db.Column(db.Integer)
+    COMMENTS = db.Column(db.String)
+    IRBREVIEWERADMIN = db.Column(db.String)
+    FNAME = db.Column(db.String)
+    LNAME = db.Column(db.String)
+    LOGIN = db.Column(db.String)
+    EVENT_TYPE = db.Column(db.Integer)
+    STATUS = db.Column(db.String)
+    DETAIL = db.Column(db.String)
+
+
+class PreReviewSchema(ma.Schema):
+    class Meta:
+        model = PreReview
+        fields = ["SS_STUDY_ID", "PROT_EVENT_ID", "DATEENTERED", "REVIEW_TYPE", "UVA_STUDY_TRACKING",
+                  "COMMENTS", "IRBREVIEWERADMIN", "FNAME", "LNAME", "LOGIN", "EVENT_TYPE", "STATUS", "DETAIL"]
+
+    UVA_STUDY_TRACKING = fields.Method('get_uva_study_tracking', dump_only=True)
+
+    @staticmethod
+    def get_uva_study_tracking(obj):
+        return obj.SS_STUDY_ID
+
+
+class PreReviewErrorSchema(ma.Schema):
+    class Meta:
+        model = PreReview
+        fields = ["STATUS", "DETAIL"]
