@@ -1,11 +1,10 @@
 from flask_table import Table, Col, LinkCol, BoolCol, DatetimeCol, NestedTableCol
 from flask_wtf import FlaskForm
 from wtforms import SelectMultipleField, StringField, BooleanField, SelectField, validators, HiddenField, DateField, IntegerField
-from wtforms_alchemy import ModelForm
 from wtforms.widgets.html5 import DateInput
 from wtforms.validators import Optional
 
-from pb.models import RequiredDocument, Investigator, StudyDetails, IRBStatus, IRBInfo, IRBInfoEvent, IRBInfoStatus
+from pb.models import RequiredDocument, Investigator, IRBStatus, IRBInfoEvent, IRBInfoStatus
 
 
 class StudyForm(FlaskForm):
@@ -209,6 +208,11 @@ class StudyTable(Table):
         anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Edit Info'},
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Edit Info'}
     )
+    pre_review = LinkCol(
+        'check', 'edit_pre_review', url_kwargs=dict(study_id='STUDYID'),
+        anchor_attrs={'class': 'btn btn-icon btn-accent', 'title': 'Pre Review'},
+        th_html_attrs={'class': 'mat-icon text-center', 'title': 'Pre Review'}
+    )
     STUDYID = Col('Study Id')
     TITLE = Col('Title')
     NETBADGEID = Col('User')
@@ -223,3 +227,16 @@ class StudyTable(Table):
         th_html_attrs={'class': 'mat-icon text-center', 'title': 'Delete Study'}
     )
 
+
+class PreReviewForm(FlaskForm):
+    SS_STUDY_ID = HiddenField()
+    UVA_STUDY_TRACKING = StringField('UVA_STUDY_TRACKING', render_kw={'readonly': True})
+    DATEENTERED = DateField('DATEENTERED', widget=DateInput())
+    REVIEW_TYPE = IntegerField('REVIEW_TYPE')
+    COMMENTS = StringField('COMMENTS')
+    IRBREVIEWERADMIN = StringField('IRBREVIEWERADMIN')
+    FNAME = StringField('FNAME')
+    LNAME = StringField('LNAME')
+    LOGIN = StringField('LOGIN')
+    EVENT_TYPE = IntegerField('EVENT_TYPE', render_kw={'readonly': True})
+    STATUS_DETAIL = SelectField("STATUS/DETAIL", choices=['', 'Error: No Records Found', 'Record: Study returned to PI.'])

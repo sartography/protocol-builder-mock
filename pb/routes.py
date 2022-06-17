@@ -4,8 +4,8 @@ from pb.ldap.ldap_service import LdapService
 from pb.pb_mock import get_current_user, get_selected_user, update_selected_user, \
     render_study_template, _update_study, redirect_home, _update_irb_info, _allowed_file, \
     process_csv_study_details, has_no_empty_params, verify_required_document_list, verify_study_details_list
-from pb.forms import StudyForm, IRBInfoForm, InvestigatorForm, ConfirmDeleteForm, StudySponsorForm, StudyDetailsForm
-from pb.models import Study, StudyDetails, IRBInfo, IRBInfoEvent, IRBInfoStatus, IRBStatus, Investigator, Sponsor, StudySponsor, RequiredDocument
+from pb.forms import StudyForm, IRBInfoForm, InvestigatorForm, ConfirmDeleteForm, StudySponsorForm, StudyDetailsForm, PreReviewForm
+from pb.models import Study, StudyDetails, IRBInfo, IRBInfoEvent, IRBInfoStatus, IRBStatus, Investigator, Sponsor, StudySponsor, RequiredDocument, PreReview
 
 import json
 
@@ -441,3 +441,53 @@ def verify_study_details():
     else:
         flash('Study details are not up to date.', 'failure')
     return redirect_home()
+
+
+@app.route('/edit_pre_review/<study_id>', methods=['GET', 'POST'])
+def edit_pre_review(study_id):
+    study = db.session.query(Study).filter(Study.STUDYID == study_id).first()
+    pre_review_models = db.session.query(PreReview).filter(PreReview.SS_STUDY_ID == study_id).all()
+    pre_reviews = []
+    for model in pre_review_models:
+        pre_reviews.append({
+            'DATEENTERED': model.DATEENTERED,
+            'COMMENTS': model.COMMENTS,
+            'PROT_EVENT_ID': model.PROT_EVENT_ID,
+            'form_action': BASE_HREF + "/delete_pre_review/" + str(model.PROT_EVENT_ID)
+        })
+    form = PreReviewForm(request.form, obj=study)
+    if request.method == 'GET':
+        form.UVA_STUDY_TRACKING.data = study_id
+        form.EVENT_TYPE.data = 299
+    if request.method == 'POST':
+        if form.validate():
+            pre_review = PreReview(
+                PROT_EVENT_ID=None,
+                SS_STUDY_ID=study_id,
+                DATEENTERED=form.DATEENTERED.data,
+                REVIEW_TYPE=form.REVIEW_TYPE.data,
+                COMMENTS=form.COMMENTS.data,
+                IRBREVIEWERADMIN=form.IRBREVIEWERADMIN.data,
+                FNAME=form.FNAME.data,
+                LNAME=form.LNAME.data,
+                LOGIN=form.LOGIN.data,
+                EVENT_TYPE=299,
+                STATUS='Record',
+                DETAIL='Study returned to PI.'
+            )
+            session.add(pre_review)
+            session.commit()
+            flash('Pre-Review updated successfully!', 'success')
+            return redirect_home()
+    action = BASE_HREF + "/edit_pre_review/" + study_id
+    title = "Edit Pre Review"
+    return render_template(
+        'form.html',
+        form=form,
+        action=action,
+        title=title,
+        description_map={'PROT_EVENT_ID': 'Assigned by DB'},
+        base_href=BASE_HREF,
+        pre_reviews=pre_reviews
+    )
+
