@@ -290,7 +290,7 @@ class TestSanity(unittest.TestCase):
         for i in range(5):
             self.add_pre_review(study.STUDYID, i)
 
-        result = self.app.get(f'/v2.0/returned_to_pi/{study.STUDYID}', follow_redirects=False)
+        result = self.app.get(f'/v2.0/pre_reviews/{study.STUDYID}', follow_redirects=False)
         reviews = json.loads(result.get_data(as_text=True))
         self.assertEqual(len(reviews), 5)
         for i in range(5):
@@ -300,7 +300,7 @@ class TestSanity(unittest.TestCase):
 
     def test_pre_review_no_review(self):
         study = self.add_study()
-        result = self.app.get(f'/v2.0/returned_to_pi/{study.STUDYID}', follow_redirects=False)
+        result = self.app.get(f'/v2.0/pre_reviews/{study.STUDYID}', follow_redirects=False)
         reviews = json.loads(result.get_data(as_text=True))
         self.assertEqual(len(reviews), 2)
         self.assertEqual(reviews['STATUS'], 'Error')
@@ -310,7 +310,7 @@ class TestSanity(unittest.TestCase):
         study = self.add_study()
         for i in range(2):
             self.add_pre_review(study.STUDYID, i)
-        result = self.app.get(f'/v2.0/returned_to_pi/{study.STUDYID}', follow_redirects=False)
+        result = self.app.get(f'/v2.0/pre_reviews/{study.STUDYID}', follow_redirects=False)
         reviews = json.loads(result.get_data(as_text=True))
         self.assertEqual(len(reviews), 2)
         review_0_id = reviews[0]['PROT_EVENT_ID']
@@ -320,7 +320,7 @@ class TestSanity(unittest.TestCase):
 
         self.app.post(f'/delete_pre_review/{review_0_id}')
 
-        result = self.app.get(f'/v2.0/returned_to_pi/{study.STUDYID}', follow_redirects=False)
+        result = self.app.get(f'/v2.0/pre_reviews/{study.STUDYID}', follow_redirects=False)
         reviews = json.loads(result.get_data(as_text=True))
         self.assertEqual(len(reviews), 1)
         self.assertEqual(reviews[0]['PROT_EVENT_ID'], review_1_id)

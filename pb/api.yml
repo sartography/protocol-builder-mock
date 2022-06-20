@@ -175,7 +175,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/IRBInfo"
-  /returned_to_pi/{study_id}:
+  /pre_reviews/{study_id}:
     parameters:
       - name: study_id
         in: path
@@ -187,7 +187,7 @@ paths:
     get:
       tags:
       - CR-Connect
-      operationId: pb.api.returned_to_pi
+      operationId: pb.api.pre_reviews
       summary: Info when study is returned to PI
       responses:
         200:

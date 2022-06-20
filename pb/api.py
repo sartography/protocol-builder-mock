@@ -49,7 +49,7 @@ def current_irb_info(studyid):
         return IRBInfoSchema(many=True).dump([irb_info])
 
 
-def returned_to_pi(study_id):
+def pre_reviews(study_id):
     results = session.query(PreReview).filter(PreReview.SS_STUDY_ID == study_id).all()
     if results:
         return PreReviewSchema(many=True).dump(results)
