@@ -12,21 +12,23 @@ from pb import app, db, session
 from pb.api import current_irb_info
 from pb.forms import StudyForm, StudySponsorForm
 from pb.ldap.ldap_service import LdapService
-from pb.models import Study, RequiredDocument, Sponsor, StudySponsor, IRBStatus, Investigator, IRBInfo, StudyDetails, IRBInfoEvent, IRBInfoStatus
+from pb.models import Study, RequiredDocument, Sponsor, StudySponsor, IRBStatus, Investigator, IRBInfo, StudyDetails, IRBInfoEvent, IRBInfoStatus, PreReview
 from example_data import ExampleDataLoader
 
 
-class Sanity_Check_Test(unittest.TestCase):
+class TestSanity(unittest.TestCase):
     auths = {}
 
     @classmethod
     def setUpClass(cls):
+        ExampleDataLoader().clean_db()
         cls.ctx = app.test_request_context()
         cls.app = app.test_client()
         db.create_all()
 
     @classmethod
     def tearDownClass(cls):
+        ExampleDataLoader().clean_db()
         db.drop_all()
 
     def setUp(self):
@@ -71,6 +73,25 @@ class Sanity_Check_Test(unittest.TestCase):
         self.assertEqual(num_reqs+1, num_docs_before)
 
         return added_study
+
+    @staticmethod
+    def add_pre_review(study_id, i):
+        pre_review = PreReview(
+            SS_STUDY_ID=study_id,
+            DATEENTERED=None,
+            REVIEW_TYPE=2,
+            COMMENTS=f'This is my comment {i}',
+            IRBREVIEWERADMIN=f'abc-{i}',
+            FNAME=f'Firstname_{i}',
+            LNAME=f'Lastname_{i}',
+            LOGIN=f'login_{i}',
+            EVENT_TYPE=299,
+            STATUS='Record',
+            DETAIL='Study returned to PI.'
+        )
+        session.add(pre_review)
+        session.commit()
+        return pre_review
 
     def test_add_and_edit_study(self):
         """Add and edit a study"""
@@ -272,3 +293,44 @@ class Sanity_Check_Test(unittest.TestCase):
         self.assertIsNone(api_irb_info[0]['IRBEVENT_ID'])
         self.assertIsNone(api_irb_info[0]['STATUS'])
         self.assertIsNone(api_irb_info[0]['DETAIL'])
+
+    def test_pre_review(self):
+        study = self.add_study()
+        for i in range(5):
+            self.add_pre_review(study.STUDYID, i)
+
+        result = self.app.get(f'/v2.0/pre_reviews/{study.STUDYID}', follow_redirects=False)
+        reviews = json.loads(result.get_data(as_text=True))
+        self.assertEqual(len(reviews), 5)
+        for i in range(5):
+            self.assertEqual(reviews[i]['COMMENTS'], f'This is my comment {i}')
+            self.assertEqual(reviews[i]['PROT_EVENT_ID'], i + 1)  # python starts at 0, postgres starts  at 1
+            self.assertEqual(reviews[i]['STATUS'], 'Record')
+
+    def test_pre_review_no_review(self):
+        study = self.add_study()
+        result = self.app.get(f'/v2.0/pre_reviews/{study.STUDYID}', follow_redirects=False)
+        reviews = json.loads(result.get_data(as_text=True))
+        self.assertEqual(len(reviews), 2)
+        self.assertEqual(reviews['STATUS'], 'Error')
+        self.assertEqual(reviews['DETAIL'], 'No records found.')
+
+    def test_pre_review_delete(self):
+        study = self.add_study()
+        for i in range(2):
+            self.add_pre_review(study.STUDYID, i)
+        result = self.app.get(f'/v2.0/pre_reviews/{study.STUDYID}', follow_redirects=False)
+        reviews = json.loads(result.get_data(as_text=True))
+        self.assertEqual(len(reviews), 2)
+        review_0_id = reviews[0]['PROT_EVENT_ID']
+        review_1_id = reviews[1]['PROT_EVENT_ID']
+        self.assertEqual(reviews[0]['COMMENTS'], 'This is my comment 0')
+        self.assertEqual(reviews[1]['COMMENTS'], 'This is my comment 1')
+
+        self.app.post(f'/delete_pre_review/{review_0_id}')
+
+        result = self.app.get(f'/v2.0/pre_reviews/{study.STUDYID}', follow_redirects=False)
+        reviews = json.loads(result.get_data(as_text=True))
+        self.assertEqual(len(reviews), 1)
+        self.assertEqual(reviews[0]['PROT_EVENT_ID'], review_1_id)
+        self.assertEqual(reviews[0]['COMMENTS'], 'This is my comment 1')
