@@ -51,8 +51,9 @@ jobs:
         with:
           python-version: '3.9'
           architecture: 'x64'
-      - run: psql -h localhost -c 'create database pb_test;' -U postgres
 
+      - name: Setup Database
+      - run: psql -h localhost -c 'create database pb_test;' -U postgres
 
       - name: Upgrade pip
         run: |
