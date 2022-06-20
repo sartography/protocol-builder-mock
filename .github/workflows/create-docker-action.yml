@@ -30,10 +30,9 @@ jobs:
       - uses: browser-actions/setup-chrome@latest
         with:
           chrome-version: stable
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          architecture: 'x64'
 
       - name: Setup Database
         run: psql -h localhost -c 'create database pb_test;' -U postgres
