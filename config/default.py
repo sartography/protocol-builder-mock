@@ -17,7 +17,7 @@ APPLICATION_ROOT = re.sub(r'//', '/', '/%s/' % environ.get('APPLICATION_ROOT', d
 
 DB_HOST = environ.get('DB_HOST', default="localhost")
 DB_PORT = environ.get('DB_PORT', default="5432")
-DB_NAME = environ.get('DB_NAME', default="pb")
+DB_NAME = environ.get('DB_NAME', default="pb2")
 DB_USER = environ.get('DB_USER', default="crc_user")
 DB_PASSWORD = environ.get('DB_PASSWORD', default="crc_pass")
 SQLALCHEMY_DATABASE_URI = environ.get(
