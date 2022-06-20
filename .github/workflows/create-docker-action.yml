@@ -75,9 +75,7 @@ jobs:
           poetry --version
           
       - name: Run the tests
-        run: |
-          poetry run coverage run -m pytest
-          poetry run coverage xml -i
+        run: poetry run -m pytest
 
   build-and-push-image:
     needs:
