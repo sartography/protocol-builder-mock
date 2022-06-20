@@ -53,7 +53,7 @@ jobs:
           architecture: 'x64'
 
       - name: Setup Database
-      - run: psql -h localhost -c 'create database pb_test;' -U postgres
+        run: psql -h localhost -c 'create database pb_test;' -U postgres
 
       - name: Upgrade pip
         run: |
@@ -75,8 +75,9 @@ jobs:
           poetry --version
           
       - name: Run the tests
-      - run: poetry run coverage run -m pytest
-      - run: poetry run coverage xml -i
+        run: |
+          poetry run coverage run -m pytest
+          poetry run coverage xml -i
 
   build-and-push-image:
     needs:
