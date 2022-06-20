@@ -25,4 +25,3 @@ COPY . /app/
 # otherwise it does not know what the main app module is
 RUN poetry install
 
-CMD ./bin/boot_server_in_docker
