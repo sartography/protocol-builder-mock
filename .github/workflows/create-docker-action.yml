@@ -64,7 +64,6 @@ jobs:
   build-and-push-image:
     needs:
       - run_tests
-      - sonarcloud
     runs-on: ubuntu-latest
     permissions:
       contents: read
