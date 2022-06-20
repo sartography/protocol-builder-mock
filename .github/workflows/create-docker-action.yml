@@ -31,7 +31,6 @@ jobs:
         with:
           chrome-version: stable
       - uses: actions/setup-python@v4
-        run: python -V
         with:
           python-version: '3.9'
 
@@ -55,7 +54,7 @@ jobs:
 
       - name: Install Poetry
         run: |
-          pipx install --pip-args=--constraint=.github/workflows/constraints.txt poetry
+          pip install --pip-args=--constraint=.github/workflows/constraints.txt poetry
           poetry --version
           poetry install
           poetry env use 3.9
