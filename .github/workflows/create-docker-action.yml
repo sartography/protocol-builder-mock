@@ -52,10 +52,30 @@ jobs:
           python-version: '3.9'
           architecture: 'x64'
       - run: psql -h localhost -c 'create database pb_test;' -U postgres
-      - run: pip install pipenv
-      - run: pipenv install --dev
-      - run: pipenv run coverage run -m pytest
-      - run: pipenv run coverage xml -i
+
+
+      - name: Upgrade pip
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt pip
+          pip --version
+
+      - name: Upgrade pip in virtual environments
+        shell: python
+        run: |
+          import os
+          import pip
+
+          with open(os.environ["GITHUB_ENV"], mode="a") as io:
+              print(f"VIRTUALENV_PIP={pip.__version__}", file=io)
+
+      - name: Install Poetry
+        run: |
+          pipx install --pip-args=--constraint=.github/workflows/constraints.txt poetry
+          poetry --version
+          
+      - name: Run the tests
+      - run: poetry run coverage run -m pytest
+      - run: poetry run coverage xml -i
 
   build-and-push-image:
     needs:

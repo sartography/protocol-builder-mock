@@ -135,7 +135,16 @@ class Sanity_Check_Test(unittest.TestCase):
         status_id ='2'
         status_string = f"('{status_id}', '{status}')"
 
-        self.app.post(f'/irb_info/{study.STUDYID}', data={'UVA_STUDY_TRACKING': tracking_string, 'IRBEVENT': event_string, 'IRB_STATUS': status_string, 'IRB_REVIEW_TYPE': 'Expedited', 'IRB_ONLINE_STATUS': 'Downloaded'})
+        self.app.post(f'/irb_info/{study.STUDYID}',
+                      data={'UVA_STUDY_TRACKING': tracking_string,
+                            'IRBEVENT': event_string,
+                            'IRB_STATUS': status_string,
+                            'IRB_REVIEW_TYPE': 'Expedited',
+                            'IRB_ONLINE_STATUS': 'Downloaded',
+                            'IRB_ADMINISTRATIVE_REVIEWER': 'DanTheMan',
+                            'IRB_OF_RECORD': '',
+                            'STUDYIRBREVIEWERADMIN':''})
+
         count = IRBInfo.query.filter(IRBInfo.SS_STUDY_ID == study.STUDYID).count()
         self.assertGreater(count, 0)
 
