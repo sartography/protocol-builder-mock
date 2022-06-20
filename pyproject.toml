@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "protocol-builder-mock"
+version = "0.1.0"
+description = "Mock of the Protocol Builder at UVA so we can test."
+authors = ["Dan <dan@sartography.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+flask = "2.1.*"
+connexion = {extras = ["swagger-ui"], version = "2.*.*"}
+gevent = "21.*.*"
+flask-wtf = "1.*.*"
+sqlalchemy = "1.*.*"
+flask-sqlalchemy = "2.*.*"
+flask-assets = "2.*.*"
+flask-table = "0.*.*"
+flask-migrate = "3.*.*"
+flask-marshmallow = "0.*.*"
+ldap3 = "2.*.*"
+ma = "1.*.*"
+marshmallow-sqlalchemy = "0.*.*"
+wtforms-alchemy = "0.*.*"
+psycopg2-binary = "2.9.*"
+pyscss = "1.*.*"
+gunicorn = "20.*.*"
+werkzeug = "2.1.*"
+flask-cors = "3.*.*"
+
+[tool.poetry.dev-dependencies]
+pbr = "5.*.*"
+coverage = "6.*.*"
+pytest = "7.*.*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

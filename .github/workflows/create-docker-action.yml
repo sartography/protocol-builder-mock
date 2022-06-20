@@ -2,15 +2,76 @@ name: Create and publish a Docker image
 
 on:
   push:
-    branches: ['master']
+    branches: ['main', 'chore/*', 'feature/*', 'bug/*']
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-
+  SQLALCHEMY_DATABASE_URI: "postgresql://postgres:postgres@localhost:5432/pb_test"
+  PGPASSWORD: postgres
 jobs:
-  build-and-push-image:
+  run_tests:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: stable
+      - run: python -V
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Setup Database
+        run: psql -h localhost -c 'create database pb_test;' -U postgres
+
+      - name: Upgrade pip
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt pip
+          pip --version
+          python -V
+
+      - name: Upgrade pip in virtual environments
+        shell: python
+        run: |
+          import os
+          import pip
+
+          with open(os.environ["GITHUB_ENV"], mode="a") as io:
+              print(f"VIRTUALENV_PIP={pip.__version__}", file=io)
+
+      - name: Install Poetry
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt poetry
+          poetry --version
+          poetry install
+          poetry env use 3.9
+          python -V
+
+
+      - name: Run the tests
+        run: |
+          ls -a
+          poetry run pytest
+
+  build-and-push-image:
+    needs:
+      - run_tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
