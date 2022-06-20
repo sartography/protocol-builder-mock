@@ -1,6 +1,6 @@
-FROM quay.io/sartography/python:3.8
+FROM ghcr.io/sartography/python:3.9
 
-RUN pip install pipenv
+RUN pip install poetry
 RUN useradd _gunicorn --no-create-home --user-group
 
 RUN apt-get update && \
@@ -10,9 +10,8 @@ RUN apt-get update && \
         gunicorn3 postgresql-client
 
 WORKDIR /app
-COPY Pipfile Pipfile.lock /app/
-RUN cd /app && pipenv lock --keep-outdated --requirements > requirements.txt
-RUN pip install -r /app/requirements.txt
+COPY pyproject.toml poetry.lock /app/
+RUN poetry install
 
 RUN set -xe \
   && apt-get remove -y gcc python3-dev libssl-dev \
@@ -21,4 +20,9 @@ RUN set -xe \
   && rm -rf /var/lib/apt/lists/*
 
 COPY . /app/
-WORKDIR /app
+
+# run poetry install again AFTER copying the app into the image
+# otherwise it does not know what the main app module is
+RUN poetry install
+
+CMD ./bin/boot_server_in_docker

@@ -1,8 +1,8 @@
 from flask_table import Table, Col, LinkCol, BoolCol, DatetimeCol, NestedTableCol
 from flask_wtf import FlaskForm
 from wtforms import SelectMultipleField, StringField, BooleanField, SelectField, validators, HiddenField, DateField, IntegerField
+from wtforms.widgets import DateInput
 from wtforms_alchemy import ModelForm
-from wtforms.widgets.html5 import DateInput
 from wtforms.validators import Optional
 
 from pb.models import RequiredDocument, Investigator, StudyDetails, IRBStatus, IRBInfo, IRBInfoEvent, IRBInfoStatus

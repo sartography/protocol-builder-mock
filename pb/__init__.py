@@ -49,20 +49,6 @@ app.static_url_path = app.config['APPLICATION_ROOT'] + 'static'
 print('app.static_folder', app.static_folder)
 print('app.static_url_path', app.static_url_path)
 
-# remove old static map
-url_map = app.url_map
-try:
-    for rule in url_map.iter_rules('static'):
-        url_map._rules.remove(rule)
-except ValueError:
-    # no static view was created yet
-    pass
-
-# register new; the same view function is used
-app.add_url_rule(
-    app.static_url_path + '/<path:filename>',
-    endpoint='static', view_func=app.send_static_file)
-
 assets = Environment(app)
 assets.init_app(app)
 assets.url = app.static_url_path
