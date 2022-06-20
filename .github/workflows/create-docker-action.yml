@@ -55,7 +55,7 @@ jobs:
 
       - name: Install Poetry
         run: |
-          pip install --pip-args=--constraint=.github/workflows/constraints.txt poetry
+          pip install --constraint=.github/workflows/constraints.txt poetry
           poetry --version
           poetry install
           poetry env use 3.9
