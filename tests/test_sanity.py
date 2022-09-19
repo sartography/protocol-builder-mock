@@ -152,7 +152,7 @@ class TestSanity(unittest.TestCase):
         event_id = '57'
         event_string = f"('{event_id}', '{event}')"
 
-        status = 'Open to enrollment'
+        status = 'Open to Enrollment'
         status_id ='2'
         status_string = f"('{status_id}', '{status}')"
 
