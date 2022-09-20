@@ -69,6 +69,7 @@ class Study(db.Model):
     TITLE = db.Column(db.Text(), nullable=False)
     NETBADGEID = db.Column(db.String(), nullable=False)
     DATE_MODIFIED = db.Column(db.DateTime(timezone=True), default=func.now())
+    DATE_CREATED = db.Column(db.DateTime(timezone=True), default=func.now())
     Q_COMPLETE = db.relationship("IRBStatus", backref="study", lazy='dynamic')
     irb_info = db.relationship("IRBInfo", backref="study", lazy='dynamic')
     requirements = db.relationship("RequiredDocument", backref="study", lazy='dynamic')
