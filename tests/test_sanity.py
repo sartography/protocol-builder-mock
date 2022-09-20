@@ -67,11 +67,6 @@ class TestSanity(unittest.TestCase):
         assert r.status_code == 302
         added_study = Study.query.filter(Study.TITLE == study_title).first()
         assert added_study
-
-        num_docs_before = RequiredDocument.query.filter(Study.STUDYID == added_study.STUDYID).count()
-        # We get 1 extra document, because code 39 adds 2 documents
-        self.assertEqual(num_reqs+1, num_docs_before)
-
         return added_study
 
     @staticmethod
@@ -334,3 +329,13 @@ class TestSanity(unittest.TestCase):
         self.assertEqual(len(reviews), 1)
         self.assertEqual(reviews[0]['PROT_EVENT_ID'], review_1_id)
         self.assertEqual(reviews[0]['COMMENTS'], 'This is my comment 1')
+
+    def test_required_documents(self):
+        document_count = len(RequiredDocument.all())
+        num_docs_before = RequiredDocument.query.count()
+        self.assertEqual(0, num_docs_before)
+        self.add_study()
+        num_docs_after = RequiredDocument.query.count()
+        # We get 1 extra document, because code 39 adds 2 documents
+        self.assertEqual(document_count+1, num_docs_after)
+
