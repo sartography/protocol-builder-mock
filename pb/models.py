@@ -117,7 +117,7 @@ class IRBInfoStatus(db.Model):
         status = [IRBInfoStatus(STATUS_ID='', STATUS=''),
                   IRBInfoStatus(STATUS_ID='30', STATUS='In PreReview New Protocol'),
                   IRBInfoStatus(STATUS_ID='31', STATUS='PreReview Complete New Protocol'),
-                  IRBInfoStatus(STATUS_ID='2', STATUS='Open to enrollment'),
+                  IRBInfoStatus(STATUS_ID='2', STATUS='Open to Enrollment'),
                   IRBInfoStatus(STATUS_ID='39', STATUS='Withdrawn'),
                   IRBInfoStatus(STATUS_ID='37', STATUS='Disapproved'),
                   IRBInfoStatus(STATUS_ID='35', STATUS='Approvable with Conditions')]
