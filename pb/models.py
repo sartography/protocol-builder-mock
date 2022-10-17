@@ -98,7 +98,8 @@ class IRBInfoEvent(db.Model):
                  IRBInfoEvent(EVENT_ID='346', EVENT='Receipt of Non-UVA Study'),
                  IRBInfoEvent(EVENT_ID='317', EVENT='Disapproved New Protocol'),
                  IRBInfoEvent(EVENT_ID='62', EVENT='Closed by PI'),
-                 IRBInfoEvent(EVENT_ID='63', EVENT='Receipt of New Protocol')]
+                 IRBInfoEvent(EVENT_ID='63', EVENT='Receipt of New Protocol'),
+                 IRBInfoEvent(EVENT_ID='359', EVENT='Administrative Review Complete – Non-UVA IRB')]
         return event
 
 
