@@ -98,7 +98,8 @@ class IRBInfoEvent(db.Model):
                  IRBInfoEvent(EVENT_ID='346', EVENT='Receipt of Non-UVA Study'),
                  IRBInfoEvent(EVENT_ID='317', EVENT='Disapproved New Protocol'),
                  IRBInfoEvent(EVENT_ID='62', EVENT='Closed by PI'),
-                 IRBInfoEvent(EVENT_ID='63', EVENT='Receipt of New Protocol')]
+                 IRBInfoEvent(EVENT_ID='63', EVENT='Receipt of New Protocol'),
+                 IRBInfoEvent(EVENT_ID='359', EVENT='Administrative Review Complete – Non-UVA IRB')]
         return event
 
 
@@ -292,7 +293,8 @@ class RequiredDocument(db.Model):
                 RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=56, AUXILIARY_DOC="Unaffiliated Investigator Agreement "),
                 RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=57, AUXILIARY_DOC="Laser Safety Officer Approval"),
                 RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=58, AUXILIARY_DOC="FDA Letter granting IND/IDE# or exemption"),
-                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=59, AUXILIARY_DOC="SOM CTO Review for Gene Therapy/Transfer Study")]
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=59, AUXILIARY_DOC="SOM CTO Review for Gene Therapy/Transfer Study"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=60, AUXILIARY_DOC="Recruitment Material")]
         return docs
 
 
