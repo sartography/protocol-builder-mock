@@ -294,7 +294,8 @@ class RequiredDocument(db.Model):
                 RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=57, AUXILIARY_DOC="Laser Safety Officer Approval"),
                 RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=58, AUXILIARY_DOC="FDA Letter granting IND/IDE# or exemption"),
                 RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=59, AUXILIARY_DOC="SOM CTO Review for Gene Therapy/Transfer Study"),
-                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=60, AUXILIARY_DOC="Recruitment Material")]
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=60, AUXILIARY_DOC="Recruitment Material"),
+                RequiredDocument(SS_AUXILIARY_DOC_TYPE_ID=60, AUXILIARY_DOC="Radioactive Material Use Approval")]
         return docs
 
 
