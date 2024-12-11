@@ -35,7 +35,7 @@ class IRBInfoForm(FlaskForm):
     IRB_ADMINISTRATIVE_REVIEWER = StringField('IRB_ADMINISTRATIVE_REVIEWER')
     AGENDA_DATE = DateField('AGENDA_DATE', [Optional()], widget=DateInput())
     IRB_REVIEW_TYPE = SelectField("IRB_REVIEW_TYPE",
-                                  choices=['None', 'Full Committee', 'Expedited', 'Non-UVA IRB Full Board', 'Non-UVA IRB Expedited'])
+                                  choices=['None', 'Full Committee', 'Expedited', 'Non-UVA IRB - Full Board', 'Non-UVA IRB Expedited'])
     IRBEVENT = SelectField("IRBEVENT_ID / IRBEVENT",
                            choices=[((q.EVENT_ID, q.EVENT), f"{q.EVENT_ID} {q.EVENT}") for q in IRBInfoEvent.all()])
     IRB_STATUS = SelectField("IRB_STATUS_ID / IRB_STATUS",
