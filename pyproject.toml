@@ -8,7 +8,7 @@ authors = ["Dan <dan@sartography.com>"]
 python = "^3.9"
 flask = "==2.2.5"
 connexion = {extras = [ "swagger-ui", "flask" ], version = "~=2.14.1"}
-gevent = "21.*.*"
+gevent = "23.*.*"
 flask-wtf = "1.*.*"
 sqlalchemy = "<2"
 flask-sqlalchemy = "2.*.*"
