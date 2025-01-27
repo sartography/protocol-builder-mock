@@ -89,16 +89,18 @@ class IRBInfoEvent(db.Model):
     @staticmethod
     def all():
         event = [IRBInfoEvent(EVENT_ID='', EVENT=''),
-                 IRBInfoEvent(EVENT_ID='299', EVENT='PreReview Returned to PI New Protocol'),
                  IRBInfoEvent(EVENT_ID='2', EVENT='Pending Full Committee Review'),
+                 IRBInfoEvent(EVENT_ID='23', EVENT='Non-UVA IRB - Expedited'),
+                 IRBInfoEvent(EVENT_ID='24', EVENT='Non-UVA IRB - Full Board'),
                  IRBInfoEvent(EVENT_ID='57', EVENT='Approval New Protocol'),
+                 IRBInfoEvent(EVENT_ID='62', EVENT='Closed by PI'),
+                 IRBInfoEvent(EVENT_ID='63', EVENT='Receipt of New Protocol'),
+                 IRBInfoEvent(EVENT_ID='299', EVENT='PreReview Returned to PI New Protocol'),
                  IRBInfoEvent(EVENT_ID='300', EVENT='Approvable with Conditions-New Protocol'),
                  IRBInfoEvent(EVENT_ID='312', EVENT='Condition Response Accepted-New Protocol'),
                  IRBInfoEvent(EVENT_ID='316', EVENT='Deferred New Protocol'),
-                 IRBInfoEvent(EVENT_ID='346', EVENT='Receipt of Non-UVA Study'),
                  IRBInfoEvent(EVENT_ID='317', EVENT='Disapproved New Protocol'),
-                 IRBInfoEvent(EVENT_ID='62', EVENT='Closed by PI'),
-                 IRBInfoEvent(EVENT_ID='63', EVENT='Receipt of New Protocol'),
+                 IRBInfoEvent(EVENT_ID='346', EVENT='Receipt of Non-UVA Study'),
                  IRBInfoEvent(EVENT_ID='359', EVENT='Administrative Review Complete – Non-UVA IRB')]
         return event
 
