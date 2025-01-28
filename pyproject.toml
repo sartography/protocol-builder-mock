@@ -3,6 +3,7 @@ name = "protocol-builder-mock"
 version = "0.1.0"
 description = "Mock of the Protocol Builder at UVA so we can test."
 authors = ["Dan <dan@sartography.com>"]
+package-mode = false
 
 
 [tool.poetry.dependencies]
