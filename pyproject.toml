@@ -4,11 +4,12 @@ version = "0.1.0"
 description = "Mock of the Protocol Builder at UVA so we can test."
 authors = ["Dan <dan@sartography.com>"]
 
+
 [tool.poetry.dependencies]
 python = "^3.9"
 flask = "==2.2.5"
 connexion = {extras = [ "swagger-ui", "flask" ], version = "~=2.14.1"}
-gevent = "21.*.*"
+gevent = "23.*.*"
 flask-wtf = "1.*.*"
 sqlalchemy = "<2"
 flask-sqlalchemy = "2.*.*"
@@ -26,7 +27,7 @@ gunicorn = "20.*.*"
 werkzeug = "~=2.2.2"
 flask-cors = "3.*.*"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pbr = "5.*.*"
 coverage = "6.*.*"
 pytest = "7.*.*"

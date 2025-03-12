@@ -11,7 +11,7 @@ RUN apt-get update && \
 
 WORKDIR /app
 COPY pyproject.toml poetry.lock /app/
-RUN poetry install
+RUN poetry install --no-root
 
 RUN set -xe \
   && apt-get remove -y gcc python3-dev libssl-dev \
