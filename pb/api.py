@@ -7,8 +7,19 @@ from pb.models import Investigator, InvestigatorSchema, IRBInfo, IRBInfoSchema, 
 
 
 def get_user_studies(uva_id):
-    studies = session.query(Study).filter(Study.NETBADGEID == uva_id).all()
-    return CreatorStudySchema(many=True).dump(studies)
+    non_exempt_studies = []
+    exempt_studies = []
+    studies = (session.query(Study).filter(Study.NETBADGEID == uva_id).all())
+    for study in studies:
+        irb_info = study.irb_info.first()
+        if hasattr(irb_info, 'IRB_REVIEW_TYPE'):
+            if irb_info.IRB_REVIEW_TYPE != 'Exempt':
+                non_exempt_studies.append(study)
+            else:
+                exempt_studies.append(study)
+        else:
+            non_exempt_studies.append(study)
+    return CreatorStudySchema(many=True).dump(non_exempt_studies)
 
 
 def required_docs(studyid):

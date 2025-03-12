@@ -160,6 +160,7 @@ class IRBInfoSchema(ma.Schema):
     IRBEVENT_ID = fields.Method("get_event_id")
     IRB_STATUS = fields.Method("get_status")
     IRB_STATUS_ID = fields.Method("get_status_id")
+    IRB_REVIEW_TYPE = fields.Method("get_review_type")
     STATUS = fields.Method("get_online_status")
     DETAIL = fields.Method("get_online_detail")
 
@@ -182,6 +183,11 @@ class IRBInfoSchema(ma.Schema):
     def get_status_id(obj):
         if obj is not None and hasattr(obj, 'IRB_STATUS'):
             return obj.IRB_STATUS[0].STATUS_ID
+
+    @staticmethod
+    def get_review_type(obj):
+        if obj is not None and hasattr(obj, 'IRB_REVIEW_TYPE'):
+            return obj.IRB_REVIEW_TYPE
 
     @staticmethod
     def get_online_status(obj):
